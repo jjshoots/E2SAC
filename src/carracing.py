@@ -11,20 +11,18 @@ class Environment():
 
         self.image_size = image_size
         self.frame_stack = 4
-        self.max_off_track = 100
+        self.max_off_track = 50
         self.steps = 0
         self.max_steps = 1000
 
         self.env = gym.make('CarRacing-v0', verbose=verbose)
-        self.min_actions = self.env.action_space.low
-        self.max_actions = self.env.action_space.high
-        self.num_actions = self.env.action_space.shape[0]
-
-        self.a_mean = (self.max_actions + self.min_actions) / 2.
-        self.a_range = self.max_actions - self.min_actions
+        self.num_actions = 2
+        self.max_accel = 0.3
+        self.max_brake = 0.5
 
         self.steps = 0
         self.off_track_t = 0
+        self.cumulative_reward = 0
         self.state = np.zeros((1, *self.image_size))
 
         self.reset()
@@ -33,9 +31,12 @@ class Environment():
     def reset(self):
         self.env.reset()
         for _ in range(50):
+            self.off_track_t = 0
             self.step(np.zeros(self.num_actions), startup=True)
 
         self.steps = 0
+        self.off_track_t = 0
+        self.cumulative_reward = 0
         self.state = np.concatenate([self.transform_obs(self.env.env.state)] * self.frame_stack, 0)
 
 
@@ -47,7 +48,7 @@ class Environment():
     def step(self, action, startup=False):
 
         """
-        actions are expected to be of shape [num_envs, self.action_space.shape]
+        actions are expected to be of shape [2]
 
         output:
             observations of shape [observation_shape]
@@ -56,8 +57,10 @@ class Environment():
             labels of shape [num_actions]
         """
 
-        # rescale and shift
-        action = action / (self.a_range / 2.) + self.a_mean
+        steer = action[0]
+        accel = ((action[1]) > 0) * abs(action[1]) * self.max_accel
+        brake = ((action[1]) < 0) * abs(action[1]) * self.max_brake
+        action = np.array([steer, accel, brake])
 
         obs, rwd, dne, _ = self.env.step(action)
 
@@ -77,6 +80,8 @@ class Environment():
             dne = 0.
 
         self.steps += 1
+
+        self.cumulative_reward += rwd
 
         return self.state, rwd, dne, label
 
@@ -106,7 +111,7 @@ class Environment():
         # cv2.imshow('something', obs)
         # cv2.waitKey(100000)
         # crop the image just above the car
-        obs = obs[41:43, 15:49]
+        obs = obs[38:40, 15:49]
         # find the centre of the track
         obs = cv2.findNonZero(obs)
 
@@ -117,8 +122,6 @@ class Environment():
             obs = 0.
 
         steering = 2. * obs
-        accel = 0.3
-        brake = abs(obs) ** 2
+        accel = 0.5
 
-        label = np.clip(np.array([steering, accel, brake]), -0.99, 0.99)
-        return (label - self.a_mean) * (self.a_range / 2.)
+        return np.clip(np.array([steering, accel]), -0.99, 0.99)

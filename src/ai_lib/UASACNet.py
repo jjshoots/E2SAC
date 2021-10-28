@@ -12,13 +12,15 @@ class Backbone(nn.Module):
     def __init__(self):
         super().__init__()
 
-        _features_description = [28, 128, 128]
-        _activation_description = ['lrelu'] * (len(_features_description) - 1)
-        self.net = Neural_blocks.generate_linear_stack(_features_description, _activation_description)
+        channels = [4, 128, 128, 256, 256, 512, 128]
+        kernels = [3] * (len(channels) - 1)
+        pooling = [2] * (len(channels) - 1)
+        activation = ['lrelu'] * len(kernels)
+        self.net = Neural_blocks.generate_conv_stack(channels, kernels, pooling, activation)
 
 
     def forward(self, state):
-        return self.net(state)
+        return self.net(state).flatten(1, -1)
 
 
 class ActorHead(nn.Module):

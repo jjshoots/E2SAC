@@ -1,18 +1,11 @@
 #!/usr/bin/env python3
-from sys import version
-import time
 import os
-import sys
+import time
 import numpy as np
 from pthflops import count_ops
 
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import torchvision.transforms.functional as TF
 
-from PIL import Image
-import matplotlib.pyplot as plt
 import cv2
 
 

@@ -3,3 +3,4 @@ weights/
 optim_weights/
 models/
 wandb/
+slurm-*

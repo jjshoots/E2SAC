@@ -4,13 +4,13 @@
 num_envs: 10
 
 # training params
-buffer_size: 1000000
+buffer_size: 400000
 buffer_size_debug: 100
-batch_size: 20000
+batch_size: 650
 start_epoch: 0
-epochs: 1000000
+epochs: 50
 transitions_per_epoch: 10000
-repeats_per_buffer: 20
+repeats_per_buffer: 10
 
 starting_LR: 0.001
 scheduler_steps: 5
@@ -18,15 +18,15 @@ scheduler_gamma: 0.5
 
 reg_lambda: 0.01
 use_entropy: true
-target_entropy: -5.
+target_entropy: -1.
 ac_update_ratio: 1
-confidence_scale: 0.03
+confidence_scale: 0.5
 
 # helper params
-wandb_project: "UA3SAC_gym"
-weights_directory: "weights"
-optim_weights_directory: "optim_weights"
-net_version: "_ant_2"
+wandb_project: 'UA3SAC_gym'
+weights_directory: 'weights'
+optim_weights_directory: 'optim_weights'
+net_version: '80154'
 net_number: 0
 epoch_interval: 1
 batch_interval: -1

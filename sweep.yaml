@@ -1,0 +1,21 @@
+program: main.py
+method: bayes
+metric:
+  name: total_reward
+  goal: maximize
+parameters:
+  use_entropy:
+    values: [true, false]
+  target_entropy:
+    min: -2.0
+    max: +2.0
+  ac_update_ratio:
+    values: [1, 2, 3, 4, 5]
+  confidence_scale:
+    min: 0.10
+    max: 10.0
+command:
+  - python3
+  - src/main.py
+  - "--train"
+  - "--wandb"
