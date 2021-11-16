@@ -7,11 +7,18 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +0 Session.vim
+badd +116 src/main.py
+badd +7 src/settings.yaml
+badd +127 src/carracing.py
+badd +27 src/ai_lib/UASACNet.py
+badd +4 sweep.yaml
+badd +68 src/utility/shebangs.py
+badd +229 src/ai_lib/UASAC.py
+badd +34 slurm/job2.slurm
 argglobal
 %argdel
-$argadd Session.vim
-edit Session.vim
+$argadd ./
+edit src/ai_lib/UASACNet.py
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -29,12 +36,13 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 12 - ((11 * winheight(0) + 22) / 44)
+let s:l = 15 - ((8 * winheight(0) + 22) / 44)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-12
-normal! 0
+15
+normal! 021|
+if exists(':tcd') == 2 | tcd ~/Sandboxes/UA3SAC_gym | endif
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

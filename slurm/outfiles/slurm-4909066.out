@@ -1,0 +1,31 @@
+wandb: Starting wandb agent 🕵️
+2021-11-02 10:37:44,775 - wandb.wandb_agent - INFO - Running runs: []
+2021-11-02 10:37:45,105 - wandb.wandb_agent - INFO - Agent received command: run
+2021-11-02 10:37:45,105 - wandb.wandb_agent - INFO - Agent starting run with config:
+	ac_update_ratio: 2
+	confidence_scale: 3.687281276337021
+	target_entropy: 0.9062111768475414
+	use_entropy: True
+2021-11-02 10:37:45,114 - wandb.wandb_agent - INFO - About to run command: python3 src/main.py --train --wandb
+wandb: Currently logged in as: jjshoots (use `wandb login --relogin` to force relogin)
+wandb: WARNING Ignored wandb.init() arg project when running a sweep
+wandb: WARNING Ignored wandb.init() arg entity when running a sweep
+-----------------------
+Using Device cuda:0
+-----------------------
+2021-11-02 10:37:50,123 - wandb.wandb_agent - INFO - Running runs: ['ju2k04c7']
+wandb: wandb version 0.12.6 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.12.0
+wandb: Syncing run 46888
+wandb:  View project at https://wandb.ai/jjshoots/UA3SAC_gym
+wandb:  View sweep at https://wandb.ai/jjshoots/UA3SAC_gym/sweeps/nktx8eqi
+wandb:  View run at https://wandb.ai/jjshoots/UA3SAC_gym/runs/ju2k04c7
+wandb: Run data is saved locally in /home/taij/e2sac/wandb/run-20211102_103749-ju2k04c7
+wandb: Run `wandb offline` to turn off syncing.
+2021-11-03 13:27:34,817 - wandb.wandb_agent - INFO - Agent received command: stop
+2021-11-03 13:27:34,818 - wandb.wandb_agent - INFO - Stop: ju2k04c7
+2021-11-03 13:27:39,824 - wandb.wandb_agent - INFO - Cleaning up finished run: ju2k04c7
+wandb: Terminating and syncing runs. Press ctrl-c to kill.
+/home/taij/.conda/envs/robocar/lib/python3.8/multiprocessing/resource_tracker.py:216: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

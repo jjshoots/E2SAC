@@ -82,12 +82,13 @@ class UASAC(nn.Module):
     """
     Uncertainty Aware Actor Critic
     """
-    def __init__(self, num_actions, entropy_tuning=True, target_entropy=None, confidence_scale=3.):
+    def __init__(self, num_actions, entropy_tuning=True, target_entropy=None, confidence_scale=3., confidence_cutoff=0.2):
         super().__init__()
 
         self.num_actions = num_actions
         self.use_entropy = entropy_tuning
         self.confidence_scale = confidence_scale
+        self.confidence_cutoff = confidence_cutoff
 
         # backbone
         self.backbone = Backbone()
@@ -126,7 +127,7 @@ class UASAC(nn.Module):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
 
-    def calc_critic_loss(self, states, next_states, actions, next_actions, rewards, dones, gamma=0.99):
+    def calc_critic_loss(self, states, actions, rewards, next_states, dones, gamma=0.99):
         """
         states is of shape B x img_size
         actions is of shape B x 3
@@ -135,13 +136,19 @@ class UASAC(nn.Module):
         """
         dones = 1. - dones
         latents = self.backbone(states)
-        next_latents = self.backbone(next_states)
 
         # current Q
         curr_q1, curr_q2 = self.critic(latents, actions)
 
         # target Q
         with torch.no_grad():
+            # next latents for next actions and next q
+            next_latents = self.backbone(next_states)
+
+            # sample the next actions based on the current policy
+            output = self.actor(next_latents)
+            next_actions, _, _ = self.actor.sample(*output)
+
             next_q1, next_q2 = self.critic_target(next_latents, next_actions)
 
             # concatenate both qs together then...
@@ -191,8 +198,12 @@ class UASAC(nn.Module):
         # supervised loss is NLL loss between label and output
         sup_loss = NIG_NLL(torch.atanh(labels), *output, reduce=False) + 1e-6
 
-        # uncertainty scalar
-        sup_scale = (1. - torch.exp(-self.confidence_scale * uncertainty))
+        # supervision scale
+        sup_scale = (1. - torch.exp(-self.confidence_scale * uncertainty)).detach()
+
+        # cutoff for supervision scale
+        blank = torch.zeros_like(sup_scale)
+        sup_scale = torch.where(sup_scale > self.confidence_cutoff, sup_scale, blank)
 
         # NIG regularizer scale
         output = self.actor(latents)

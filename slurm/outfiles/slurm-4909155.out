@@ -1,0 +1,32 @@
+wandb: Starting wandb agent 🕵️
+2021-11-04 00:08:48,986 - wandb.wandb_agent - INFO - Running runs: []
+2021-11-04 00:08:49,324 - wandb.wandb_agent - INFO - Agent received command: run
+2021-11-04 00:08:49,324 - wandb.wandb_agent - INFO - Agent starting run with config:
+	ac_update_ratio: 4
+	confidence_scale: 5.05191790310509
+	target_entropy: 1.5429555994416955
+	use_entropy: False
+2021-11-04 00:08:49,384 - wandb.wandb_agent - INFO - About to run command: python3 src/main.py --train --wandb
+2021-11-04 00:08:54,395 - wandb.wandb_agent - INFO - Running runs: ['pmnboc5g']
+wandb: Currently logged in as: jjshoots (use `wandb login --relogin` to force relogin)
+wandb: WARNING Ignored wandb.init() arg project when running a sweep
+wandb: WARNING Ignored wandb.init() arg entity when running a sweep
+-----------------------
+Using Device cuda:0
+-----------------------
+wandb: wandb version 0.12.6 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.12.0
+wandb: Syncing run 46525
+wandb:  View project at https://wandb.ai/jjshoots/UA3SAC_gym
+wandb:  View sweep at https://wandb.ai/jjshoots/UA3SAC_gym/sweeps/nktx8eqi
+wandb:  View run at https://wandb.ai/jjshoots/UA3SAC_gym/runs/pmnboc5g
+wandb: Run data is saved locally in /home/taij/e2sac/wandb/run-20211104_000902-pmnboc5g
+wandb: Run `wandb offline` to turn off syncing.
+XIO:  fatal IO error 0 (Success) on X server ":99"
+      after 590 requests (590 known processed) with 3 events remaining.
+2021-11-04 14:01:24,666 - wandb.wandb_agent - INFO - Cleaning up finished run: pmnboc5g
+wandb: Terminating and syncing runs. Press ctrl-c to kill.
+/usr/bin/xvfb-run: line 186: kill: (362003) - No such process
+/home/taij/.conda/envs/robocar/lib/python3.8/multiprocessing/resource_tracker.py:216: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

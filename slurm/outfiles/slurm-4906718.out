@@ -1,0 +1,83 @@
+flatpak: /share/apps/Anaconda3_2020.11/lib/libuuid.so.1: no version information available (required by /usr/lib64/libappstream-glib.so.8)
+flatpak: /share/apps/Anaconda3_2020.11/lib/libuuid.so.1: no version information available (required by /usr/lib64/libblkid.so.1)
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+
+wandb: Starting wandb agent 🕵️
+2021-10-26 20:40:53,264 - wandb.wandb_agent - INFO - Running runs: []
+2021-10-26 20:40:53,602 - wandb.wandb_agent - INFO - Agent received command: run
+2021-10-26 20:40:53,602 - wandb.wandb_agent - INFO - Agent starting run with config:
+	ac_update_ratio: 5
+	confidence_scale: 5.11342084104764
+	target_entropy: 1.0543925693473333
+	use_entropy: True
+2021-10-26 20:40:53,608 - wandb.wandb_agent - INFO - About to run command: python3 src/main.py --train --wandb
+wandb: Currently logged in as: jjshoots (use `wandb login --relogin` to force relogin)
+wandb: WARNING Ignored wandb.init() arg project when running a sweep
+wandb: WARNING Ignored wandb.init() arg entity when running a sweep
+-----------------------
+Using Device cuda:0
+-----------------------
+2021-10-26 20:40:58,618 - wandb.wandb_agent - INFO - Running runs: ['hz7sb1l0']
+wandb: wandb version 0.12.5 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.12.0
+wandb: Syncing run 55430
+wandb:  View project at https://wandb.ai/jjshoots/UA3SAC_gym
+wandb:  View sweep at https://wandb.ai/jjshoots/UA3SAC_gym/sweeps/nktx8eqi
+wandb:  View run at https://wandb.ai/jjshoots/UA3SAC_gym/runs/hz7sb1l0
+wandb: Run data is saved locally in /home/taij/e2sac/wandb/run-20211026_204058-hz7sb1l0
+wandb: Run `wandb offline` to turn off syncing.
+/home/taij/e2sac/src/ai_lib/UASAC.py:114: UserWarning: Target entropy is recommended to be negative,                                  currently it is 1.0543925693473333,                                  I hope you know what you're doing...
+  warnings.warn(f"Target entropy is recommended to be negative,\
+
+No weights directory for weights/Version55430, generating new one in 3 seconds.
+No weights directory for optim_weights/Version55430, generating new one in 3 seconds.
+Traceback (most recent call last):
+  File "src/main.py", line 285, in <module>
+    train(set)
+  File "src/main.py", line 23, in train
+    net, net_helper, optim_set, sched_set, optim_helper = setup_nets(set)
+  File "src/main.py", line 225, in setup_nets
+    net = UASAC(
+  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/torch/nn/modules/module.py", line 852, in to
+    return self._apply(convert)
+  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/torch/nn/modules/module.py", line 530, in _apply
+    module._apply(fn)
+  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/torch/nn/modules/module.py", line 530, in _apply
+    module._apply(fn)
+  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/torch/nn/modules/module.py", line 530, in _apply
+    module._apply(fn)
+  [Previous line repeated 1 more time]
+  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/torch/nn/modules/module.py", line 552, in _apply
+    param_applied = fn(param)
+  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/torch/nn/modules/module.py", line 850, in convert
+    return t.to(device, dtype if t.is_floating_point() or t.is_complex() else None, non_blocking)
+RuntimeError: CUDA out of memory. Tried to allocate 20.00 MiB (GPU 0; 11.92 GiB total capacity; 602.50 KiB already allocated; 3.56 MiB free; 2.00 MiB reserved in total by PyTorch)
+wandb: Waiting for W&B process to finish, PID 279041
+wandb: Program failed with code 1.  Press ctrl-c to abort syncing.
+wandb: - 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: \ 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: | 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: / 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: - 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: \ 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: | 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: / 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: - 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: \ 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: | 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: / 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: - 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb:                                                                                
+wandb: Find user logs for this run at: /home/taij/e2sac/wandb/run-20211026_204058-hz7sb1l0/logs/debug.log
+wandb: Find internal logs for this run at: /home/taij/e2sac/wandb/run-20211026_204058-hz7sb1l0/logs/debug-internal.log
+wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: 
+wandb: Synced 55430: https://wandb.ai/jjshoots/UA3SAC_gym/runs/hz7sb1l0
+
+2021-10-26 20:41:34,693 - wandb.wandb_agent - INFO - Cleaning up finished run: hz7sb1l0
+wandb: Terminating and syncing runs. Press ctrl-c to kill.

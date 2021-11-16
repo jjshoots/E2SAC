@@ -1,0 +1,25 @@
+wandb: Starting wandb agent 🕵️
+2021-11-04 22:28:58,826 - wandb.wandb_agent - INFO - Running runs: []
+2021-11-04 22:28:59,176 - wandb.wandb_agent - INFO - Agent received command: run
+2021-11-04 22:28:59,176 - wandb.wandb_agent - INFO - Agent starting run with config:
+	ac_update_ratio: 2
+	confidence_scale: 8.589456602304834
+	target_entropy: 1.0527958920714044
+	use_entropy: True
+2021-11-04 22:28:59,196 - wandb.wandb_agent - INFO - About to run command: python3 src/main.py --train --wandb
+2021-11-04 22:29:04,206 - wandb.wandb_agent - INFO - Running runs: ['d5x1kelw']
+wandb: Currently logged in as: jjshoots (use `wandb login --relogin` to force relogin)
+wandb: WARNING Ignored wandb.init() arg project when running a sweep
+wandb: WARNING Ignored wandb.init() arg entity when running a sweep
+-----------------------
+Using Device cuda:0
+-----------------------
+wandb: wandb version 0.12.6 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.12.0
+wandb: Syncing run 11742
+wandb:  View project at https://wandb.ai/jjshoots/UA3SAC_gym
+wandb:  View sweep at https://wandb.ai/jjshoots/UA3SAC_gym/sweeps/nktx8eqi
+wandb:  View run at https://wandb.ai/jjshoots/UA3SAC_gym/runs/d5x1kelw
+wandb: Run data is saved locally in /home/taij/e2sac/wandb/run-20211104_222904-d5x1kelw
+wandb: Run `wandb offline` to turn off syncing.

@@ -1,0 +1,49 @@
+flatpak: /share/apps/Anaconda3_2020.11/lib/libuuid.so.1: no version information available (required by /usr/lib64/libappstream-glib.so.8)
+flatpak: /share/apps/Anaconda3_2020.11/lib/libuuid.so.1: no version information available (required by /usr/lib64/libblkid.so.1)
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+
+wandb: Starting wandb agent 🕵️
+2021-11-02 10:27:16,906 - wandb.wandb_agent - INFO - Running runs: []
+2021-11-02 10:27:17,383 - wandb.wandb_agent - INFO - Agent received command: run
+2021-11-02 10:27:17,383 - wandb.wandb_agent - INFO - Agent starting run with config:
+	ac_update_ratio: 5
+	confidence_scale: 5.789347248291359
+	target_entropy: 1.5828207224566326
+	use_entropy: False
+2021-11-02 10:27:17,403 - wandb.wandb_agent - INFO - About to run command: python3 src/main.py --train --wandb
+2021-11-02 10:27:22,415 - wandb.wandb_agent - INFO - Running runs: ['jh5jcjeo']
+wandb: Currently logged in as: jjshoots (use `wandb login --relogin` to force relogin)
+wandb: WARNING Ignored wandb.init() arg project when running a sweep
+wandb: WARNING Ignored wandb.init() arg entity when running a sweep
+-----------------------
+Using Device cuda:0
+-----------------------
+wandb: wandb version 0.12.6 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.12.0
+wandb: Syncing run 45752
+wandb:  View project at https://wandb.ai/jjshoots/UA3SAC_gym
+wandb:  View sweep at https://wandb.ai/jjshoots/UA3SAC_gym/sweeps/nktx8eqi
+wandb:  View run at https://wandb.ai/jjshoots/UA3SAC_gym/runs/jh5jcjeo
+wandb: Run data is saved locally in /home/taij/e2sac/wandb/run-20211102_102728-jh5jcjeo
+wandb: Run `wandb offline` to turn off syncing.
+slurmstepd: *** JOB 4909039 ON zeus409 CANCELLED AT 2021-11-02T10:34:33 ***
+/home/taij/.conda/envs/robocar/lib/python3.8/multiprocessing/resource_tracker.py:216: UserWarning: resource_tracker: There appear to be 6 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
