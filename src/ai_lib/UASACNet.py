@@ -12,7 +12,7 @@ class Backbone(nn.Module):
     def __init__(self):
         super().__init__()
 
-        channels = [4, 128, 128, 256, 256, 512, 128]
+        channels = [4, 16, 32, 64, 64, 64, 64]
         kernels = [3] * (len(channels) - 1)
         pooling = [2] * (len(channels) - 1)
         activation = ['lrelu'] * len(kernels)
@@ -23,20 +23,24 @@ class Backbone(nn.Module):
         return self.net(state).flatten(1, -1)
 
 
-class ActorHead(nn.Module):
+
+class Actor(nn.Module):
     """
-    Actor Head for Net
+    Actor network
     """
     def __init__(self, num_actions):
         super().__init__()
         self.num_actions = num_actions
 
-        _features_description = [128, 128, num_actions * 4]
+        self.backbone = Backbone()
+
+        _features_description = [64, 64, num_actions * 4]
         _activation_description = ['lrelu'] * (len(_features_description) - 2) + ['identity']
         self.net = Neural_blocks.generate_linear_stack(_features_description, _activation_description)
 
 
     def forward(self, states):
+        states = self.backbone(states)
         states = self.net(states).reshape(-1, 4, self.num_actions).permute(1, 0, 2)
 
         mu, lognu, logalpha, logbeta = torch.split(states, 1, dim=0)
@@ -48,15 +52,18 @@ class ActorHead(nn.Module):
         return torch.cat([mu, nu, alpha, beta], dim=0)
 
 
-class CriticHead(nn.Module):
+
+class Critic(nn.Module):
     """
-    Critic Head for Net
+    Critic Network
     """
     def __init__(self, num_actions):
         super().__init__()
         self.num_actions = num_actions
 
-        _features_description = [128, 64]
+        self.backbone = Backbone()
+
+        _features_description = [64, 64]
         _activation_description = ['lrelu'] * (len(_features_description) - 1)
         self.context = Neural_blocks.generate_linear_stack(_features_description, _activation_description)
 
@@ -70,4 +77,5 @@ class CriticHead(nn.Module):
 
 
     def forward(self, states, actions):
+        states = self.backbone(states)
         return self.merge(self.context(states) + self.action(actions))

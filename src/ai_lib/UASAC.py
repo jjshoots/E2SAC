@@ -18,19 +18,19 @@ class TwinnedQNetwork(nn.Module):
         super().__init__()
 
         # critic, clipped double Q
-        self.Q_network1 = CriticHead(num_actions)
-        self.Q_network2 = CriticHead(num_actions)
+        self.Q_network1 = Critic(num_actions)
+        self.Q_network2 = Critic(num_actions)
 
 
-    def forward(self, latents, actions):
+    def forward(self, states, actions):
         """
         states is of shape ** x num_inputs
         actions is of shape ** x num_actions
         output is a tuple of [** x 1], [** x 1]
         """
         # get q1 and q2
-        q1 = self.Q_network1(latents, actions)
-        q2 = self.Q_network2(latents, actions)
+        q1 = self.Q_network1(states, actions)
+        q2 = self.Q_network2(states, actions)
 
         return q1, q2
 
@@ -41,11 +41,11 @@ class GaussianActor(nn.Module):
     """
     def __init__(self, num_actions):
         super().__init__()
-        self.net = ActorHead(num_actions)
+        self.net = Actor(num_actions)
 
 
-    def forward(self, latents):
-        return self.net(latents)
+    def forward(self, states):
+        return self.net(states)
 
 
     @staticmethod
@@ -135,21 +135,17 @@ class UASAC(nn.Module):
         dones is of shape B x 1
         """
         dones = 1. - dones
-        latents = self.backbone(states)
 
         # current Q
-        curr_q1, curr_q2 = self.critic(latents, actions)
+        curr_q1, curr_q2 = self.critic(states, actions)
 
         # target Q
         with torch.no_grad():
-            # next latents for next actions and next q
-            next_latents = self.backbone(next_states)
-
             # sample the next actions based on the current policy
-            output = self.actor(next_latents)
+            output = self.actor(next_states)
             next_actions, _, _ = self.actor.sample(*output)
 
-            next_q1, next_q2 = self.critic_target(next_latents, next_actions)
+            next_q1, next_q2 = self.critic_target(next_states, next_actions)
 
             # concatenate both qs together then...
             next_q  = torch.cat((next_q1, next_q2), dim=-1)
@@ -178,14 +174,13 @@ class UASAC(nn.Module):
         labels is of shape B x 3
         """
         dones = 1. - dones
-        latents = self.backbone(states)
 
         # We re-sample actions to calculate expectations of Q.
-        output = self.actor(latents)
+        output = self.actor(states)
         actions, entropies, uncertainty = self.actor.sample(*output)
 
         # expectations of Q with clipped double Q
-        q1, q2 = self.critic(latents, actions)
+        q1, q2 = self.critic(states, actions)
         q, _ = torch.min(torch.cat((q1, q2), dim=-1), dim=-1, keepdim=True)
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
@@ -206,7 +201,7 @@ class UASAC(nn.Module):
         sup_scale = torch.where(sup_scale > self.confidence_cutoff, sup_scale, blank)
 
         # NIG regularizer scale
-        output = self.actor(latents)
+        output = self.actor(states)
         reg_loss = 2*output[1] + output[2]
 
         return rnf_loss, sup_loss, sup_scale.detach(), reg_loss
@@ -216,9 +211,7 @@ class UASAC(nn.Module):
         if not self.entropy_tuning:
             return torch.zeros(1)
 
-        latents = self.backbone(states)
-
-        output = self.actor(latents)
+        output = self.actor(states)
         _, entropies, _ = self.actor.sample(*output)
 
         # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.

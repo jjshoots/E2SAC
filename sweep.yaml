@@ -1,7 +1,7 @@
 program: main.py
 method: bayes
 metric:
-  name: max_mean_reward
+  name: max_eval_perf
   goal: maximize
 parameters:
   use_entropy:
@@ -11,7 +11,7 @@ parameters:
     max: +2.0
   confidence_scale:
     min: 0.10
-    max: 2.00
+    max: 10.0
 command:
   - python3
   - src/main.py

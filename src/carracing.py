@@ -45,7 +45,7 @@ class Environment():
         return self.state, None, None, label
 
 
-    def step(self, action, startup=False):
+    def step(self, action, startup=False, early_end=True):
 
         """
         actions are expected to be of shape [2]
@@ -74,10 +74,8 @@ class Environment():
         else:
             self.off_track_t = 0
 
-        if self.off_track_t >= self.max_off_track:
+        if self.off_track_t >= self.max_off_track and early_end:
             dne = 1.
-        else:
-            dne = 0.
 
         self.steps += 1
 

@@ -22,6 +22,8 @@ target_entropy: -1.
 confidence_scale: 0.5
 confidence_cutoff: 0.2
 
+eval_num_traj: 100
+
 # helper params
 wandb_project: 'UA3SAC_gym'
 weights_directory: 'weights'

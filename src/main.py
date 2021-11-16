@@ -24,10 +24,10 @@ def train(set):
     memory = ReplayBuffer(set.buffer_size)
     num_episodes = set.num_envs
     max_mean_reward = -100
+    max_eval_perf = -100
 
     for epoch in range(set.start_epoch, set.epochs):
-        # gather the data
-        net.eval()
+        # reinitialize buffers
         mean_reward = []
         total_reward = []
         entropy_tracker = []
@@ -41,49 +41,78 @@ def train(set):
         next_labels = np.zeros((set.num_envs, set.num_actions))
         entropy = np.zeros((set.num_envs, 1))
 
+        # eval
+        for env in envs: env.reset()
+        net.eval()
+        net.zero_grad()
+
+        eval_perf = []
+        while len(eval_perf) < set.eval_num_traj:
+            with torch.no_grad():
+                # get the initial state and action
+                for i, env in enumerate(envs):
+                    obs, _, _, _ = env.get_state()
+                    states[i] = obs
+
+                output = net.actor(gpuize(states, set.device))
+                actions = cpuize(net.actor.infer(*output))
+
+                # get the next state and reward
+                for i, env in enumerate(envs):
+                    _, _, dne, _ = env.step(actions[i], early_end=False)
+
+                    if dne:
+                        eval_perf.append(env.cumulative_reward)
+                        env.reset()
+
+        # gather data
+        for env in envs: env.reset()
+        net.eval()
+        net.zero_grad()
+
         transitions = 0
         while transitions < set.transitions_per_epoch:
-            net.zero_grad()
+            with torch.no_grad():
+                # get the initial state and action
+                for i, env in enumerate(envs):
+                    transitions += 1
+                    obs, _, _, lbl = env.get_state()
+                    states[i] = obs
+                    labels[i] = lbl
 
-            # get the initial state and action
-            for i, env in enumerate(envs):
-                transitions += 1
-                obs, _, _, lbl = env.get_state()
-                states[i] = obs
-                labels[i] = lbl
+                output = net.actor(gpuize(states, set.device))
+                o1, ent, _ = net.actor.sample(*output)
+                actions = cpuize(o1)
+                entropy = cpuize(ent)
 
-            output = net.backbone(gpuize(states, set.device))
-            output = net.actor(output)
-            o1, ent, _ = net.actor.sample(*output)
-            actions = cpuize(o1)
-            entropy = cpuize(ent)
+                # get the next state and other stuff
+                for i, env in enumerate(envs):
+                    obs, rew, dne, lbl = env.step(actions[i])
+                    next_states[i] = obs
+                    rewards[i] = rew
+                    dones[i] = dne
+                    next_labels[i] = lbl
 
-            # get the next state and other stuff
-            for i, env in enumerate(envs):
-                obs, rew, dne, lbl = env.step(actions[i])
-                next_states[i] = obs
-                rewards[i] = rew
-                dones[i] = dne
-                next_labels[i] = lbl
+                    if dne:
+                        total_reward.append(env.cumulative_reward)
+                        env.reset()
+                        num_episodes += 1
 
-                if dne or env.steps > env.max_steps:
-                    total_reward.append(env.cumulative_reward)
-                    env.reset()
-                    num_episodes += 1
+                # store stuff in mem
+                for stuff in zip(states, actions, rewards, next_states, dones, labels):
+                    memory.push(stuff)
 
-            # store stuff in mem
-            for stuff in zip(states, actions, rewards, next_states, dones, labels):
-                memory.push(stuff)
-
-            # log progress
-            mean_reward.append(np.mean(rewards))
-            entropy_tracker.append(np.mean(entropy))
+                # log progress
+                mean_reward.append(np.mean(rewards))
+                entropy_tracker.append(np.mean(entropy))
 
         # for logging
-        mean_reward = np.mean(np.array(mean_reward))
         total_reward = np.mean(np.array(total_reward))
         entropy_tracker = np.mean(np.array(entropy_tracker))
-        max_mean_reward = total_reward if total_reward > max_mean_reward else max_mean_reward
+        mean_reward = np.mean(np.array(mean_reward))
+        max_mean_reward = max([max_mean_reward, mean_reward])
+        eval_perf = np.mean(np.array(eval_perf))
+        max_eval_perf = max([max_eval_perf, eval_perf])
 
         # train on data
         net.train()
@@ -106,8 +135,6 @@ def train(set):
                 q_loss.backward()
                 optim_set['critic'].step()
                 sched_set['critic'].step()
-                optim_set['backbone'].step()
-                sched_set['backbone'].step()
                 net.update_q_target()
 
                 # train actor
@@ -151,6 +178,7 @@ def train(set):
                                 'mean_reward': mean_reward,
                                 'total_reward': total_reward,
                                 'max_mean_reward': max_mean_reward,
+                                'max_eval_perf': max_eval_perf,
                                 'mean_entropy': entropy_tracker,
                                 'sup_scale': sup_scale.mean().item(),
                                 'log_alpha': net.log_alpha.item(),
@@ -176,14 +204,13 @@ def display(set):
     while True:
         obs, rwd, dne, lbl = env.step(actions[0])
 
-        if dne or env.steps > env.max_steps:
+        if dne:
             actions *= 0.
             env.reset()
 
         if use_net:
             state = gpuize(obs, set.device).unsqueeze(0)
-            output = net.backbone(state)
-            output = net.actor(output)
+            output = net.actor(state)
             # actions = cpuize(net.actor.sample(*output)[0])
             actions = cpuize(net.actor.infer(*output))
         else:
@@ -225,8 +252,6 @@ def setup_nets(set):
         confidence_scale=set.confidence_scale,
         confidence_cutoff=set.confidence_cutoff
     ).to(set.device)
-    backbone_optim = optim.AdamW(net.backbone.parameters(), lr=set.starting_LR, amsgrad=True)
-    backbone_sched = optim.lr_scheduler.StepLR(backbone_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma)
     actor_optim = optim.AdamW(net.actor.parameters(), lr=set.starting_LR, amsgrad=True)
     actor_sched = optim.lr_scheduler.StepLR(actor_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma)
     critic_optim = optim.AdamW(net.critic.parameters(), lr=set.starting_LR, amsgrad=True)
@@ -238,13 +263,11 @@ def setup_nets(set):
     optim_set['actor'] = actor_optim
     optim_set['critic'] = critic_optim
     optim_set['alpha'] = alpha_optim
-    optim_set['backbone'] = backbone_optim
 
     sched_set = dict()
     sched_set['actor'] = actor_sched
     sched_set['critic'] = critic_sched
     sched_set['alpha'] = alpha_sched
-    sched_set['backbone'] = backbone_sched
 
     # get latest weight files
     net_weights = net_helper.get_weight_file()
