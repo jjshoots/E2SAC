@@ -3,4 +3,5 @@ weights/
 optim_weights/
 models/
 wandb/
+venv/
 slurm-*
