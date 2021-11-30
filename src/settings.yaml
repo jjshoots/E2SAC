@@ -6,11 +6,13 @@ num_envs: 10
 # training params
 buffer_size: 500000
 buffer_size_debug: 10000
-batch_size: 500
+batch_size: 300
 start_epoch: 0
 epochs: 50
 transitions_per_epoch: 10000
 repeats_per_buffer: 10
+critic_update_multiplier: 3
+actor_update_multiplier: 1
 
 starting_LR: 0.001
 scheduler_steps: 5

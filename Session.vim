@@ -7,14 +7,14 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +181 src/main.py
-badd +25 src/settings.yaml
-badd +39 src/carracing.py
-badd +22 src/ai_lib/UASACNet.py
-badd +4 sweep.yaml
-badd +79 src/utility/shebangs.py
-badd +146 src/ai_lib/UASAC.py
+badd +313 src/main.py
+badd +33 src/settings.yaml
+badd +92 src/carracing.py
+badd +15 src/ai_lib/UASACNet.py
+badd +11 sweep.yaml
+badd +70 src/ai_lib/UASAC.py
 badd +34 slurm/job2.slurm
+badd +223 src/ai_lib/helpers.py
 argglobal
 %argdel
 $argadd ./
@@ -36,12 +36,12 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 181 - ((21 * winheight(0) + 22) / 44)
+let s:l = 313 - ((36 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-181
-normal! 0
+313
+normal! 09|
 if exists(':tcd') == 2 | tcd ~/Sandboxes/UA3SAC_gym | endif
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'

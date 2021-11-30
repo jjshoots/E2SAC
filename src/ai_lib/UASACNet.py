@@ -12,7 +12,7 @@ class Backbone(nn.Module):
     def __init__(self):
         super().__init__()
 
-        channels = [4, 16, 32, 64, 64, 64, 64]
+        channels = [4, 128, 128, 128, 4]
         kernels = [3] * (len(channels) - 1)
         pooling = [2] * (len(channels) - 1)
         activation = ['lrelu'] * len(kernels)

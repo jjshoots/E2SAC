@@ -4,11 +4,11 @@ metric:
   name: max_eval_perf
   goal: maximize
 parameters:
-  use_entropy:
-    values: [true, false]
+  # use_entropy:
+  #   values: [true, false]
   target_entropy:
-    min: -2.0
-    max: +2.0
+    min: -4.0
+    max: +4.0
   confidence_scale:
     min: 0.10
     max: 10.0

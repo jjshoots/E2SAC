@@ -14,7 +14,6 @@ class Logger:
         """
         Helper class for handling loss recording and weights file management
         """
-
         assert epoch_interval * batch_interval < 0, 'epoch_interval or batch_interval must be positive number'
 
         self.iter_passed = 0
@@ -44,7 +43,7 @@ class Logger:
             os.makedirs(os.path.join(self.weights_location, f'Version{self.version_number}'))
 
         f = open(os.path.join(self.weights_location, f'Version{self.version_number}/training_log.txt'), "a")
-        f.write(f'New Training Session, Net Version {self.version_number} \n')
+        f.write(f'New Session, Net Version {self.version_number} \n')
         f.write(f'Epoch, Batch, Running Loss, Lowest Running Loss, Mark Number \n')
         f.close()
 
@@ -117,10 +116,12 @@ class Logger:
             np.savetxt(f, [data], delimiter=',', fmt=precision)
 
 
-    # retrieves the latest weight file based on mark and version number
-    # weight location is location where all weights of all versions are stored
-    # version number for new networks, mark number for training
     def get_weight_file(self, latest=True):
+        """
+        retrieves the latest weight file based on mark and version number
+        weight location is location where all weights of all versions are stored
+        version number for new networks, mark number for training
+        """
         # if we are not incrementing and the file doesn't exist, just exit
         if not self.increment:
             if not os.path.isfile(self.weights_file):
@@ -158,7 +159,9 @@ class Logger:
 
 
 def get_device():
-    # select device
+    """
+    gets gpu if available otherwise cpu
+    """
     device = 'cpu'
     if(torch.cuda.is_available()):
         device = torch.device('cuda:0')
@@ -182,10 +185,12 @@ def cpuize(input):
     return input.detach().cpu().numpy()
 
 
-# converts saliency map to pseudo segmentation
-# expects input of dim 2
-# fastener_area_threshold is minimum area of output object BEFORE scaling to input size
 def saliency_to_contour(input, original_image, fastener_area_threshold, input_output_ratio):
+    """
+    converts saliency map to pseudo segmentation
+    expects input of dim 2
+    fastener_area_threshold is minimum area of output object BEFORE scaling to input size
+    """
     # find contours in the image
     threshold = input.detach().cpu().squeeze().numpy().astype(np.uint8)
     contours, _ = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -213,7 +218,6 @@ def network_stats(network, input_image):
     total_params = sum(p.numel() for p in network.parameters() if p.requires_grad)
     count_ops(network, input_image)
     print(f'Total number of Parameters: {total_params}')
-
 
 
 def fgsm_attack(data, epsilon=0.1):

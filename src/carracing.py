@@ -1,3 +1,4 @@
+import copy
 import gym
 import cv2
 import numpy as np
@@ -12,20 +13,28 @@ class Environment():
         self.image_size = image_size
         self.frame_stack = 4
         self.max_off_track = 50
-        self.steps = 0
-        self.max_steps = 1000
 
         self.env = gym.make('CarRacing-v0', verbose=verbose)
         self.num_actions = 2
         self.max_accel = 0.3
         self.max_brake = 0.5
 
-        self.steps = 0
         self.off_track_t = 0
+        self.done_marker = 0
         self.cumulative_reward = 0
         self.state = np.zeros((1, *self.image_size))
 
+        self.eval_run = False
+
         self.reset()
+
+
+    def eval(self):
+        self.eval_run = True
+
+
+    def train(self):
+        self.eval_run = False
 
 
     def reset(self):
@@ -34,8 +43,8 @@ class Environment():
             self.off_track_t = 0
             self.step(np.zeros(self.num_actions), startup=True)
 
-        self.steps = 0
         self.off_track_t = 0
+        self.done_marker = 0
         self.cumulative_reward = 0
         self.state = np.concatenate([self.transform_obs(self.env.env.state)] * self.frame_stack, 0)
 
@@ -45,7 +54,7 @@ class Environment():
         return self.state, None, None, label
 
 
-    def step(self, action, startup=False, early_end=True):
+    def step(self, action, startup=False):
 
         """
         actions are expected to be of shape [2]
@@ -63,6 +72,7 @@ class Environment():
         action = np.array([steer, accel, brake])
 
         obs, rwd, dne, _ = self.env.step(action)
+        self.done_marker = copy.copy(dne)
 
         obs = self.transform_obs(obs)
         self.state = np.concatenate([self.state[1:], obs])
@@ -74,14 +84,26 @@ class Environment():
         else:
             self.off_track_t = 0
 
-        if self.off_track_t >= self.max_off_track and early_end:
-            dne = 1.
-
-        self.steps += 1
+        # during training, only end when we go off track for more than specified steps
+        if not self.eval_run:
+            if self.off_track_t >= self.max_off_track:
+                dne = 1.
+            else:
+                dne = 0.
 
         self.cumulative_reward += rwd
 
         return self.state, rwd, dne, label
+
+
+    @property
+    def is_done(self):
+        """
+        check for eval or training end criterias
+        """
+        eval_criteria = self.done_marker and self.eval_run
+        train_criteria = self.off_track_t >= self.max_off_track and not self.eval_run
+        return eval_criteria or train_criteria
 
 
     def transform_obs(self, obs):

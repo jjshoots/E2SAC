@@ -31,4 +31,4 @@ fi
 module load python/last
 conda activate robocar
 
-xvfb-run -s "$screen" wandb agent --count=1 jjshoots/UA3SAC_gym/a13vysqn
+xvfb-run -s "$screen" wandb agent --count=1 jjshoots/UA3SAC_gym/yp3kgbaf
