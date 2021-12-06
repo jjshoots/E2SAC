@@ -10,16 +10,10 @@ set shortmess=aoO
 badd +306 src/main.py
 badd +33 src/settings.yaml
 badd +54 src/carracing.py
-badd +76 src/ai_lib/UASACNet.py
-badd +11 sweep.yaml
-badd +70 src/ai_lib/UASAC.py
-badd +34 slurm/job2.slurm
-badd +229 src/ai_lib/helpers.py
-badd +357 src/ai_lib/neural_blocks.py
 argglobal
 %argdel
 $argadd ./
-edit src/ai_lib/UASACNet.py
+edit src/main.py
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -37,12 +31,12 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 76 - ((38 * winheight(0) + 22) / 44)
+let s:l = 306 - ((30 * winheight(0) + 22) / 44)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-76
-normal! 0103|
+306
+normal! 0
 if exists(':tcd') == 2 | tcd ~/Sandboxes/UA3SAC_gym | endif
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
