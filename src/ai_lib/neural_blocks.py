@@ -7,12 +7,12 @@ class Neural_blocks():
         pass
 
     @classmethod
-    def conv_module(cls, in_channel, out_channel, kernel_size, pooling, activation, pool_method='max', padding=None, batch_norm=True):
+    def conv_module(cls, in_channel, out_channel, kernel_size, pooling, activation, pool_method='max', padding=None, norm='non'):
         module_list = []
 
         # batch norm
-        if batch_norm:
-            module_list.append(nn.BatchNorm2d(num_features=in_channel))
+        if norm != 'non':
+            module_list.append(cls.get_normalization(norm, num_features=in_channel, dimension=2))
 
         # conv module
         if padding is not None:
@@ -28,24 +28,24 @@ class Neural_blocks():
                 module_list.append(nn.AvgPool2d(kernel_size=pooling))
 
         # add in the activation function
-        module_list.append(cls.get_activation_function(activation))
+        module_list.append(cls.get_activation(activation))
 
         return nn.Sequential(*module_list)
 
 
     @classmethod
-    def linear_module(cls, in_features, out_features, activation, batch_norm=True, bias=True):
+    def linear_module(cls, in_features, out_features, activation, norm='non', bias=True):
         module_list = []
 
         # batch norm
-        if batch_norm:
-            module_list.append(nn.BatchNorm1d(num_features=in_features))
+        if norm != 'non':
+            module_list.append(cls.get_normalization(norm, num_features=in_features, dimension=1))
 
         # linear module
         module_list.append(nn.Linear(in_features, out_features, bias))
 
         # add in the activation function
-        module_list.append(cls.get_activation_function(activation))
+        module_list.append(cls.get_activation(activation))
 
         return nn.Sequential(*module_list)
 
@@ -61,7 +61,7 @@ class Neural_blocks():
         module_list.append(nn.ConvTranspose2d(in_channels=in_channel, out_channels=out_channel, kernel_size=kernel_size, padding=padding, stride=stride))
 
         # add in the activation function
-        module_list.append(cls.get_activation_function(activation))
+        module_list.append(cls.get_activation(activation))
 
         return nn.Sequential(*module_list)
 
@@ -74,7 +74,7 @@ class Neural_blocks():
 
 
     @classmethod
-    def get_activation_function(cls, activation):
+    def get_activation(cls, activation):
         if activation == 'sigmoid':
             return nn.Sigmoid()
         elif activation == 'relu':
@@ -86,11 +86,24 @@ class Neural_blocks():
         elif activation == 'identity':
             return nn.Identity()
         else:
-            raise Exception(f'Unknown activation function "{activation}"')
+            raise NotImplementedError
 
 
     @classmethod
-    def generate_conv_stack(cls, channels_description, kernels_description, pooling_description, activation_description, padding=None, batch_norm=True):
+    def get_normalization(cls, activation, num_features, dimension):
+        if activation == 'batch':
+            if dimension == 1:
+                return nn.BatchNorm1d(num_features)
+            elif dimension == 2:
+                return nn.BatchNorm2d(num_features)
+            else:
+                raise NotImplementedError
+        else:
+            raise NotImplementedError
+
+
+    @classmethod
+    def generate_conv_stack(cls, channels_description, kernels_description, pooling_description, activation_description, padding=None, norm='non'):
         """
         conv -> conv -> conv -> ...
         """
@@ -113,7 +126,7 @@ class Neural_blocks():
                     pooling_description[i],
                     activation_description[i],
                     padding=padding,
-                    batch_norm=batch_norm
+                    norm=norm
                 )
             )
 
@@ -296,7 +309,7 @@ class Neural_blocks():
 
 
     @classmethod
-    def generate_linear_stack(cls, features_description, activation_description, batch_norm=True, bias=True):
+    def generate_linear_stack(cls, features_description, activation_description, norm='non', bias=True):
         """
         linear -> linear -> linear -> ...
         """
@@ -314,7 +327,7 @@ class Neural_blocks():
                     features_description[i],
                     features_description[i+1],
                     activation_description[i],
-                    batch_norm=batch_norm,
+                    norm=norm,
                     bias=bias
                 )
             )
@@ -323,7 +336,7 @@ class Neural_blocks():
 
 
     @classmethod
-    def generate_gated_linear_stack(cls, features_description, batch_norm=True):
+    def generate_gated_linear_stack(cls, features_description, norm='non'):
         """
         gated_linear -> gated_linear -> gated_linear -> ...
         """
@@ -331,8 +344,10 @@ class Neural_blocks():
 
         module_list = []
         for i in range(network_depth):
-            if batch_norm:
-                module_list.append(nn.BatchNorm1d(features_description[i]))
+
+            # batch norm
+            if norm != 'non':
+                module_list.append(cls.get_normalization(norm, num_features=features_description[i], dimension=2))
 
             module_list.append(GatedLinear(features_description[i], features_description[i+1]))
 

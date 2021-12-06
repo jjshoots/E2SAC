@@ -73,7 +73,7 @@ class Critic(nn.Module):
 
         _features_description = [64, 64, 1]
         _activation_description = ['lrelu'] * (len(_features_description) - 2) + ['identity']
-        self.merge = Neural_blocks.generate_linear_stack(_features_description, _activation_description, batch_norm=False)
+        self.merge = Neural_blocks.generate_linear_stack(_features_description, _activation_description)
 
 
     def forward(self, states, actions):
