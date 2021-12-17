@@ -1,0 +1,5 @@
+/venv
+/weights
+/optim_weights
+/resource
+.git

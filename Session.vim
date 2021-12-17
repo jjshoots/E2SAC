@@ -7,13 +7,14 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +306 src/main.py
-badd +33 src/settings.yaml
-badd +54 src/carracing.py
+badd +53 src/main.py
+badd +12 src/settings.yaml
+badd +38 src/carracing.py
+badd +223 src/ai_lib/UASAC.py
 argglobal
 %argdel
 $argadd ./
-edit src/main.py
+edit src/settings.yaml
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -31,11 +32,11 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 306 - ((30 * winheight(0) + 22) / 44)
+let s:l = 12 - ((11 * winheight(0) + 21) / 42)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-306
+12
 normal! 0
 if exists(':tcd') == 2 | tcd ~/Sandboxes/UA3SAC_gym | endif
 tabnext 1

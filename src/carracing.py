@@ -3,10 +3,12 @@ import gym
 import cv2
 import numpy as np
 
-class Environment():
+
+class Environment:
     """
     Wrapper for OpenAI gym environments that outputs suboptimal actions also
     """
+
     def __init__(self, image_size=(64, 64), verbose=False):
         super().__init__()
 
@@ -14,7 +16,7 @@ class Environment():
         self.frame_stack = 4
         self.max_off_track = 50
 
-        self.env = gym.make('CarRacing-v0', verbose=verbose)
+        self.env = gym.make("CarRacing-v0", verbose=verbose)
         self.num_actions = 2
         self.max_accel = 0.3
         self.max_brake = 0.5
@@ -28,14 +30,11 @@ class Environment():
 
         self.reset()
 
-
     def eval(self):
         self.eval_run = True
 
-
     def train(self):
         self.eval_run = False
-
 
     def reset(self):
         self.env.reset()
@@ -46,13 +45,13 @@ class Environment():
         self.off_track_t = 0
         self.done_marker = 0
         self.cumulative_reward = 0
-        self.state = np.concatenate([self.transform_obs(self.env.env.state)] * self.frame_stack, 0)
-
+        self.state = np.concatenate(
+            [self.transform_obs(self.env.env.state)] * self.frame_stack, 0
+        )
 
     def get_state(self):
         label = self.get_label(self.transform_obs(self.env.env.state))
         return self.state, None, None, label
-
 
     def step(self, action, startup=False):
 
@@ -79,7 +78,7 @@ class Environment():
 
         label = None if startup else self.get_label(obs)
 
-        if rwd < 0.:
+        if rwd < 0.0:
             self.off_track_t += 1
         else:
             self.off_track_t = 0
@@ -87,14 +86,13 @@ class Environment():
         # during training, only end when we go off track for more than specified steps
         if not self.eval_run:
             if self.off_track_t >= self.max_off_track:
-                dne = 1.
+                dne = 1.0
             else:
-                dne = 0.
+                dne = 0.0
 
         self.cumulative_reward += rwd
 
         return self.state, rwd, dne, label
-
 
     @property
     def is_done(self):
@@ -105,12 +103,11 @@ class Environment():
         train_criteria = self.off_track_t >= self.max_off_track and not self.eval_run
         return eval_criteria or train_criteria
 
-
     def transform_obs(self, obs):
         """
         grayscale and crop and resize and norm
         """
-        obs = (obs[:80, ...])
+        obs = obs[:80, ...]
         obs = cv2.resize(obs, dsize=self.image_size, interpolation=cv2.INTER_LINEAR)
         obs = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY)
         obs = np.expand_dims(obs, 0)
@@ -118,7 +115,6 @@ class Environment():
         obs = np.transpose(obs, (0, 2, 1))
 
         return obs
-
 
     def get_label(self, obs):
         obs = np.uint8((obs * 127.5 + 127.5))
@@ -136,12 +132,16 @@ class Environment():
         obs = cv2.findNonZero(obs)
 
         if obs is not None:
-            obs = (obs[:, 0, 0].max() + obs[:, 0, 0].min()) / 2 / (self.image_size[1] - 30)
+            obs = (
+                (obs[:, 0, 0].max() + obs[:, 0, 0].min())
+                / 2
+                / (self.image_size[1] - 30)
+            )
             obs = (obs - 0.5) / 0.5
         else:
-            obs = 0.
+            obs = 0.0
 
-        steering = 2. * obs
+        steering = 2.0 * obs
         accel = 0.5
 
         return np.clip(np.array([steering, accel]), -0.99, 0.99)

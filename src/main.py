@@ -27,7 +27,7 @@ def train(set):
     max_eval_perf = -100
 
     for epoch in range(set.start_epoch, set.epochs):
-        """ REINIT BUFFERS """
+        """REINIT BUFFERS"""
         eval_perf = []
         mean_reward = []
         total_reward = []
@@ -43,29 +43,30 @@ def train(set):
         entropy = np.zeros((set.num_envs, 1))
 
         """ EVAL RUN """
-        for env in envs:
-            env.reset()
-            env.eval()
-        net.eval()
-        net.zero_grad()
+        if epoch % set.eval_epoch_ratio == 0:
+            for env in envs:
+                env.reset()
+                env.eval()
+            net.eval()
+            net.zero_grad()
 
-        while len(eval_perf) < set.eval_num_traj:
-            with torch.no_grad():
-                # get the initial state and action
-                for i, env in enumerate(envs):
-                    obs, _, _, _ = env.get_state()
-                    states[i] = obs
+            while len(eval_perf) < set.eval_num_traj:
+                with torch.no_grad():
+                    # get the initial state and action
+                    for i, env in enumerate(envs):
+                        obs, _, _, _ = env.get_state()
+                        states[i] = obs
 
-                output = net.actor(gpuize(states, set.device))
-                actions = cpuize(net.actor.infer(*output))
+                    output = net.actor(gpuize(states, set.device))
+                    actions = cpuize(net.actor.infer(*output))
 
-                # get the next state and reward
-                for i, env in enumerate(envs):
-                    _, _, dne, _ = env.step(actions[i])
+                    # get the next state and reward
+                    for i, env in enumerate(envs):
+                        _, _, dne, _ = env.step(actions[i])
 
-                    if env.is_done:
-                        eval_perf.append(env.cumulative_reward)
-                        env.reset()
+                        if env.is_done:
+                            eval_perf.append(env.cumulative_reward)
+                            env.reset()
 
         """ENVIRONMENT INTERACTION """
         for env in envs:
@@ -107,6 +108,11 @@ def train(set):
                     memory.push(stuff)
 
                 # log progress
+                total_reward = (
+                    [env.cumulative_reward for env in envs]
+                    if len(total_reward) == 0
+                    else total_reward
+                )
                 mean_reward.append(np.mean(rewards))
                 entropy_tracker.append(np.mean(entropy))
 
@@ -119,7 +125,9 @@ def train(set):
 
         """ TRAINING RUN """
         net.train()
-        dataloader = torch.utils.data.DataLoader(memory, batch_size=set.batch_size, shuffle=True, drop_last=False)
+        dataloader = torch.utils.data.DataLoader(
+            memory, batch_size=set.batch_size, shuffle=True, drop_last=False
+        )
 
         for i in range(set.repeats_per_buffer):
             for j, stuff in enumerate(dataloader):
@@ -136,32 +144,46 @@ def train(set):
                 # train critic
                 reg_scale = None
                 for _ in range(set.critic_update_multiplier):
-                    q_loss, reg_scale = net.calc_critic_loss(states, actions, rewards, next_states, dones)
+                    q_loss, reg_scale = net.calc_critic_loss(
+                        states, actions, rewards, next_states, dones
+                    )
                     q_loss.backward()
-                    optim_set['critic'].step()
-                    sched_set['critic'].step()
+                    optim_set["critic"].step()
+                    sched_set["critic"].step()
                     net.update_q_target()
 
                 # train actor
                 for _ in range(set.actor_update_multiplier):
-                    rnf_loss, sup_loss, sup_scale, reg_loss = net.calc_actor_loss(states, dones, labels)
-                    actor_loss = set.reg_lambda * (sup_loss / reg_loss).mean().detach() * (reg_scale * reg_loss).mean() \
-                                 + ((1. - sup_scale) * rnf_loss).mean() + (sup_scale * sup_loss).mean()
+                    rnf_loss, sup_loss, sup_scale, reg_loss = net.calc_actor_loss(
+                        states, dones, labels
+                    )
+                    actor_loss = (
+                        set.reg_lambda
+                        * (sup_loss / reg_loss).mean().detach()
+                        * (reg_scale * reg_loss).mean()
+                        + ((1.0 - sup_scale) * rnf_loss).mean()
+                        + (sup_scale * sup_loss).mean()
+                    )
                     actor_loss.backward()
-                    optim_set['actor'].step()
-                    sched_set['actor'].step()
+                    optim_set["actor"].step()
+                    sched_set["actor"].step()
 
                     # train entropy regularizer
                     if net.use_entropy:
                         ent_loss = net.calc_alpha_loss(states)
                         ent_loss.backward()
-                        optim_set['alpha'].step()
-                        sched_set['alpha'].step()
+                        optim_set["alpha"].step()
+                        sched_set["alpha"].step()
 
                 """ WEIGHTS SAVING """
-                net_weights = net_helper.training_checkpoint(loss=-total_reward, batch=batch, epoch=epoch)
-                net_optim_weights = optim_helper.training_checkpoint(loss=-total_reward, batch=batch, epoch=epoch)
-                if net_weights != -1: torch.save(net.state_dict(), net_weights)
+                net_weights = net_helper.training_checkpoint(
+                    loss=-total_reward, batch=batch, epoch=epoch
+                )
+                net_optim_weights = optim_helper.training_checkpoint(
+                    loss=-total_reward, batch=batch, epoch=epoch
+                )
+                if net_weights != -1:
+                    torch.save(net.state_dict(), net_weights)
                 if net_optim_weights != -1:
                     optim_dict = dict()
                     for key in optim_set:
@@ -169,27 +191,29 @@ def train(set):
                     sched_dict = dict()
                     for key in optim_set:
                         sched_dict[key] = sched_set[key].state_dict()
-                    torch.save({ \
-                                'optim': optim_dict,
-                                'sched': sched_dict,
-                                'lowest_running_loss': optim_helper.lowest_running_loss,
-                                'epoch': epoch,
-                               },
-                              net_optim_weights)
+                    torch.save(
+                        {
+                            "optim": optim_dict,
+                            "sched": sched_dict,
+                            "lowest_running_loss": optim_helper.lowest_running_loss,
+                            "epoch": epoch,
+                        },
+                        net_optim_weights,
+                    )
 
                 """ WANDB """
                 if set.wandb:
                     metrics = {
-                                'epoch': epoch,
-                                'mean_reward': mean_reward,
-                                'total_reward': total_reward,
-                                'eval_perf': eval_perf,
-                                'max_eval_perf': max_eval_perf,
-                                'mean_entropy': entropy_tracker,
-                                'sup_scale': sup_scale.mean().item(),
-                                'log_alpha': net.log_alpha.item(),
-                                'num_episodes': num_episodes
-                               }
+                        "epoch": epoch,
+                        "mean_reward": mean_reward,
+                        "total_reward": total_reward,
+                        "eval_perf": eval_perf,
+                        "max_eval_perf": max_eval_perf,
+                        "mean_entropy": entropy_tracker,
+                        "sup_scale": sup_scale.mean().item(),
+                        "log_alpha": net.log_alpha.item(),
+                        "num_episodes": num_episodes,
+                    }
                     wandb.log(metrics)
 
 
@@ -206,13 +230,13 @@ def display(set):
 
     actions = np.zeros((set.num_envs, set.num_actions))
 
-    cv2.namedWindow('display', cv2.WINDOW_NORMAL)
+    cv2.namedWindow("display", cv2.WINDOW_NORMAL)
 
     while True:
         obs, rwd, dne, lbl = env.step(actions[0])
 
         if env.is_done:
-            actions *= 0.
+            actions *= 0.0
             env.reset()
 
         if use_net:
@@ -225,7 +249,7 @@ def display(set):
 
         display = np.concatenate([*obs], 1)
         display = np.uint8((display + 1) / 2 * 255)
-        cv2.imshow('display', display)
+        cv2.imshow("display", display)
         cv2.waitKey(int(1000 / 24))
 
 
@@ -237,19 +261,21 @@ def setup_envs(set):
 
 
 def setup_nets(set):
-    net_helper = Logger(mark_number=set.net_number,
-                         version_number=set.net_version,
-                         weights_location=set.weights_directory,
-                         epoch_interval=set.epoch_interval,
-                         batch_interval=set.batch_interval,
-                         )
-    optim_helper = Logger(mark_number=0,
-                           version_number=set.net_version,
-                           weights_location=set.optim_weights_directory,
-                           epoch_interval=set.epoch_interval,
-                           batch_interval=set.batch_interval,
-                           increment=False,
-                           )
+    net_helper = Logger(
+        mark_number=set.net_number,
+        version_number=set.net_version,
+        weights_location=set.weights_directory,
+        epoch_interval=set.epoch_interval,
+        batch_interval=set.batch_interval,
+    )
+    optim_helper = Logger(
+        mark_number=0,
+        version_number=set.net_version,
+        weights_location=set.optim_weights_directory,
+        epoch_interval=set.epoch_interval,
+        batch_interval=set.batch_interval,
+        increment=False,
+    )
 
     # set up networks and optimizers
     net = UASAC(
@@ -257,28 +283,37 @@ def setup_nets(set):
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
         confidence_scale=set.confidence_scale,
-        confidence_cutoff=set.confidence_cutoff
+        confidence_cutoff=set.confidence_cutoff,
     ).to(set.device)
     actor_optim = optim.AdamW(net.actor.parameters(), lr=set.starting_LR, amsgrad=True)
-    actor_sched = optim.lr_scheduler.StepLR(actor_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma)
-    critic_optim = optim.AdamW(net.critic.parameters(), lr=set.starting_LR, amsgrad=True)
-    critic_sched = optim.lr_scheduler.StepLR(critic_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma)
+    actor_sched = optim.lr_scheduler.StepLR(
+        actor_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma
+    )
+    critic_optim = optim.AdamW(
+        net.critic.parameters(), lr=set.starting_LR, amsgrad=True
+    )
+    critic_sched = optim.lr_scheduler.StepLR(
+        critic_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma
+    )
     alpha_optim = optim.AdamW([net.log_alpha], lr=set.starting_LR, amsgrad=True)
-    alpha_sched = optim.lr_scheduler.StepLR(alpha_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma)
+    alpha_sched = optim.lr_scheduler.StepLR(
+        alpha_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma
+    )
 
     optim_set = dict()
-    optim_set['actor'] = actor_optim
-    optim_set['critic'] = critic_optim
-    optim_set['alpha'] = alpha_optim
+    optim_set["actor"] = actor_optim
+    optim_set["critic"] = critic_optim
+    optim_set["alpha"] = alpha_optim
 
     sched_set = dict()
-    sched_set['actor'] = actor_sched
-    sched_set['critic'] = critic_sched
-    sched_set['alpha'] = alpha_sched
+    sched_set["actor"] = actor_sched
+    sched_set["critic"] = critic_sched
+    sched_set["alpha"] = alpha_sched
 
     # get latest weight files
     net_weights = net_helper.get_weight_file()
-    if net_weights != -1: net.load_state_dict(torch.load(net_weights))
+    if net_weights != -1:
+        net.load_state_dict(torch.load(net_weights))
 
     # get latest optimizer states
     net_optimizer_weights = optim_helper.get_weight_file()
@@ -286,20 +321,21 @@ def setup_nets(set):
         checkpoint = torch.load(net_optimizer_weights)
 
         for opt_key in optim_set:
-            optim_set[opt_key].load_state_dict(checkpoint['optim'][opt_key])
+            optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
         for sch_key in sched_set:
-            sched_set[sch_key].load_state_dict(checkpoint['optim'][sch_key])
+            sched_set[sch_key].load_state_dict(checkpoint["optim"][sch_key])
 
-        net_helper.lowest_running_loss = checkpoint['lowest_running_loss']
-        optim_helper.lowest_running_loss = checkpoint['lowest_running_loss']
+        net_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
+        optim_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
         # set.start_epoch = checkpoint['epoch']
-        print(f'Lowest Running Loss for Net: {net_helper.lowest_running_loss} @ epoch {set.start_epoch}')
+        print(
+            f"Lowest Running Loss for Net: {net_helper.lowest_running_loss} @ epoch {set.start_epoch}"
+        )
 
-    return \
-        net, net_helper, optim_set, sched_set, optim_helper
+    return net, net_helper, optim_set, sched_set, optim_helper
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     signal(SIGINT, shutdown_handler)
     set = parse_set()
     check_venv()
@@ -311,9 +347,9 @@ if __name__ == '__main__':
     elif set.train:
         train(set)
     else:
-        print('Guess this is life now.')
+        print("Guess this is life now.")
 
     """ SCRIPTS END """
 
     if set.shutdown:
-        os.system('poweroff')
+        os.system("poweroff")
