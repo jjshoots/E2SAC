@@ -1,5 +1,5 @@
-/venv
-/weights
 /optim_weights
+/venv
+/wandb
+/weights
 /resource
-.git

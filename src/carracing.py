@@ -18,8 +18,8 @@ class Environment:
 
         self.env = gym.make("CarRacing-v0", verbose=verbose)
         self.num_actions = 2
-        self.max_accel = 0.3
-        self.max_brake = 0.5
+        self.max_accel = 1.0
+        self.max_brake = 1.0
 
         self.off_track_t = 0
         self.done_marker = 0
@@ -70,14 +70,25 @@ class Environment:
         brake = ((action[1]) < 0) * abs(action[1]) * self.max_brake
         action = np.array([steer, accel, brake])
 
-        obs, rwd, dne, _ = self.env.step(action)
-        self.done_marker = copy.copy(dne)
+        obs = []
+        rwd = 0.0
+        dne = 0.0
+        lbl = None
+        for i in range(self.frame_stack):
+            observation, reward, done, _ = self.env.step(action)
+            obs.append(self.transform_obs(observation))
+            rwd += reward
+            dne = max(dne, done)
 
-        obs = self.transform_obs(obs)
-        self.state = np.concatenate([self.state[1:], obs])
+            self.done_marker = copy.copy(dne)
+            if i == 0:
+                lbl = (
+                    None if startup else self.get_label(self.transform_obs(observation))
+                )
 
-        label = None if startup else self.get_label(obs)
+        self.state = np.concatenate(obs, axis=0)
 
+        # record the number of times we go off track or generate no rewards
         if rwd < 0.0:
             self.off_track_t += 1
         else:
@@ -92,7 +103,7 @@ class Environment:
 
         self.cumulative_reward += rwd
 
-        return self.state, rwd, dne, label
+        return self.state, rwd, dne, lbl
 
     @property
     def is_done(self):
@@ -107,18 +118,24 @@ class Environment:
         """
         grayscale and crop and resize and norm
         """
-        obs = obs[:80, ...]
+        # obs = obs[:80, ...]
         obs = cv2.resize(obs, dsize=self.image_size, interpolation=cv2.INTER_LINEAR)
-        obs = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY)
-        obs = np.expand_dims(obs, 0)
-        obs = (obs - 127.5) / 127.5
-        obs = np.transpose(obs, (0, 2, 1))
+        # obs = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY)
+        # obs = np.expand_dims(obs, 0)
+        # obs = (obs - 127.5) / 127.5
+        obs = np.transpose(obs, (2, 0, 1))
 
         return obs
 
     def get_label(self, obs):
+
+        obs = np.transpose(obs, (1, 2, 0))
+        obs = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY)
+        obs = np.expand_dims(obs, 0)
+        obs = (obs - 127.5) / 127.5
+
         obs = np.uint8((obs * 127.5 + 127.5))
-        obs = np.transpose(obs, (2, 1, 0))
+        obs = np.transpose(obs, (1, 2, 0))
 
         # blur
         obs = cv2.GaussianBlur(obs, (5, 5), 0)
@@ -141,7 +158,10 @@ class Environment:
         else:
             obs = 0.0
 
-        steering = 2.0 * obs
-        accel = 0.5
+        steering = 0.6 * obs
+        accel = 0.1
+
+        # steering = 0.0
+        # accel = 0.3
 
         return np.clip(np.array([steering, accel]), -0.99, 0.99)

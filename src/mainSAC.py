@@ -16,8 +16,7 @@ from utility.shebangs import *
 from carracing import *
 
 from ai_lib.replay_buffer import *
-from ai_lib.normal_inverse_gamma import *
-from ai_lib.UASAC import UASAC
+from ai_lib.SAC import SAC
 
 
 def train(set):
@@ -68,15 +67,15 @@ def train(set):
         with torch.no_grad():
             while not env.is_done:
                 # get the initial state and label
-                obs, _, _, lbl = env.get_state()
+                obs, _, _, _ = env.get_state()
 
                 # pass states to actor and get actions
                 output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                if epoch < set.exploration_epochs:
+                if epoch < 100:
                     action = np.random.uniform(-1.0, 1.0, 2)
                     ent = 0.0
                 else:
-                    action, ent, _ = net.actor.sample(*output)
+                    action, ent = net.actor.sample(*output)
                     action = cpuize(action)[0]
                     ent = cpuize(ent)[0]
 
@@ -84,7 +83,7 @@ def train(set):
                 next_obs, rew, dne, _ = env.step(action)
 
                 # store stuff in mem
-                memory.push((obs, action, rew, next_obs, dne, lbl))
+                memory.push((obs, action, rew, next_obs, dne))
 
                 # log progress
                 mean_entropy.append(ent)
@@ -108,13 +107,11 @@ def train(set):
                 rewards = gpuize(stuff[2], set.device)
                 next_states = gpuize(stuff[3], set.device)
                 dones = gpuize(stuff[4], set.device)
-                labels = gpuize(stuff[5], set.device)
 
                 # train critic
-                regularizer = None
                 for _ in range(set.critic_update_multiplier):
                     net.zero_grad()
-                    q_loss, regularizer = net.calc_critic_loss(
+                    q_loss = net.calc_critic_loss(
                         states, actions, rewards, next_states, dones
                     )
                     q_loss.backward()
@@ -126,16 +123,8 @@ def train(set):
                 # train actor
                 for _ in range(set.actor_update_multiplier):
                     net.zero_grad()
-                    rnf_loss, sup_loss, sup_scale, reg_loss = net.calc_actor_loss(
-                        states, dones, labels
-                    )
-
-                    actor_loss = (
-                        (set.reg_lambda * regularizer * reg_loss).mean()
-                        + ((1.0 - sup_scale) * rnf_loss).mean()
-                        + (sup_scale * sup_loss).mean()
-                    )
-                    actor_loss.backward()
+                    rnf_loss = net.calc_actor_loss(states, dones)
+                    rnf_loss.backward()
                     # nn.utils.clip_grad_norm_(net.actor.parameters(), max_norm=2.0, norm_type=2)
                     optim_set["actor"].step()
                     sched_set["actor"].step()
@@ -182,7 +171,6 @@ def train(set):
                         "eval_perf": eval_perf,
                         "max_eval_perf": max_eval_perf,
                         "mean_entropy": mean_entropy,
-                        "sup_scale": sup_scale.mean().item(),
                         "log_alpha": net.log_alpha.item(),
                         "num_episodes": epoch,
                     }
@@ -226,13 +214,12 @@ def display(set):
                 .item()
             )
         else:
-            action = lbl
+            action = lbl[0]
 
-        display = obs[:3, ...]
-        display = np.transpose(display, (1, 2, 0))
-        # display = np.uint8((display + 1) / 2 * 255)
+        display = np.concatenate([*obs], 1)
+        display = np.uint8((display + 1) / 2 * 255)
         cv2.imshow("display", display)
-        cv2.waitKey(int(1000 / 15))
+        cv2.waitKey(int(1000 / 24))
 
 
 def setup_env(set):
@@ -260,12 +247,10 @@ def setup_nets(set):
     )
 
     # set up networks and optimizers
-    net = UASAC(
+    net = SAC(
         num_actions=set.num_actions,
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
-        confidence_scale=set.confidence_scale,
-        confidence_cutoff=set.confidence_cutoff,
     ).to(set.device)
     actor_optim = optim.AdamW(net.actor.parameters(), lr=set.starting_LR, amsgrad=True)
     actor_sched = optim.lr_scheduler.StepLR(

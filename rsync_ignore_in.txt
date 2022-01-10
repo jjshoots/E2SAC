@@ -1,0 +1,12 @@
+/resource
+/slurm
+/src
+/venv
+/wandb
+README.md
+requirements.txt
+rsync*
+run.sh
+Session.vim
+sweep.yaml
+sync*

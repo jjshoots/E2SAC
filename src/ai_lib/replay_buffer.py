@@ -24,6 +24,14 @@ class ReplayBuffer(Dataset):
         return (*data,)
 
     def push(self, data):
+        def _ensure_dims(thing):
+            thing = np.array(thing)
+            if len(thing.shape) == 0:
+                thing = np.expand_dims(thing, axis=0)
+            return thing
+
+        data = list(map(_ensure_dims, data))
+
         if self.counter == 0:
             self.memory = []
             for i in range(len(data)):

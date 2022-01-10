@@ -96,9 +96,6 @@ class UASAC(nn.Module):
         self.confidence_scale = confidence_scale
         self.confidence_cutoff = confidence_cutoff
 
-        # backbone
-        self.backbone = Backbone()
-
         # actor head
         self.actor = GaussianActor(num_actions)
 
@@ -128,7 +125,16 @@ class UASAC(nn.Module):
         else:
             self.log_alpha = nn.Parameter(torch.tensor(0.0, requires_grad=True))
 
-    def update_q_target(self, tau=0.1):
+        # store q_variance
+        self.q_std = None
+
+    def update_q_std(self, q_std, tau=0.05):
+        if self.q_std is None:
+            self.q_std = q_std
+        else:
+            self.q_std = (1 - tau) * self.q_std + tau * q_std
+
+    def update_q_target(self, tau=0.005):
         # polyak averaging update for target q network
         for target, source in zip(
             self.critic_target.parameters(), self.critic.parameters()
@@ -166,19 +172,22 @@ class UASAC(nn.Module):
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
                 rewards
-                - self.log_alpha.exp().detach() * entropies
-                + dones * gamma * next_q
+                + (-self.log_alpha.exp().detach() * entropies + gamma * next_q) * dones
             )
 
         # critic loss is mean squared TD errors
         q1_loss = func.mse_loss(curr_q1, target_q, reduction="none")
         q2_loss = func.mse_loss(curr_q2, target_q, reduction="none")
-        q_loss = q1_loss + q2_loss
+        q_loss = (q1_loss + q2_loss) / 2.0
+
+        # update the q_std
+        self.update_q_std(torch.std(target_q).detach())
 
         # NIG regularizer scale
-        reg_scale = q_loss.abs().detach()
+        regularizer = (abs(curr_q1 - target_q) + abs(curr_q2 - target_q))
+        regularizer = regularizer / self.q_std
 
-        return (q_loss.mean() / 2.0), reg_scale
+        return q_loss.mean(), regularizer.detach()
 
     def calc_actor_loss(self, states, dones, labels):
         """

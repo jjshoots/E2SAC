@@ -80,6 +80,15 @@ def arg_parser():
         help="ID of the run in wandb.",
     )
 
+    parser.add_argument(
+        "--net_version",
+        type=str,
+        nargs="?",
+        const=False,
+        default="",
+        help="Network weights number.",
+    )
+
     return parser.parse_args()
 
 
@@ -116,11 +125,19 @@ def parse_set():
         if args.debug
         else settings["transitions_per_epoch"]
     )
-    settings["net_version"] = (
-        str(np.random.randint(100000))
-        if settings["net_version"] == ""
-        else settings["net_version"]
-    )
+    # when formatting net_version, assert that only either args or settings
+    # file have a value, not both
+    if settings["net_version"] == "" and args.net_version == "":
+        settings["net_version"] = str(np.random.randint(999999))
+    elif settings["net_version"] != "" and args.net_version == "":
+        settings["net_version"] = settings["net_version"]
+    elif settings["net_version"] == "" and args.net_version != "":
+        settings["net_version"] = args.net_version
+    else:
+        raise AssertionError(
+            "net_version cannot be set in both settings.yaml and in args."
+        )
+    args.net_version = settings["net_version"]
 
     # merge args and settings
     settings = dict({**settings, **vars(args)})

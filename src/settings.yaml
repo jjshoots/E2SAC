@@ -1,37 +1,41 @@
-# settings.yaml file
-
 # number of environments to run in parallel
 num_envs: 1
 
 # training params
-buffer_size: 100000
+buffer_size: 200000
 buffer_size_debug: 10000
-batch_size: 128
+batch_size: 256
 start_epoch: 0
-epochs: 500
+epochs: 2000
 transitions_per_epoch: 1000
-repeats_per_buffer: 1
-critic_update_multiplier: 5
+repeats_per_buffer: 5
+critic_update_multiplier: 1
 actor_update_multiplier: 1
 
+# exploration settings
+exploration_epochs: 50
+
+# learning rate and scheduler
 starting_LR: 0.001
-scheduler_steps: 5
+scheduler_steps: 2
 scheduler_gamma: 0.5
 
-reg_lambda: 0.01
+# algorithm specifics
+reg_lambda: 0.00001
 use_entropy: true
-target_entropy: -2.
-confidence_scale: 5.0
+target_entropy: -1.5
+confidence_scale: 1.
 confidence_cutoff: 0.2
 
+# eval settings
 eval_num_traj: 100
-eval_epoch_ratio: 5
+eval_epoch_ratio: 20
 
 # helper params
 wandb_project: 'UA3SAC_gym'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
-net_version: 'test_short_epochs'
+net_version: ''
 net_number: 0
 epoch_interval: 1
 batch_interval: -1
