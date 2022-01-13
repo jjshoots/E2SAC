@@ -58,6 +58,7 @@ def train(set):
         """ENVIRONMENT INTERACTION """
         total_reward = []
         mean_entropy = []
+        video_log = []
 
         env.reset()
         env.train()
@@ -71,7 +72,7 @@ def train(set):
 
                 # pass states to actor and get actions
                 output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                if epoch < 100:
+                if epoch < set.exploration_epochs:
                     action = np.random.uniform(-1.0, 1.0, 2)
                     ent = 0.0
                 else:
@@ -87,10 +88,12 @@ def train(set):
 
                 # log progress
                 mean_entropy.append(ent)
+                video_log.append(np.uint8(obs[:3, ...] * 127.5 + 127.5))
 
         # for logging
         total_reward = env.cumulative_reward
         mean_entropy = np.mean(np.array(mean_entropy))
+        video_log = np.stack(video_log, axis=0)
 
         """ TRAINING RUN """
         dataloader = torch.utils.data.DataLoader(
@@ -164,8 +167,9 @@ def train(set):
                     )
 
                 """ WANDB """
-                if set.wandb:
+                if set.wandb and i == 0 and j == 0:
                     metrics = {
+                        "video": wandb.Video(video_log, fps=50, format="gif"),
                         "epoch": epoch,
                         "total_reward": total_reward,
                         "eval_perf": eval_perf,
@@ -204,8 +208,8 @@ def display(set):
             output = net.actor(gpuize(obs, set.device).unsqueeze(0))
             # action = cpuize(net.actor.sample(*output)[0][0])
             action = cpuize(net.actor.infer(*output))[0]
-            # print(action)
 
+            # print(action)
             print(
                 net.critic.forward(
                     gpuize(obs, set.device).unsqueeze(0), net.actor.infer(*output)[0]
@@ -216,10 +220,11 @@ def display(set):
         else:
             action = lbl[0]
 
-        display = np.concatenate([*obs], 1)
-        display = np.uint8((display + 1) / 2 * 255)
+        display = obs[:3, ...]
+        display = np.uint8((display * 127.5 + 127.5))
+        display = np.transpose(display, (1, 2, 0))
         cv2.imshow("display", display)
-        cv2.waitKey(int(1000 / 24))
+        cv2.waitKey(int(1000 / 15))
 
 
 def setup_env(set):

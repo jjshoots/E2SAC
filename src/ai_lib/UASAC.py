@@ -56,7 +56,7 @@ class GaussianActor(nn.Module):
             log_probs is of shape ** x num_actions
         """
         output = gamma, nu, alpha, beta
-        normals = ShrunkenNormalInvGamma(*output)
+        normals = ShrunkenNormalInvGamma(*output, clamp_mean=2., clamp_var=10.)
 
         # compute epistemic uncertainty
         uncertainty = NIG_uncertainty(*output)
@@ -128,11 +128,13 @@ class UASAC(nn.Module):
         # store q_variance
         self.q_std = None
 
-    def update_q_std(self, q_std, tau=0.05):
-        if self.q_std is None:
-            self.q_std = q_std
-        else:
-            self.q_std = (1 - tau) * self.q_std + tau * q_std
+    def update_q_std(self, q, tau=0.05):
+        q = torch.var(q)
+        if not torch.isnan(q):
+            if self.q_std is None:
+                self.q_std = q
+            else:
+                self.q_std = (1 - tau) * self.q_std + tau * q
 
     def update_q_target(self, tau=0.005):
         # polyak averaging update for target q network
@@ -181,11 +183,11 @@ class UASAC(nn.Module):
         q_loss = (q1_loss + q2_loss) / 2.0
 
         # update the q_std
-        self.update_q_std(torch.std(target_q).detach())
+        self.update_q_std(target_q)
 
         # NIG regularizer scale
-        regularizer = (abs(curr_q1 - target_q) + abs(curr_q2 - target_q))
-        regularizer = regularizer / self.q_std
+        regularizer = abs(curr_q1 - target_q) + abs(curr_q2 - target_q)
+        regularizer = regularizer / (self.q_std + 1e-6)
 
         return q_loss.mean(), regularizer.detach()
 
@@ -208,12 +210,12 @@ class UASAC(nn.Module):
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         rnf_loss = 0.0
         if self.use_entropy:
-            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * dones) + 1e-6
+            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * dones)
         else:
-            rnf_loss = -(q * dones) + 1e-6
+            rnf_loss = -(q * dones)
 
         # supervised loss is NLL loss between label and output
-        sup_loss = NIG_NLL(torch.atanh(labels), *output, reduce=False) + 1e-6
+        sup_loss = NIG_NLL(torch.atanh(labels), *output, reduce=False)
 
         # supervision scale
         sup_scale = (1.0 - torch.exp(-self.confidence_scale * uncertainty)).detach()

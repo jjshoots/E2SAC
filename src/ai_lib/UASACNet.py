@@ -13,7 +13,7 @@ class Backbone(nn.Module):
     def __init__(self):
         super().__init__()
 
-        channels = [12, 128, 128, 128, 4]
+        channels = [12, 128, 128, 128, 8]
         kernels = [3] * (len(channels) - 1)
         pooling = [2] * (len(channels) - 1)
         activation = ["lrelu"] * len(kernels)
@@ -36,7 +36,7 @@ class Actor(nn.Module):
 
         self.backbone = Backbone()
 
-        _features_description = [64, 64, num_actions * 4]
+        _features_description = [128, 128, num_actions * 4]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -68,19 +68,13 @@ class Critic(nn.Module):
 
         self.backbone = Backbone()
 
-        _features_description = [64, 64]
-        _activation_description = ["lrelu"] * (len(_features_description) - 1)
-        self.context = Neural_blocks.generate_linear_stack(
-            _features_description, _activation_description
-        )
-
-        _features_description = [num_actions, 64]
+        _features_description = [num_actions, 128]
         _activation_description = ["identity"] * (len(_features_description) - 1)
         self.action = Neural_blocks.generate_linear_stack(
             _features_description, _activation_description
         )
 
-        _features_description = [64, 64, 1]
+        _features_description = [128, 128, 128, 1]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -90,4 +84,4 @@ class Critic(nn.Module):
 
     def forward(self, states, actions):
         states = self.backbone(states)
-        return self.merge(self.context(states) + self.action(actions))
+        return self.merge(states + self.action(actions))

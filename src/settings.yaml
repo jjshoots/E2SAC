@@ -2,13 +2,13 @@
 num_envs: 1
 
 # training params
-buffer_size: 200000
+buffer_size: 300000
 buffer_size_debug: 10000
-batch_size: 256
+batch_size: 170
 start_epoch: 0
 epochs: 2000
 transitions_per_epoch: 1000
-repeats_per_buffer: 5
+repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 
@@ -21,18 +21,18 @@ scheduler_steps: 2
 scheduler_gamma: 0.5
 
 # algorithm specifics
-reg_lambda: 0.00001
-use_entropy: true
-target_entropy: -1.5
+reg_lambda: 0.04
 confidence_scale: 1.
-confidence_cutoff: 0.2
+confidence_cutoff: 0.25
+use_entropy: true
+target_entropy: -0.5
 
 # eval settings
 eval_num_traj: 100
 eval_epoch_ratio: 20
 
 # helper params
-wandb_project: 'UA3SAC_gym'
+wandb_project: 'e2SAC'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''

@@ -3,3 +3,4 @@
 /wandb
 /weights
 /resource
+*/__pycache__

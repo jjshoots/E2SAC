@@ -29,7 +29,7 @@ def train(set):
 
     for epoch in range(set.start_epoch, set.epochs):
         """EVAL RUN"""
-        if epoch % set.eval_epoch_ratio == 0:
+        if epoch % set.eval_epoch_ratio == 0 and epoch != 0:
             env.reset()
             env.eval()
             net.eval()
@@ -59,6 +59,7 @@ def train(set):
         """ENVIRONMENT INTERACTION """
         total_reward = []
         mean_entropy = []
+        video_log = []
 
         env.reset()
         env.train()
@@ -72,13 +73,9 @@ def train(set):
 
                 # pass states to actor and get actions
                 output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                if epoch < set.exploration_epochs:
-                    action = np.random.uniform(-1.0, 1.0, 2)
-                    ent = 0.0
-                else:
-                    action, ent, _ = net.actor.sample(*output)
-                    action = cpuize(action)[0]
-                    ent = cpuize(ent)[0]
+                action, ent, _ = net.actor.sample(*output)
+                action = cpuize(action)[0]
+                ent = cpuize(ent)[0]
 
                 # get the next state and other stuff
                 next_obs, rew, dne, _ = env.step(action)
@@ -88,10 +85,12 @@ def train(set):
 
                 # log progress
                 mean_entropy.append(ent)
+                video_log.append(np.uint8(obs[:3, ...] * 127.5 + 127.5))
 
         # for logging
         total_reward = env.cumulative_reward
         mean_entropy = np.mean(np.array(mean_entropy))
+        video_log = np.stack(video_log, axis=0)
 
         """ TRAINING RUN """
         dataloader = torch.utils.data.DataLoader(
@@ -123,13 +122,13 @@ def train(set):
                     sched_set["critic"].step()
                     net.update_q_target()
 
+
                 # train actor
                 for _ in range(set.actor_update_multiplier):
                     net.zero_grad()
                     rnf_loss, sup_loss, sup_scale, reg_loss = net.calc_actor_loss(
                         states, dones, labels
                     )
-
                     actor_loss = (
                         (set.reg_lambda * regularizer * reg_loss).mean()
                         + ((1.0 - sup_scale) * rnf_loss).mean()
@@ -175,8 +174,9 @@ def train(set):
                     )
 
                 """ WANDB """
-                if set.wandb:
+                if set.wandb and i == 0 and j == 0:
                     metrics = {
+                        "video": wandb.Video(video_log, fps=50, format="gif"),
                         "epoch": epoch,
                         "total_reward": total_reward,
                         "eval_perf": eval_perf,
@@ -216,8 +216,8 @@ def display(set):
             output = net.actor(gpuize(obs, set.device).unsqueeze(0))
             # action = cpuize(net.actor.sample(*output)[0][0])
             action = cpuize(net.actor.infer(*output))[0]
-            # print(action)
 
+            # print(action)
             print(
                 net.critic.forward(
                     gpuize(obs, set.device).unsqueeze(0), net.actor.infer(*output)[0]
@@ -229,8 +229,8 @@ def display(set):
             action = lbl
 
         display = obs[:3, ...]
+        display = np.uint8((display * 127.5 + 127.5))
         display = np.transpose(display, (1, 2, 0))
-        # display = np.uint8((display + 1) / 2 * 255)
         cv2.imshow("display", display)
         cv2.waitKey(int(1000 / 15))
 
@@ -318,6 +318,10 @@ def setup_nets(set):
 
 
 if __name__ == "__main__":
+
+    # delete this line during actual training deployment
+    torch.autograd.set_detect_anomaly(True)
+
     signal(SIGINT, shutdown_handler)
     set = parse_set()
     check_venv()

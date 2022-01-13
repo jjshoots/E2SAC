@@ -2,23 +2,22 @@ let SessionLoad = 1
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
 silent only
-cd ~/Sandboxes/UA3SAC_gym
+cd ~/Sandboxes/e2SAC
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +71 src/main.py
-badd +75 src/mainSAC.py
-badd +11 src/settings.yaml
-badd +16 src/ai_lib/UASACNet.py
-badd +203 src/ai_lib/UASAC.py
-badd +148 src/carracing.py
-badd +16 src/ai_lib/SACNet.py
-badd +9 run.sh
+badd +92 src/main.py
+badd +91 src/mainSAC.py
+badd +5 src/settings.yaml
+badd +54 src/ai_lib/UASACNet.py
+badd +190 src/ai_lib/UASAC.py
+badd +10 run.sh
+badd +9 sweep.yaml
 argglobal
 %argdel
 $argadd src/main.py
-edit src/settings.yaml
+edit src/main.py
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -36,19 +35,19 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 26 - ((25 * winheight(0) + 22) / 45)
+let s:l = 92 - ((22 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-26
-normal! 020|
-if exists(':tcd') == 2 | tcd ~/Sandboxes/UA3SAC_gym | endif
+92
+normal! 0
+if exists(':tcd') == 2 | tcd ~/Sandboxes/e2SAC | endif
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
 unlet! s:wipebuf
-set winheight=1 winwidth=20 winminheight=1 winminwidth=1 shortmess=filnxtToOFA
+set winheight=1 winwidth=90 winminheight=1 winminwidth=1 shortmess=filnxtToOFA
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if file_readable(s:sx)
   exe "source " . fnameescape(s:sx)

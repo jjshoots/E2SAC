@@ -122,19 +122,18 @@ class Environment:
         obs = cv2.resize(obs, dsize=self.image_size, interpolation=cv2.INTER_LINEAR)
         # obs = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY)
         # obs = np.expand_dims(obs, 0)
-        # obs = (obs - 127.5) / 127.5
         obs = np.transpose(obs, (2, 0, 1))
+        obs = (obs - 127.5) / 127.5
 
         return obs
 
     def get_label(self, obs):
+        obs = np.uint8((obs * 127.5 + 127.5))
 
         obs = np.transpose(obs, (1, 2, 0))
         obs = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY)
         obs = np.expand_dims(obs, 0)
-        obs = (obs - 127.5) / 127.5
 
-        obs = np.uint8((obs * 127.5 + 127.5))
         obs = np.transpose(obs, (1, 2, 0))
 
         # blur
