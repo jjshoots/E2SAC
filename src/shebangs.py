@@ -1,12 +1,12 @@
+import argparse
 import os
 import sys
-import argparse
 import warnings
 
 import yaml
-import wandb
+from utils.helpers import *
 
-from ai_lib.helpers import *
+import wandb
 
 
 def shutdown_handler(*_):
@@ -105,7 +105,7 @@ def parse_set():
     args = arg_parser()
 
     # parse settings
-    with open(os.path.join(os.path.dirname(__file__), "../settings.yaml")) as f:
+    with open(os.path.join(os.path.dirname(__file__), "./settings.yaml")) as f:
         settings = yaml.load(f, Loader=yaml.FullLoader)
 
     # format settings a bit

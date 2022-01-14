@@ -7,25 +7,23 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +92 src/main.py
-badd +91 src/mainSAC.py
-badd +5 src/settings.yaml
-badd +54 src/ai_lib/UASACNet.py
-badd +190 src/ai_lib/UASAC.py
-badd +10 run.sh
-badd +9 sweep.yaml
+badd +1 src/main.py
+badd +18 src/mainSAC.py
+badd +18 utils/helpers.py
 argglobal
 %argdel
-$argadd src/main.py
-edit src/main.py
+$argadd .gitignore
+edit utils/helpers.py
 set splitbelow splitright
-set nosplitbelow
-set nosplitright
 wincmd t
 set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
+exe '2resize ' . ((&lines * 2 + 24) / 48)
+exe 'vert 2resize ' . ((&columns * 1 + 86) / 173)
+exe '3resize ' . ((&lines * 2 + 24) / 48)
+exe 'vert 3resize ' . ((&columns * 20 + 86) / 173)
 argglobal
 setlocal fdm=indent
 setlocal fde=0
@@ -35,13 +33,39 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 92 - ((22 * winheight(0) + 23) / 46)
+let s:l = 18 - ((9 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-92
-normal! 0
-if exists(':tcd') == 2 | tcd ~/Sandboxes/e2SAC | endif
+18
+normal! 026|
+wincmd w
+argglobal
+enew
+setlocal fdm=indent
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+wincmd w
+argglobal
+enew
+setlocal fdm=indent
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal nofen
+wincmd w
+exe '2resize ' . ((&lines * 2 + 24) / 48)
+exe 'vert 2resize ' . ((&columns * 1 + 86) / 173)
+exe '3resize ' . ((&lines * 2 + 24) / 48)
+exe 'vert 3resize ' . ((&columns * 20 + 86) / 173)
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

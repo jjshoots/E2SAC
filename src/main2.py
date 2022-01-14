@@ -1,22 +1,18 @@
 import os
 import sys
-from signal import signal, SIGINT
+from signal import SIGINT, signal
 
 import cv2
-import torch
-import wandb
 import numpy as np
-
 import torch
 import torch.optim as optim
 
-from utility.shebangs import *
-
+import wandb
 from carracing import *
-
-from ai_lib.replay_buffer import *
-from ai_lib.normal_inverse_gamma import *
-from ai_lib.UASAC import UASAC
+from e2SAC.normal_inverse_gamma import *
+from e2SAC.UASAC import UASAC
+from utility.shebangs import *
+from utils.replay_buffer import *
 
 
 def train(set):

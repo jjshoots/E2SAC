@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import warnings
+
 import torch
-import torch.nn as nn
 import torch.distributions as dist
+import torch.nn as nn
 import torch.nn.functional as func
 
-from ai_lib.UASACNet import *
-from ai_lib.neural_blocks import *
-from ai_lib.normal_inverse_gamma import *
+from SAC.SACNet import *
+from utils.neural_blocks import *
 
 
 class TwinnedQNetwork(nn.Module):
@@ -45,21 +45,19 @@ class GaussianActor(nn.Module):
         self.net = Actor(num_actions)
 
     def forward(self, states):
-        return self.net(states)
+        output = torch.tanh(self.net(states))
+        return output[0] * 2.0, output[1] * 10.0
 
     @staticmethod
-    def sample(gamma, nu, alpha, beta):
+    def sample(mu, sigma):
         """
         output:
             actions is of shape ** x num_actions
             entropies is of shape ** x 1
             log_probs is of shape ** x num_actions
         """
-        output = gamma, nu, alpha, beta
-        normals = ShrunkenNormalInvGamma(*output, clamp_mean=2., clamp_var=10.)
-
-        # compute epistemic uncertainty
-        uncertainty = NIG_uncertainty(*output)
+        # lower bound sigma and bias it
+        normals = dist.Normal(mu, F.softplus(sigma + 1) + 1e-6)
 
         # sample from dist
         mu_samples = normals.rsample()
@@ -69,16 +67,16 @@ class GaussianActor(nn.Module):
         log_probs = normals.log_prob(mu_samples) - torch.log(1 - actions.pow(2) + 1e-6)
         entropies = log_probs.sum(dim=-1, keepdim=True)
 
-        return actions, entropies, uncertainty
+        return actions, entropies
 
     @staticmethod
-    def infer(gamma, nu, alpha, beta):
-        return torch.tanh(gamma)
+    def infer(mu, sigma):
+        return torch.tanh(mu)
 
 
-class UASAC(nn.Module):
+class SAC(nn.Module):
     """
-    Uncertainty Aware Actor Critic
+    Soft Actor Critic
     """
 
     def __init__(
@@ -86,15 +84,11 @@ class UASAC(nn.Module):
         num_actions,
         entropy_tuning=True,
         target_entropy=None,
-        confidence_scale=3.0,
-        confidence_cutoff=0.2,
     ):
         super().__init__()
 
         self.num_actions = num_actions
         self.use_entropy = entropy_tuning
-        self.confidence_scale = confidence_scale
-        self.confidence_cutoff = confidence_cutoff
 
         # actor head
         self.actor = GaussianActor(num_actions)
@@ -125,17 +119,6 @@ class UASAC(nn.Module):
         else:
             self.log_alpha = nn.Parameter(torch.tensor(0.0, requires_grad=True))
 
-        # store q_variance
-        self.q_std = None
-
-    def update_q_std(self, q, tau=0.05):
-        q = torch.var(q)
-        if not torch.isnan(q):
-            if self.q_std is None:
-                self.q_std = q
-            else:
-                self.q_std = (1 - tau) * self.q_std + tau * q
-
     def update_q_target(self, tau=0.005):
         # polyak averaging update for target q network
         for target, source in zip(
@@ -161,7 +144,7 @@ class UASAC(nn.Module):
         with torch.no_grad():
             # sample the next actions based on the current policy
             output = self.actor(next_states)
-            next_actions, entropies, _ = self.actor.sample(*output)
+            next_actions, entropies = self.actor.sample(*output)
 
             next_q1, next_q2 = self.critic_target(next_states, next_actions)
 
@@ -178,30 +161,22 @@ class UASAC(nn.Module):
             )
 
         # critic loss is mean squared TD errors
-        q1_loss = func.mse_loss(curr_q1, target_q, reduction="none")
-        q2_loss = func.mse_loss(curr_q2, target_q, reduction="none")
+        q1_loss = func.mse_loss(curr_q1, target_q)
+        q2_loss = func.mse_loss(curr_q2, target_q)
         q_loss = (q1_loss + q2_loss) / 2.0
 
-        # update the q_std
-        self.update_q_std(target_q)
+        return q_loss
 
-        # NIG regularizer scale
-        regularizer = abs(curr_q1 - target_q) + abs(curr_q2 - target_q)
-        regularizer = regularizer / (self.q_std + 1e-6)
-
-        return q_loss.mean(), regularizer.detach()
-
-    def calc_actor_loss(self, states, dones, labels):
+    def calc_actor_loss(self, states, dones):
         """
         states is of shape B x img_size
         dones is of shape B x 1
-        labels is of shape B x 3
         """
         dones = 1.0 - dones
 
         # We re-sample actions to calculate expectations of Q.
         output = self.actor(states)
-        actions, entropies, uncertainty = self.actor.sample(*output)
+        actions, entropies = self.actor.sample(*output)
 
         # expectations of Q with clipped double Q
         q1, q2 = self.critic(states, actions)
@@ -210,36 +185,17 @@ class UASAC(nn.Module):
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         rnf_loss = 0.0
         if self.use_entropy:
-            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * dones)
+            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * dones) + 1e-6
         else:
-            rnf_loss = -(q * dones)
+            rnf_loss = -(q * dones) + 1e-6
 
-        # supervised loss is NLL loss between label and output
-        sup_loss = NIG_NLL(torch.atanh(labels), *output, reduce=False)
-
-        # supervision scale
-        sup_scale = (1.0 - torch.exp(-self.confidence_scale * uncertainty)).detach()
-
-        # cutoff for supervision scale
-        blank = torch.zeros_like(sup_scale)
-        sup_scale = torch.where(sup_scale < self.confidence_cutoff, blank, sup_scale)
-
-        # NIG regularizer scale
-        output = self.actor(states)
-        reg_loss = 2 * output[1] + output[2]
-
-        return rnf_loss, sup_loss, sup_scale.detach(), reg_loss
+        return rnf_loss.mean()
 
     def calc_alpha_loss(self, states):
         if not self.entropy_tuning:
             return torch.zeros(1)
 
         output = self.actor(states)
-        _, entropies, _ = self.actor.sample(*output)
+        _, entropies = self.actor.sample(*output)
 
-        # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.
-        entropy_loss = (
-            self.log_alpha * (self.target_entropy - entropies).detach()
-        ).mean()
-
-        return entropy_loss
+        return (self.log_alpha * (self.target_entropy - entropies).detach()).mean()

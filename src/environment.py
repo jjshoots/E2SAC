@@ -1,8 +1,7 @@
-import gym
-import pybulletgym
-
 import cv2
+import gym
 import numpy as np
+import pybulletgym
 
 
 class Environment:

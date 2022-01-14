@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 import os
 import time
-import numpy as np
-from pthflops import count_ops
-
-import torch
 
 import cv2
+import numpy as np
+import torch
+from pthflops import count_ops
 
 
 class Logger:
@@ -43,7 +42,7 @@ class Logger:
         # weight file variables
         self.directory = os.path.dirname(__file__)
         self.weights_location = os.path.join(
-            self.directory, f"../../{weights_location}"
+            self.directory, f"../{weights_location}"
         )
         self.mark_number = mark_number
         self.version_number = version_number

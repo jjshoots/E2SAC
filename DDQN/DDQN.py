@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 import torch
-import torch.nn as nn
 import torch.distributions as D
+import torch.nn as nn
 import torch.nn.functional as F
-
-from ai_lib.neural_blocks import *
 from ai_lib.autoencoder import *
+from ai_lib.neural_blocks import *
 
 
 class TwinnedQNetwork(nn.Module):

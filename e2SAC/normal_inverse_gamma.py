@@ -1,7 +1,8 @@
 import math
+
 import torch
-import torch.nn.functional as F
 import torch.distributions as D
+import torch.nn.functional as F
 
 """
 Normal Inverse Gamma Distribution for evidential uncertainty learning adapted for Torch:
@@ -17,8 +18,12 @@ def NormalInvGamma(gamma, nu, alpha, beta):
     Normal Inverse Gamma Distribution
     """
     assert torch.all(nu > 0.0), f"nu must be more than zero, min value is {nu.min()}"
-    assert torch.all(alpha > 1.0), f"alpha must be more than one, min value is {alpha.min()}"
-    assert torch.all(beta > 0.0), f"beta must be more than zero, min value is {beta.min()}"
+    assert torch.all(
+        alpha > 1.0
+    ), f"alpha must be more than one, min value is {alpha.min()}"
+    assert torch.all(
+        beta > 0.0
+    ), f"beta must be more than zero, min value is {beta.min()}"
 
     InvGamma = D.transformed_distribution.TransformedDistribution(
         D.Gamma(alpha, beta),
@@ -35,8 +40,12 @@ def ShrunkenNormalInvGamma(gamma, nu, alpha, beta, clamp_mean=None, clamp_var=No
     """
     Normal Inverse Gamma Distribution
     """
-    assert torch.all(alpha > 1.0), f"alpha must be more than one, min value is {alpha.min()}"
-    assert torch.all(beta > 0.0), f"beta must be more than zero, min value is {beta.min()}"
+    assert torch.all(
+        alpha > 1.0
+    ), f"alpha must be more than one, min value is {alpha.min()}"
+    assert torch.all(
+        beta > 0.0
+    ), f"beta must be more than zero, min value is {beta.min()}"
 
     var = beta / (alpha - 1)
 
@@ -61,8 +70,12 @@ def NIG_uncertainty(gamma, nu, alpha, beta):
     the value is effectively expectation of sigma square
     """
     assert torch.all(nu > 0.0), f"nu must be more than zero, min value is {nu.min()}"
-    assert torch.all(alpha > 1.0), f"alpha must be more than one, min value is {alpha.min()}"
-    assert torch.all(beta > 0.0), f"beta must be more than zero, min value is {beta.min()}"
+    assert torch.all(
+        alpha > 1.0
+    ), f"alpha must be more than one, min value is {alpha.min()}"
+    assert torch.all(
+        beta > 0.0
+    ), f"beta must be more than zero, min value is {beta.min()}"
 
     return torch.sqrt(beta / (alpha - 1) / nu)
 

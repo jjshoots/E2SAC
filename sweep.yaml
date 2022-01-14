@@ -6,10 +6,10 @@ metric:
 parameters:
   target_entropy:
     min: -1.0
-    max: +0.0
+    max: -0.5
   reg_lambda:
     min: +0.001
-    max: +0.200
+    max: +0.100
 command:
   - python3
   - src/main.py

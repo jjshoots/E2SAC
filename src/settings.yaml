@@ -6,14 +6,15 @@ buffer_size: 300000
 buffer_size_debug: 10000
 batch_size: 170
 start_epoch: 0
-epochs: 2000
-transitions_per_epoch: 1000
-repeats_per_buffer: 1
+epochs: 1000
+repeats_per_buffer: 5 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
+repeats_per_buffer_scale: -0.005
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 
 # exploration settings
 exploration_epochs: 50
+transitions_per_epoch: 1000
 
 # learning rate and scheduler
 starting_LR: 0.001
@@ -23,7 +24,7 @@ scheduler_gamma: 0.5
 # algorithm specifics
 reg_lambda: 0.04
 confidence_scale: 1.
-confidence_cutoff: 0.25
+confidence_cutoff: 0.20
 use_entropy: true
 target_entropy: -0.5
 

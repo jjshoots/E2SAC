@@ -1,23 +1,20 @@
 import os
 import sys
-from signal import signal, SIGINT
+from signal import SIGINT, signal
 
 import cv2
-import torch
-import wandb
 import numpy as np
-
 import torch
-import torch.optim as optim
 import torch.nn as nn
+import torch.optim as optim
+from PIL import Image, ImageDraw
 
-from utility.shebangs import *
-
+import wandb
 from carracing import *
-
-from ai_lib.replay_buffer import *
-from ai_lib.normal_inverse_gamma import *
-from ai_lib.UASAC import UASAC
+from e2SAC.normal_inverse_gamma import *
+from e2SAC.UASAC import UASAC
+from shebangs import *
+from utils.replay_buffer import *
 
 
 def train(set):
@@ -85,19 +82,29 @@ def train(set):
 
                 # log progress
                 mean_entropy.append(ent)
-                video_log.append(np.uint8(obs[:3, ...] * 127.5 + 127.5))
+                frame = np.uint8(obs[:3, ...] * 127.5 + 127.5).transpose(1, 2, 0)
+                video_log.append(Image.fromarray(frame))
 
         # for logging
         total_reward = env.cumulative_reward
         mean_entropy = np.mean(np.array(mean_entropy))
-        video_log = np.stack(video_log, axis=0)
+        video_log[0].save(
+            "./resource/video_log.gif",
+            save_all=True,
+            append_images=video_log[1:],
+            optimize=False,
+            duration=20,
+            loop=0,
+        )
 
         """ TRAINING RUN """
         dataloader = torch.utils.data.DataLoader(
             memory, batch_size=set.batch_size, shuffle=True, drop_last=False
         )
 
-        for i in range(set.repeats_per_buffer):
+        for i in range(
+            int(set.repeats_per_buffer + set.repeats_per_buffer_scale * epoch)
+        ):
             for j, stuff in enumerate(dataloader):
                 net.train()
 
@@ -121,7 +128,6 @@ def train(set):
                     optim_set["critic"].step()
                     sched_set["critic"].step()
                     net.update_q_target()
-
 
                 # train actor
                 for _ in range(set.actor_update_multiplier):
@@ -176,7 +182,7 @@ def train(set):
                 """ WANDB """
                 if set.wandb and i == 0 and j == 0:
                     metrics = {
-                        "video": wandb.Video(video_log, fps=50, format="gif"),
+                        "video": wandb.Video("./resource/video_log.gif"),
                         "epoch": epoch,
                         "total_reward": total_reward,
                         "eval_perf": eval_perf,

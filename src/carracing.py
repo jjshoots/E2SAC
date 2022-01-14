@@ -1,6 +1,7 @@
 import copy
-import gym
+
 import cv2
+import gym
 import numpy as np
 
 
@@ -14,7 +15,7 @@ class Environment:
 
         self.image_size = image_size
         self.frame_stack = 4
-        self.max_off_track = 50
+        self.max_off_track = 100
 
         self.env = gym.make("CarRacing-v0", verbose=verbose)
         self.num_actions = 2
