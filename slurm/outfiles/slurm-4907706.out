@@ -1,185 +1,0 @@
-wandb: Starting wandb agent 🕵️
-2021-10-28 07:19:42,978 - wandb.wandb_agent - INFO - Running runs: []
-2021-10-28 07:19:43,239 - wandb.wandb_agent - INFO - Agent received command: run
-2021-10-28 07:19:43,239 - wandb.wandb_agent - INFO - Agent starting run with config:
-	ac_update_ratio: 4
-	confidence_scale: 4.71316737708915
-	target_entropy: 1.5263421223253393
-	use_entropy: False
-2021-10-28 07:19:43,260 - wandb.wandb_agent - INFO - About to run command: python3 src/main.py --train --wandb
-2021-10-28 07:19:48,271 - wandb.wandb_agent - INFO - Running runs: ['12j446zj']
-wandb: Currently logged in as: jjshoots (use `wandb login --relogin` to force relogin)
-wandb: WARNING Ignored wandb.init() arg project when running a sweep
-wandb: WARNING Ignored wandb.init() arg entity when running a sweep
------------------------
-Using Device cuda:0
------------------------
-wandb: wandb version 0.12.6 is available!  To upgrade, please run:
-wandb:  $ pip install wandb --upgrade
-wandb: Tracking run with wandb version 0.12.0
-wandb: Syncing run 84945
-wandb:  View project at https://wandb.ai/jjshoots/UA3SAC_gym
-wandb:  View sweep at https://wandb.ai/jjshoots/UA3SAC_gym/sweeps/nktx8eqi
-wandb:  View run at https://wandb.ai/jjshoots/UA3SAC_gym/runs/12j446zj
-wandb: Run data is saved locally in /home/taij/e2sac/wandb/run-20211028_071953-12j446zj
-wandb: Run `wandb offline` to turn off syncing.
-502 response executing GraphQL.
-
-<html><head>
-<meta http-equiv="content-type" content="text/html;charset=utf-8">
-<title>502 Server Error</title>
-</head>
-<body text=#000000 bgcolor=#ffffff>
-<h1>Error: Server Error</h1>
-<h2>The server encountered a temporary error and could not complete your request.<p>Please try again in 30 seconds.</h2>
-<h2></h2>
-</body></html>
-
-wandb: Network error (ReadTimeout), entering retry loop.
-Error communicating with W&B: context deadline exceeded
-500 response executing GraphQL.
-{"errors":[{"message":"Error 1040: Too many connections","path":["agentHeartbeat"]}],"data":{"agentHeartbeat":null}}
-wandb: ERROR Error while calling W&B API: Error 1040: Too many connections (<Response [500]>)
-500 response executing GraphQL.
-{"error":"Error 1040: Too many connections"}
-
-500 response executing GraphQL.
-{"error":"Error 1040: Too many connections"}
-
-Retry attempt failed:
-Traceback (most recent call last):
-  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/wandb/sdk/lib/retry.py", line 102, in __call__
-    result = self._call_fn(*args, **kwargs)
-  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/wandb/sdk/internal/internal_api.py", line 136, in execute
-    six.reraise(*sys.exc_info())
-  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/six.py", line 719, in reraise
-    raise value
-  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/wandb/sdk/internal/internal_api.py", line 130, in execute
-    return self.client.execute(*args, **kwargs)
-  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/wandb/vendor/gql-0.2.0/gql/client.py", line 52, in execute
-    result = self._get_result(document, *args, **kwargs)
-  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/wandb/vendor/gql-0.2.0/gql/client.py", line 60, in _get_result
-    return self.transport.execute(document, *args, **kwargs)
-  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/wandb/vendor/gql-0.2.0/gql/transport/requests.py", line 39, in execute
-    request.raise_for_status()
-  File "/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/requests/models.py", line 953, in raise_for_status
-    raise HTTPError(http_error_msg, response=self)
-requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: https://api.wandb.ai/graphql
-wandb: Network error (HTTPError), entering retry loop.
-500 response executing GraphQL.
-{"error":"Error 1040: Too many connections"}
-
-500 response executing GraphQL.
-{"error":"Error 1040: Too many connections"}
-
-wandb: ERROR Error while calling W&B API: Error 1040: Too many connections (<Response [500]>)
-500 response executing GraphQL.
-{"error":"Error 1040: Too many connections"}
-
-/home/taij/.conda/envs/robocar/lib/python3.8/site-packages/torch/nn/functional.py:718: UserWarning: Named tensors and all their associated APIs are an experimental feature and subject to change. Please do not use them for anything important until they are released as stable. (Triggered internally at  /pytorch/c10/core/TensorImpl.h:1156.)
-  return torch.max_pool2d(input, kernel_size, stride, padding, dilation, ceil_mode)
-[34m[1mwandb[0m: Network error resolved after 0:03:05.274985, resuming normal operation.
-
-No weights directory for weights/Version84945, generating new one in 3 seconds.
-No weights directory for optim_weights/Version84945, generating new one in 3 seconds.
-No weights file found, generating new one during training.
-Epoch 1; Batch Number 0; Running Loss -9.26747; Lowest Running Loss -9.26747
-Epoch 2; Batch Number 0; Running Loss 3.22088; Lowest Running Loss -9.26747
-Epoch 3; Batch Number 0; Running Loss -18.77844; Lowest Running Loss -9.26747
-New lowest point, saving weights to: weights/weights0.pth
-Epoch 4; Batch Number 0; Running Loss -134.58424; Lowest Running Loss -18.77844
-New lowest point, saving weights to: weights/weights1.pth
-Epoch 5; Batch Number 0; Running Loss -56.62192; Lowest Running Loss -134.58424
-Epoch 6; Batch Number 0; Running Loss -86.74447; Lowest Running Loss -134.58424
-Epoch 7; Batch Number 0; Running Loss -106.58288; Lowest Running Loss -134.58424
-Epoch 8; Batch Number 0; Running Loss -93.05664; Lowest Running Loss -134.58424
-Epoch 9; Batch Number 0; Running Loss -104.72688; Lowest Running Loss -134.58424
-Passed 5 intervals without saving so far, saving weights to: /weights_intermediary.pth
-Epoch 10; Batch Number 0; Running Loss -197.23535; Lowest Running Loss -134.58424
-New lowest point, saving weights to: weights/weights2.pth
-Epoch 11; Batch Number 0; Running Loss -347.53614; Lowest Running Loss -197.23535
-New lowest point, saving weights to: weights/weights3.pth
-Epoch 12; Batch Number 0; Running Loss -392.32628; Lowest Running Loss -347.53614
-New lowest point, saving weights to: weights/weights4.pth
-Epoch 13; Batch Number 0; Running Loss -360.96919; Lowest Running Loss -392.32628
-Epoch 14; Batch Number 0; Running Loss -428.36107; Lowest Running Loss -392.32628
-New lowest point, saving weights to: weights/weights5.pth
-Epoch 15; Batch Number 0; Running Loss -331.54147; Lowest Running Loss -428.36107
-Epoch 16; Batch Number 0; Running Loss -227.00858; Lowest Running Loss -428.36107
-Epoch 17; Batch Number 0; Running Loss -179.85265; Lowest Running Loss -428.36107
-Epoch 18; Batch Number 0; Running Loss -282.09175; Lowest Running Loss -428.36107
-Epoch 19; Batch Number 0; Running Loss -281.09877; Lowest Running Loss -428.36107
-Passed 5 intervals without saving so far, saving weights to: /weights_intermediary.pth
-Epoch 20; Batch Number 0; Running Loss -317.95035; Lowest Running Loss -428.36107
-Epoch 21; Batch Number 0; Running Loss -403.29966; Lowest Running Loss -428.36107
-Epoch 22; Batch Number 0; Running Loss -421.24328; Lowest Running Loss -428.36107
-Epoch 23; Batch Number 0; Running Loss -459.85571; Lowest Running Loss -428.36107
-New lowest point, saving weights to: weights/weights6.pth
-Epoch 24; Batch Number 0; Running Loss -374.79639; Lowest Running Loss -459.85571
-Epoch 25; Batch Number 0; Running Loss -446.04997; Lowest Running Loss -459.85571
-Epoch 26; Batch Number 0; Running Loss -502.66475; Lowest Running Loss -459.85571
-New lowest point, saving weights to: weights/weights7.pth
-Epoch 27; Batch Number 0; Running Loss -409.29448; Lowest Running Loss -502.66475
-Epoch 28; Batch Number 0; Running Loss -570.38984; Lowest Running Loss -502.66475
-New lowest point, saving weights to: weights/weights8.pth
-Epoch 29; Batch Number 0; Running Loss -496.87457; Lowest Running Loss -570.38984
-Epoch 30; Batch Number 0; Running Loss -539.98106; Lowest Running Loss -570.38984
-Epoch 31; Batch Number 0; Running Loss -545.76909; Lowest Running Loss -570.38984
-Epoch 32; Batch Number 0; Running Loss -474.18074; Lowest Running Loss -570.38984
-Epoch 33; Batch Number 0; Running Loss -516.74683; Lowest Running Loss -570.38984
-Passed 5 intervals without saving so far, saving weights to: /weights_intermediary.pth
-Epoch 34; Batch Number 0; Running Loss -503.97635; Lowest Running Loss -570.38984
-Epoch 35; Batch Number 0; Running Loss -513.10273; Lowest Running Loss -570.38984
-Epoch 36; Batch Number 0; Running Loss -587.50385; Lowest Running Loss -570.38984
-New lowest point, saving weights to: weights/weights9.pth
-Epoch 37; Batch Number 0; Running Loss -599.76759; Lowest Running Loss -587.50385
-New lowest point, saving weights to: weights/weights10.pth
-Epoch 38; Batch Number 0; Running Loss -551.76256; Lowest Running Loss -599.76759
-Epoch 39; Batch Number 0; Running Loss -624.32655; Lowest Running Loss -599.76759
-New lowest point, saving weights to: weights/weights11.pth
-Epoch 40; Batch Number 0; Running Loss -566.13368; Lowest Running Loss -624.32655
-Epoch 41; Batch Number 0; Running Loss -524.23318; Lowest Running Loss -624.32655
-Epoch 42; Batch Number 0; Running Loss -557.80314; Lowest Running Loss -624.32655
-Epoch 43; Batch Number 0; Running Loss -629.49254; Lowest Running Loss -624.32655
-New lowest point, saving weights to: weights/weights12.pth
-Epoch 44; Batch Number 0; Running Loss -591.79144; Lowest Running Loss -629.49254
-Epoch 45; Batch Number 0; Running Loss -500.83420; Lowest Running Loss -629.49254
-Epoch 46; Batch Number 0; Running Loss -590.99668; Lowest Running Loss -629.49254
-Epoch 47; Batch Number 0; Running Loss -520.70571; Lowest Running Loss -629.49254
-Epoch 48; Batch Number 0; Running Loss -502.82255; Lowest Running Loss -629.49254
-Passed 5 intervals without saving so far, saving weights to: /weights_intermediary.pth
-Epoch 49; Batch Number 0; Running Loss -413.28309; Lowest Running Loss -629.49254
-wandb: Waiting for W&B process to finish, PID 300727
-wandb: Program ended successfully.
-wandb: - 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: \ 0.00MB of 0.00MB uploaded (0.00MB deduped)wandb: | 0.00MB of 0.01MB uploaded (0.00MB deduped)wandb: / 0.00MB of 0.01MB uploaded (0.00MB deduped)wandb: - 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: \ 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: | 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: / 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: - 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: \ 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: | 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: / 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: - 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: \ 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: | 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: / 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: - 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: \ 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: | 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb: / 0.01MB of 0.01MB uploaded (0.00MB deduped)wandb:                                                                                
-wandb: Find user logs for this run at: /home/taij/e2sac/wandb/run-20211028_071953-12j446zj/logs/debug.log
-wandb: Find internal logs for this run at: /home/taij/e2sac/wandb/run-20211028_071953-12j446zj/logs/debug-internal.log
-wandb: Run summary:
-wandb:          epoch 49
-wandb:    mean_reward 0.79028
-wandb:   total_reward 413.28309
-wandb:   mean_entropy 4.88434
-wandb:      sup_scale 0.39291
-wandb:      log_alpha 0.0
-wandb:   num_episodes 1304
-wandb:       _runtime 440898
-wandb:     _timestamp 1635842891
-wandb:          _step 187939
-wandb: Run history:
-wandb:          epoch ▁▂▂▂▃▃▃▃▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇█████
-wandb:    mean_reward ▂▁▃▄▄▃▄▅▆▆▅▆▇▆▇▇▇▆▆▆▆▆██▇▇█▇▇▇▆▇▇▇▇█▇▆▆▆
-wandb:   total_reward ▂▁▄▄▄▂▃▄▅▆▅▆▆▅▆▆▇▆▆▇▆▆▇█▇▇█▇▇▇▇██▆▆▇▇▆▆▅
-wandb:   mean_entropy ▁▃▃▂▃▄▄▄▃▃▃▃▃▃▃▃▃▃▃▄▃▃▄▄▄▄▄▄▄▄▅▅▅▆▆█▇▄▄▆
-wandb:      sup_scale ▆▅▃▃▂▄▃▂▂▃▂▂▃▃▄▃▃▄▁▂▂▂▂▄▂▁▁▂▃▄▃▇▆▆▆▆▂▁█▅
-wandb:      log_alpha ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
-wandb:   num_episodes ▁▂▃▃▃▄▄▄▅▅▅▅▅▅▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇▇▇▇▇█████
-wandb:       _runtime ▁▁▁▁▂▂▂▂▂▃▃▃▃▃▄▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇████
-wandb:     _timestamp ▁▁▁▁▂▂▂▂▂▃▃▃▃▃▄▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇████
-wandb:          _step ▁▁▁▁▂▂▂▂▂▃▃▃▃▃▄▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇████
-wandb: 
-wandb: Synced 6 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
-wandb: 
-wandb: Synced 84945: https://wandb.ai/jjshoots/UA3SAC_gym/runs/12j446zj
-
-2021-11-02 08:48:25,413 - wandb.wandb_agent - INFO - Cleaning up finished run: 12j446zj
-wandb: Terminating and syncing runs. Press ctrl-c to kill.
