@@ -13,17 +13,13 @@ badd +18 utils/helpers.py
 argglobal
 %argdel
 $argadd .gitignore
-edit utils/helpers.py
+edit src/mainSAC.py
 set splitbelow splitright
 wincmd t
 set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe '2resize ' . ((&lines * 2 + 24) / 48)
-exe 'vert 2resize ' . ((&columns * 1 + 86) / 173)
-exe '3resize ' . ((&lines * 2 + 24) / 48)
-exe 'vert 3resize ' . ((&columns * 20 + 86) / 173)
 argglobal
 setlocal fdm=indent
 setlocal fde=0
@@ -33,39 +29,13 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 18 - ((9 * winheight(0) + 22) / 45)
+let s:l = 18 - ((17 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 18
-normal! 026|
-wincmd w
-argglobal
-enew
-setlocal fdm=indent
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-wincmd w
-argglobal
-enew
-setlocal fdm=indent
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal nofen
-wincmd w
-exe '2resize ' . ((&lines * 2 + 24) / 48)
-exe 'vert 2resize ' . ((&columns * 1 + 86) / 173)
-exe '3resize ' . ((&lines * 2 + 24) / 48)
-exe 'vert 3resize ' . ((&columns * 20 + 86) / 173)
+normal! 0
+if exists(':tcd') == 2 | tcd ~/Sandboxes/e2SAC | endif
 tabnext 1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
