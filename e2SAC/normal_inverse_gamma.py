@@ -84,7 +84,7 @@ def NIG_NLL(label, gamma, nu, alpha, beta, reduce=True):
     """
     Negative Log Likelihood loss between label and predicted output
     """
-    twoBlambda = 3 * beta * (1 + nu)
+    twoBlambda = 2 * beta * (1 + nu)
 
     nll = (
         0.5 * torch.log(math.pi / nu)

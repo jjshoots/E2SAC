@@ -96,8 +96,10 @@ class Environment:
             self.off_track_t = 0
 
         # during training, only end when we go off track for more than specified steps
+        # or we go outside the map
         if not self.eval_run:
-            if self.off_track_t >= self.max_off_track:
+            if self.off_track_t >= self.max_off_track or rwd < -50.:
+                self.off_track_t = self.max_off_track + 1
                 dne = 1.0
             else:
                 dne = 0.0
@@ -158,7 +160,7 @@ class Environment:
         else:
             obs = 0.0
 
-        steering = 0.6 * obs
+        steering = 0.8 * obs
         accel = 0.1
 
         # steering = 0.0

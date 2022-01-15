@@ -221,9 +221,16 @@ class UASAC(nn.Module):
         # supervision scale
         sup_scale = (1.0 - torch.exp(-self.confidence_scale * uncertainty)).detach()
 
-        # cutoff for supervision scale
+        # cutoff for supervision scale depending on expected the q of suboptimal policy
         blank = torch.zeros_like(sup_scale)
         sup_scale = torch.where(sup_scale < self.confidence_cutoff, blank, sup_scale)
+
+        # expectations of Q with clipped doble Q for suboptimal policy
+        # blank = torch.zeros_like(sup_scale)
+        # q_sub1, q_sub2 = self.critic(states, labels)
+        # q_sub, _ = torch.min(torch.cat((q_sub1, q_sub2), dim=-1), dim=-1, keepdim=True)
+        # q_sub = q_sub.detach()
+        # sup_scale = torch.where(q_sub < q, blank, sup_scale)
 
         # NIG regularizer scale
         output = self.actor(states)

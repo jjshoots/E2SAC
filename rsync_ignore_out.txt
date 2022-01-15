@@ -3,4 +3,5 @@
 /wandb
 /weights
 /resource
+*/*egg-info
 */__pycache__

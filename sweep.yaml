@@ -4,9 +4,6 @@ metric:
   name: max_eval_perf
   goal: maximize
 parameters:
-  target_entropy:
-    min: -1.0
-    max: -0.5
   reg_lambda:
     min: +0.001
     max: +0.100

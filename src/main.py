@@ -68,11 +68,13 @@ def train(set):
                 # get the initial state and label
                 obs, _, _, lbl = env.get_state()
 
-                # pass states to actor and get actions
-                output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                action, ent, _ = net.actor.sample(*output)
-                action = cpuize(action)[0]
-                ent = cpuize(ent)[0]
+                if epoch < set.exploration_epochs:
+                    action = np.random.uniform(-1.0, 1.0, 2)
+                    ent = 0.0
+                else:
+                    action, ent, _ = net.actor.sample(*output)
+                    action = cpuize(action)[0]
+                    ent = cpuize(ent)[0]
 
                 # get the next state and other stuff
                 next_obs, rew, dne, _ = env.step(action)
@@ -197,7 +199,7 @@ def train(set):
 
 def display(set):
 
-    use_net = True
+    use_net = False
 
     env = setup_env(set)
     env.eval()
@@ -324,10 +326,6 @@ def setup_nets(set):
 
 
 if __name__ == "__main__":
-
-    # delete this line during actual training deployment
-    torch.autograd.set_detect_anomaly(True)
-
     signal(SIGINT, shutdown_handler)
     set = parse_set()
     check_venv()

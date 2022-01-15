@@ -25,7 +25,7 @@ def train(set):
 
     for epoch in range(set.start_epoch, set.epochs):
         """EVAL RUN"""
-        if epoch % set.eval_epoch_ratio == 0:
+        if epoch % set.eval_epoch_ratio == 0 and epoch != 0:
             env.reset()
             env.eval()
             net.eval()
@@ -225,7 +225,7 @@ def display(set):
                 .item()
             )
         else:
-            action = lbl[0]
+            action = lbl
 
         display = obs[:3, ...]
         display = np.uint8((display * 127.5 + 127.5))

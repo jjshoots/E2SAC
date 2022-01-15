@@ -10,3 +10,5 @@ run.sh
 Session.vim
 sweep.yaml
 sync*
+*/*egg-info
+*/__pycache__
