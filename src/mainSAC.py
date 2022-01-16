@@ -67,12 +67,11 @@ def train(set):
                 # get the initial state and label
                 obs, _, _, _ = env.get_state()
 
-                # pass states to actor and get actions
-                output = net.actor(gpuize(obs, set.device).unsqueeze(0))
                 if epoch < set.exploration_epochs:
                     action = np.random.uniform(-1.0, 1.0, 2)
                     ent = 0.0
                 else:
+                    output = net.actor(gpuize(obs, set.device).unsqueeze(0))
                     action, ent = net.actor.sample(*output)
                     action = cpuize(action)[0]
                     ent = cpuize(ent)[0]

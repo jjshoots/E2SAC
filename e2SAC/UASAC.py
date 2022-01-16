@@ -130,7 +130,7 @@ class UASAC(nn.Module):
         self.q_std = None
 
     def update_q_std(self, q, tau=0.05):
-        q = torch.var(q)
+        q = torch.std(q)
         if not torch.isnan(q):
             if self.q_std is None:
                 self.q_std = q

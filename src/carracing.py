@@ -163,7 +163,4 @@ class Environment:
         steering = 0.8 * obs
         accel = 0.1
 
-        # steering = 0.0
-        # accel = 0.3
-
         return np.clip(np.array([steering, accel]), -0.99, 0.99)
