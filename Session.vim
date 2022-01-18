@@ -1,30 +1,19 @@
 let SessionLoad = 1
-let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
+let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1
 let v:this_session=expand("<sfile>:p")
 silent only
+silent tabonly
 cd ~/Sandboxes/e2SAC
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +75 src/main.py
-badd +188 src/mainSAC.py
-badd +18 utils/helpers.py
-badd +5 src/settings.yaml
-badd +8 sweep.yaml
-badd +193 e2SAC/UASAC.py
-badd +143 src/carracing.py
 argglobal
 %argdel
 $argadd .gitignore
-edit src/main.py
-set splitbelow splitright
-wincmd t
-set winminheight=0
-set winheight=1
-set winminwidth=0
-set winwidth=1
+edit e2SAC/UASAC.py
 argglobal
+balt sweep.yaml
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -33,24 +22,32 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 42 - ((23 * winheight(0) + 22) / 45)
+let s:l = 245 - ((20 * winheight(0) + 20) / 40)
 if s:l < 1 | let s:l = 1 | endif
-exe s:l
+keepjumps exe s:l
 normal! zt
-42
-normal! 047|
-if exists(':tcd') == 2 | tcd ~/Sandboxes/e2SAC | endif
+keepjumps 245
+normal! 09|
 tabnext 1
-if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
+badd +246 e2SAC/UASAC.py
+badd +1 .gitignore
+badd +13 sweep.yaml
+badd +34 src/main.py
+badd +251 src/mainSAC.py
+badd +11 utils/helpers.py
+badd +27 src/settings.yaml
+badd +143 src/carracing.py
+if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
 unlet! s:wipebuf
-set winheight=1 winwidth=90 winminheight=1 winminwidth=1 shortmess=filnxtToOFA
+set winheight=1 winwidth=90 shortmess=filnxtToOFA
 let s:sx = expand("<sfile>:p:r")."x.vim"
-if file_readable(s:sx)
+if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
-let &so = s:so_save | let &siso = s:siso_save
+let &g:so = s:so_save | let &g:siso = s:siso_save
+nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

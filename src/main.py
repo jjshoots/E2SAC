@@ -21,18 +21,19 @@ def train(set):
     env = setup_env(set)
     net, net_helper, optim_set, sched_set, optim_helper = setup_nets(set)
     memory = ReplayBuffer(set.buffer_size)
-    eval_perf = 0.0
+    eval_perf = -100.0
     max_eval_perf = -100.0
 
     for epoch in range(set.start_epoch, set.epochs):
         """EVAL RUN"""
         if epoch % set.eval_epoch_ratio == 0 and epoch != 0:
+            eval_perf = []
+
             env.reset()
             env.eval()
             net.eval()
             net.zero_grad()
 
-            eval_perf = []
             while len(eval_perf) < set.eval_num_traj:
                 with torch.no_grad():
                     # get the initial state and action
@@ -68,9 +69,9 @@ def train(set):
                 # get the initial state and label
                 obs, _, _, lbl = env.get_state()
 
+                ent = 0.0
                 if epoch < set.exploration_epochs:
                     action = np.random.uniform(-1.0, 1.0, 2)
-                    ent = 0.0
                 else:
                     output = net.actor(gpuize(obs, set.device).unsqueeze(0))
                     action, ent, _ = net.actor.sample(*output)
@@ -101,6 +102,9 @@ def train(set):
         )
 
         """ TRAINING RUN """
+        sup_scale_std = 0
+        sup_scale_mean = 0
+
         dataloader = torch.utils.data.DataLoader(
             memory, batch_size=set.batch_size, shuffle=True, drop_last=False
         )
@@ -156,6 +160,10 @@ def train(set):
                         optim_set["alpha"].step()
                         sched_set["alpha"].step()
 
+                    # for logging
+                    sup_scale_mean = sup_scale.mean().item()
+                    sup_scale_std = sup_scale.std().item()
+
                 """ WEIGHTS SAVING """
                 net_weights = net_helper.training_checkpoint(
                     loss=-eval_perf, batch=batch, epoch=epoch
@@ -191,7 +199,8 @@ def train(set):
                         "eval_perf": eval_perf,
                         "max_eval_perf": max_eval_perf,
                         "mean_entropy": mean_entropy,
-                        "sup_scale": sup_scale.mean().item(),
+                        "sup_scale": sup_scale_mean,
+                        "sup_scale_std": sup_scale_std,
                         "log_alpha": net.log_alpha.item(),
                         "num_episodes": epoch,
                     }
@@ -252,14 +261,14 @@ def setup_env(set):
 
 
 def setup_nets(set):
-    net_helper = Logger(
+    net_helper = Helpers(
         mark_number=set.net_number,
         version_number=set.net_version,
         weights_location=set.weights_directory,
         epoch_interval=set.epoch_interval,
         batch_interval=set.batch_interval,
     )
-    optim_helper = Logger(
+    optim_helper = Helpers(
         mark_number=0,
         version_number=set.net_version,
         weights_location=set.optim_weights_directory,

@@ -126,8 +126,9 @@ class UASAC(nn.Module):
         else:
             self.log_alpha = nn.Parameter(torch.tensor(0.0, requires_grad=True))
 
-        # store q_variance
+        # store some stuff
         self.q_std = None
+        self.k_mean = 1.
 
     def update_q_std(self, q, tau=0.05):
         q = torch.std(q)
@@ -136,6 +137,13 @@ class UASAC(nn.Module):
                 self.q_std = q
             else:
                 self.q_std = (1 - tau) * self.q_std + tau * q
+
+    def update_k_mean(self, k, tau=0.05):
+        k = torch.mean(k)
+        if self.k_mean is None:
+            self.k_mean = k
+        else:
+            self.k_mean = (1 - tau) * self.k_mean + tau * k
 
     def update_q_target(self, tau=0.005):
         # polyak averaging update for target q network
@@ -222,15 +230,20 @@ class UASAC(nn.Module):
         sup_scale = (1.0 - torch.exp(-self.confidence_scale * uncertainty)).detach()
 
         # cutoff for supervision scale depending on expected the q of suboptimal policy
-        blank = torch.zeros_like(sup_scale)
-        sup_scale = torch.where(sup_scale < self.confidence_cutoff, blank, sup_scale)
+        # blank = torch.zeros_like(sup_scale)
 
         # expectations of Q with clipped doble Q for suboptimal policy
-        # blank = torch.zeros_like(sup_scale)
-        # q_sub1, q_sub2 = self.critic(states, labels)
-        # q_sub, _ = torch.min(torch.cat((q_sub1, q_sub2), dim=-1), dim=-1, keepdim=True)
-        # q_sub = q_sub.detach()
+        # q_sub = None
+        # with torch.no_grad():
+        #     q_sub1, q_sub2 = self.critic(states, labels)
+        #     q_sub, _ = torch.min(
+        #         torch.cat((q_sub1, q_sub2), dim=-1), dim=-1, keepdim=True
+        #     )
+
+        # we blank out the supervision scale whenever these criteria are met
+        # sup_scale = torch.where(sup_scale < self.confidence_cutoff, blank, sup_scale)
         # sup_scale = torch.where(q_sub < q, blank, sup_scale)
+        sup_scale = torch.clamp(sup_scale, 0., self.k_mean)
 
         # NIG regularizer scale
         output = self.actor(states)

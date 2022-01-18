@@ -8,7 +8,7 @@ import torch
 from pthflops import count_ops
 
 
-class Logger:
+class Helpers:
     def __init__(
         self,
         mark_number,
@@ -41,9 +41,7 @@ class Logger:
 
         # weight file variables
         self.directory = os.path.dirname(__file__)
-        self.weights_location = os.path.join(
-            self.directory, f"../{weights_location}"
-        )
+        self.weights_location = os.path.join(self.directory, f"../{weights_location}")
         self.mark_number = mark_number
         self.version_number = version_number
         self.weights_file = os.path.join(

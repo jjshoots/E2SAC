@@ -67,9 +67,9 @@ def train(set):
                 # get the initial state and label
                 obs, _, _, _ = env.get_state()
 
+                ent = 0.0
                 if epoch < set.exploration_epochs:
                     action = np.random.uniform(-1.0, 1.0, 2)
-                    ent = 0.0
                 else:
                     output = net.actor(gpuize(obs, set.device).unsqueeze(0))
                     action, ent = net.actor.sample(*output)
@@ -241,14 +241,14 @@ def setup_env(set):
 
 
 def setup_nets(set):
-    net_helper = Logger(
+    net_helper = Helpers(
         mark_number=set.net_number,
         version_number=set.net_version,
         weights_location=set.weights_directory,
         epoch_interval=set.epoch_interval,
         batch_interval=set.batch_interval,
     )
-    optim_helper = Logger(
+    optim_helper = Helpers(
         mark_number=0,
         version_number=set.net_version,
         weights_location=set.optim_weights_directory,

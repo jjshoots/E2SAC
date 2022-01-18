@@ -98,7 +98,7 @@ class Environment:
         # during training, only end when we go off track for more than specified steps
         # or we go outside the map
         if not self.eval_run:
-            if self.off_track_t >= self.max_off_track or rwd < -50.:
+            if self.off_track_t >= self.max_off_track or rwd < -50.0:
                 self.off_track_t = self.max_off_track + 1
                 dne = 1.0
             else:
