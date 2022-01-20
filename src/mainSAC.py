@@ -181,6 +181,7 @@ def train(set):
                         "mean_entropy": mean_entropy,
                         "log_alpha": net.log_alpha.item(),
                         "num_episodes": epoch,
+                        "num_transitions": memory.__len__(),
                     }
                     wandb.log(metrics)
 
