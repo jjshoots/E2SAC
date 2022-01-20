@@ -1,7 +1,0 @@
-numpy
-torch
-torchvision
-pyyaml
-wandb
-opencv-python
-gym[all]
