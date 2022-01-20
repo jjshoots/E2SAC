@@ -14,7 +14,6 @@ actor_update_multiplier: 1
 
 # exploration settings
 exploration_epochs: 50
-transitions_per_epoch: 1000
 
 # learning rate and scheduler
 starting_LR: 0.001
