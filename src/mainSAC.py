@@ -124,7 +124,6 @@ def train(set):
                         states, actions, rewards, next_states, dones
                     )
                     q_loss.backward()
-                    # nn.utils.clip_grad_norm_(net.critic.parameters(), max_norm=2.0, norm_type=2)
                     optim_set["critic"].step()
                     sched_set["critic"].step()
                     net.update_q_target()
@@ -134,7 +133,6 @@ def train(set):
                     net.zero_grad()
                     rnf_loss = net.calc_actor_loss(states, dones)
                     rnf_loss.backward()
-                    # nn.utils.clip_grad_norm_(net.actor.parameters(), max_norm=2.0, norm_type=2)
                     optim_set["actor"].step()
                     sched_set["actor"].step()
 

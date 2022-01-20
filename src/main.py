@@ -14,10 +14,11 @@ from carracing import *
 from e2SAC.normal_inverse_gamma import *
 from e2SAC.UASAC import UASAC
 from shebangs import *
-from utils.replay_buffer import *
+from utils.replay_buffer import ReplayBuffer
 
 
 def train(set):
+
     env = setup_env(set)
     net, net_helper, optim_set, sched_set, optim_helper = setup_nets(set)
     memory = ReplayBuffer(set.buffer_size)
@@ -131,7 +132,6 @@ def train(set):
                         states, actions, rewards, next_states, dones
                     )
                     q_loss.backward()
-                    # nn.utils.clip_grad_norm_(net.critic.parameters(), max_norm=2.0, norm_type=2)
                     optim_set["critic"].step()
                     sched_set["critic"].step()
                     net.update_q_target()
@@ -148,7 +148,6 @@ def train(set):
                         + (sup_scale * sup_loss).mean()
                     )
                     actor_loss.backward()
-                    # nn.utils.clip_grad_norm_(net.actor.parameters(), max_norm=2.0, norm_type=2)
                     optim_set["actor"].step()
                     sched_set["actor"].step()
 
@@ -203,13 +202,14 @@ def train(set):
                         "sup_scale_std": sup_scale_std,
                         "log_alpha": net.log_alpha.item(),
                         "num_episodes": epoch,
+                        "num_transitions": memory.__len__(),
                     }
                     wandb.log(metrics)
 
 
 def display(set):
 
-    use_net = True
+    use_net = False
 
     env = setup_env(set)
     env.eval()
@@ -251,6 +251,45 @@ def display(set):
         display = np.transpose(display, (1, 2, 0))
         cv2.imshow("display", display)
         cv2.waitKey(int(1000 / 15))
+
+
+def evaluate(set):
+
+    use_net = False
+
+    net = None
+    if use_net:
+        net, _, _, _, _ = setup_nets(set)
+        net.eval()
+
+    env = setup_env(set)
+    env.reset()
+    env.eval()
+
+    eval_perf = []
+
+    while len(eval_perf) < set.eval_num_traj:
+        with torch.no_grad():
+            # get the initial state and action
+            obs, _, _, lbl = env.get_state()
+
+            if use_net:
+                output = net.actor(gpuize(obs, set.device).unsqueeze(0))
+                action = net.actor.infer(*output)
+                action = cpuize(action)[0]
+            else:
+                action = lbl
+
+            # get the next state and reward
+            _, _, _, _ = env.step(action)
+
+            if env.is_done:
+                eval_perf.append(env.cumulative_reward)
+                print(len(eval_perf))
+                env.reset()
+
+    eval_perf = np.mean(np.array(eval_perf))
+    print(eval_perf)
 
 
 def setup_env(set):
@@ -346,6 +385,8 @@ if __name__ == "__main__":
         display(set)
     elif set.train:
         train(set)
+    elif set.evaluate:
+        evaluate(set)
     else:
         print("Guess this is life now.")
 

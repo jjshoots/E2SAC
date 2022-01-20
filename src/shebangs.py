@@ -54,6 +54,15 @@ def arg_parser():
     )
 
     parser.add_argument(
+        "--evaluate",
+        type=bool,
+        nargs="?",
+        const=True,
+        default=False,
+        help="Evaluate the network.",
+    )
+
+    parser.add_argument(
         "--shutdown",
         type=bool,
         nargs="?",

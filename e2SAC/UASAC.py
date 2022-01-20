@@ -128,10 +128,10 @@ class UASAC(nn.Module):
 
         # store some stuff
         self.q_std = None
-        self.k_mean = 1.
+        self.sup_scale_mean = 1.0
 
     def update_q_std(self, q, tau=0.05):
-        q = torch.std(q)
+        q = torch.std(q).detach()
         if not torch.isnan(q):
             if self.q_std is None:
                 self.q_std = q
@@ -139,11 +139,8 @@ class UASAC(nn.Module):
                 self.q_std = (1 - tau) * self.q_std + tau * q
 
     def update_k_mean(self, k, tau=0.05):
-        k = torch.mean(k)
-        if self.k_mean is None:
-            self.k_mean = k
-        else:
-            self.k_mean = (1 - tau) * self.k_mean + tau * k
+        k = torch.mean(k).detach()
+        self.sup_scale_mean = (1 - tau) * self.sup_scale_mean + tau * k
 
     def update_q_target(self, tau=0.005):
         # polyak averaging update for target q network
@@ -229,27 +226,22 @@ class UASAC(nn.Module):
         # supervision scale
         sup_scale = (1.0 - torch.exp(-self.confidence_scale * uncertainty)).detach()
 
-        # cutoff for supervision scale depending on expected the q of suboptimal policy
-        # blank = torch.zeros_like(sup_scale)
+        # clamp if too low
+        sup_scale = torch.where(
+            sup_scale < self.confidence_cutoff, torch.zeros_like(sup_scale), sup_scale
+        )
 
-        # expectations of Q with clipped doble Q for suboptimal policy
-        # q_sub = None
-        # with torch.no_grad():
-        #     q_sub1, q_sub2 = self.critic(states, labels)
-        #     q_sub, _ = torch.min(
-        #         torch.cat((q_sub1, q_sub2), dim=-1), dim=-1, keepdim=True
-        #     )
+        # contraction map
+        sup_scale = torch.clamp(sup_scale, 0.0, self.sup_scale_mean).detach()
 
-        # we blank out the supervision scale whenever these criteria are met
-        # sup_scale = torch.where(sup_scale < self.confidence_cutoff, blank, sup_scale)
-        # sup_scale = torch.where(q_sub < q, blank, sup_scale)
-        sup_scale = torch.clamp(sup_scale, 0., self.k_mean)
+        # update the mean of supervision scale
+        self.update_k_mean(sup_scale)
 
         # NIG regularizer scale
         output = self.actor(states)
         reg_loss = 2 * output[1] + output[2]
 
-        return rnf_loss, sup_loss, sup_scale.detach(), reg_loss
+        return rnf_loss, sup_loss, sup_scale, reg_loss
 
     def calc_alpha_loss(self, states):
         if not self.entropy_tuning:

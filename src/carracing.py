@@ -130,7 +130,7 @@ class Environment:
 
         return obs
 
-    def get_label(self, obs):
+    def old_get_label(self, obs):
         obs = np.uint8((obs * 127.5 + 127.5))
 
         obs = np.transpose(obs, (1, 2, 0))
@@ -161,6 +161,22 @@ class Environment:
             obs = 0.0
 
         steering = 0.8 * obs
+        accel = 0.1
+
+        return np.clip(np.array([steering, accel]), -0.99, 0.99)
+
+    def get_label(self, obs):
+        obs = obs[:, 15, :]
+        obs = np.sum(obs, 0)
+        obs = obs[1:] - obs[:-1]
+
+        rise = np.argmax(obs)
+        fall = np.argmin(obs)
+
+        midpoint = (rise + fall) / 2.0
+        midpoint = (midpoint / 64.0) - 0.5
+
+        steering = midpoint * 0.5
         accel = 0.1
 
         return np.clip(np.array([steering, accel]), -0.99, 0.99)

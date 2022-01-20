@@ -2,8 +2,8 @@
 num_envs: 1
 
 # training params
-buffer_size: 300000
-buffer_size_debug: 10000
+buffer_size: 250000
+buffer_size_debug: 10
 batch_size: 170
 start_epoch: 0
 epochs: 1000
@@ -22,9 +22,9 @@ scheduler_steps: 2
 scheduler_gamma: 0.5
 
 # algorithm specifics
-reg_lambda: 0.005
+reg_lambda: 0.05
 confidence_scale: 1.
-confidence_cutoff: 0.4
+confidence_cutoff: 0.08
 use_entropy: true
 target_entropy: -0.5
 

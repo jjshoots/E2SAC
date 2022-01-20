@@ -10,10 +10,10 @@ endif
 set shortmess=aoO
 argglobal
 %argdel
-$argadd .gitignore
-edit e2SAC/UASAC.py
+$argadd ~/Sandboxes/e2SAC/
+edit src/main.py
 argglobal
-balt sweep.yaml
+balt src/settings.yaml
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -22,21 +22,23 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 245 - ((20 * winheight(0) + 20) / 40)
+let s:l = 205 - ((22 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 245
-normal! 09|
+keepjumps 205
+normal! 049|
+if exists(':tcd') == 2 | tcd ~/Sandboxes/e2SAC | endif
 tabnext 1
-badd +246 e2SAC/UASAC.py
-badd +1 .gitignore
-badd +13 sweep.yaml
-badd +34 src/main.py
-badd +251 src/mainSAC.py
-badd +11 utils/helpers.py
-badd +27 src/settings.yaml
-badd +143 src/carracing.py
+badd +147 ~/Sandboxes/e2SAC/e2SAC/UASAC.py
+badd +1 ~/Sandboxes/e2SAC/src/mainSAC.py
+badd +205 ~/Sandboxes/e2SAC/src/main.py
+badd +43 ~/Sandboxes/e2SAC/utils/replay_buffer.py
+badd +6 ~/Sandboxes/e2SAC/src/settings.yaml
+badd +54 ~/Sandboxes/e2SAC/src/carracing.py
+badd +124 ~/Sandboxes/e2SAC/src/shebangs.py
+badd +58 ~/Sandboxes/e2SAC/e2SAC/UASACNet.py
+badd +60 ~/Sandboxes/e2SAC/e2SAC/normal_inverse_gamma.py
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
@@ -47,7 +49,6 @@ if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :
