@@ -28,31 +28,8 @@ def train(set):
     for epoch in range(set.start_epoch, set.epochs):
         """EVAL RUN"""
         if epoch % set.eval_epoch_ratio == 0 and epoch != 0:
-            eval_perf = []
-
-            env.reset()
-            env.eval()
-            net.eval()
-            net.zero_grad()
-
-            while len(eval_perf) < set.eval_num_traj:
-                with torch.no_grad():
-                    # get the initial state and action
-                    obs, _, _, _ = env.get_state()
-
-                    output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                    action = net.actor.infer(*output)
-                    action = cpuize(action)[0]
-
-                    # get the next state and reward
-                    _, _, _, _ = env.step(action)
-
-                    if env.is_done:
-                        eval_perf.append(env.cumulative_reward)
-                        env.reset()
-
             # for logging
-            eval_perf = np.mean(np.array(eval_perf))
+            eval_perf = env.evaluate(set, net)
             max_eval_perf = max([max_eval_perf, eval_perf])
 
         """ENVIRONMENT INTERACTION """
@@ -208,88 +185,23 @@ def train(set):
 
 
 def display(set):
-
-    use_net = False
-
     env = setup_env(set)
-    env.eval()
+
     net = None
-    if use_net:
+    if True:
         net, _, _, _, _ = setup_nets(set)
-        net.eval()
 
-    action = np.zeros((set.num_actions))
-
-    cv2.namedWindow("display", cv2.WINDOW_NORMAL)
-
-    while True:
-        obs, rwd, dne, lbl = env.step(action)
-
-        if env.is_done:
-            print(f"Total Reward: {env.cumulative_reward}")
-            env.reset()
-            action *= 0.0
-
-        if use_net:
-            output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-            # action = cpuize(net.actor.sample(*output)[0][0])
-            action = cpuize(net.actor.infer(*output))[0]
-
-            # print(action)
-            print(
-                net.critic.forward(
-                    gpuize(obs, set.device).unsqueeze(0), net.actor.infer(*output)[0]
-                )[0]
-                .squeeze()
-                .item()
-            )
-        else:
-            action = lbl
-
-        display = obs[:3, ...]
-        display = np.uint8((display * 127.5 + 127.5))
-        display = np.transpose(display, (1, 2, 0))
-        cv2.imshow("display", display)
-        cv2.waitKey(int(1000 / 15))
+    env.display(set, net)
 
 
 def evaluate(set):
-
-    use_net = False
+    env = setup_env(set)
 
     net = None
-    if use_net:
+    if True:
         net, _, _, _, _ = setup_nets(set)
-        net.eval()
 
-    env = setup_env(set)
-    env.reset()
-    env.eval()
-
-    eval_perf = []
-
-    while len(eval_perf) < set.eval_num_traj:
-        with torch.no_grad():
-            # get the initial state and action
-            obs, _, _, lbl = env.get_state()
-
-            if use_net:
-                output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                action = net.actor.infer(*output)
-                action = cpuize(action)[0]
-            else:
-                action = lbl
-
-            # get the next state and reward
-            _, _, _, _ = env.step(action)
-
-            if env.is_done:
-                eval_perf.append(env.cumulative_reward)
-                print(len(eval_perf))
-                env.reset()
-
-    eval_perf = np.mean(np.array(eval_perf))
-    print(eval_perf)
+    print(env.evaluate(set, net))
 
 
 def setup_env(set):
