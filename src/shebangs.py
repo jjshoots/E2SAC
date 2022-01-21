@@ -129,11 +129,6 @@ def parse_set():
     settings["buffer_size"] = (
         settings["buffer_size_debug"] if args.debug else settings["buffer_size"]
     )
-    settings["transitions_per_epoch"] = (
-        settings["buffer_size_debug"]
-        if args.debug
-        else settings["transitions_per_epoch"]
-    )
     # when formatting net_version, assert that only either args or settings
     # file have a value, not both
     if settings["net_version"] == "" and args.net_version == "":
