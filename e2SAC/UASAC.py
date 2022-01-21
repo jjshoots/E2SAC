@@ -221,8 +221,7 @@ class UASAC(nn.Module):
             rnf_loss = -(q * dones)
 
         # supervised loss is NLL loss between label and output
-        # sup_loss = NIG_NLL(torch.atanh(labels), *output, reduce=False)
-        sup_loss = F.smooth_l1_loss(NormalInvGamma(*output).rsample(), torch.atanh(labels))
+        sup_loss = NIG_NLL(torch.atanh(labels), *output, reduce=False) * 0.01
 
         # supervision scale
         sup_scale = (1.0 - torch.exp(-self.confidence_scale * uncertainty)).detach()
