@@ -3,5 +3,7 @@
 /wandb
 /weights
 /resource
+/.git
+/.vim
 */*egg-info
 */__pycache__
