@@ -17,17 +17,16 @@ class Environment:
 
         self.image_size = image_size
         self.frame_stack = 4
-        self.max_off_track = 100
 
         self.env = gym.make("CarRacing-v0", verbose=verbose)
+        self.state = np.zeros((1, *self.image_size))
         self.num_actions = 2
-        self.max_accel = 1.0
-        self.max_brake = 1.0
 
         self.off_track_t = 0
-        self.done_marker = 0
+        self.max_off_track = 50
+
+        self.done = 0
         self.cumulative_reward = 0
-        self.state = np.zeros((1, *self.image_size))
 
         self.eval_run = False
 
@@ -46,7 +45,7 @@ class Environment:
             self.step(np.zeros(self.num_actions), startup=True)
 
         self.off_track_t = 0
-        self.done_marker = 0
+        self.done = 0
         self.cumulative_reward = 0
         self.state = np.concatenate(
             [self.transform_obs(self.env.env.state)] * self.frame_stack, 0
@@ -67,28 +66,26 @@ class Environment:
             dones of shape [1]
             labels of shape [num_actions]
         """
-
+        # formulate the action
         steer = action[0]
-        accel = ((action[1]) > 0) * abs(action[1]) * self.max_accel
-        brake = ((action[1]) < 0) * abs(action[1]) * self.max_brake
+        accel = ((action[1]) > 0) * abs(action[1])
+        brake = ((action[1]) < 0) * abs(action[1])
         action = np.array([steer, accel, brake])
 
+        # step through the env for frame stack num times
         obs = []
         rwd = 0.0
-        dne = 0.0
         lbl = None
         for i in range(self.frame_stack):
             observation, reward, done, _ = self.env.step(action)
             obs.append(self.transform_obs(observation))
             rwd += reward
-            dne = max(dne, done)
+            self.done = max(done, self.done)
 
-            self.done_marker = copy.copy(dne)
             if i == 0:
                 lbl = (
                     None if startup else self.get_label(self.transform_obs(observation))
                 )
-
         self.state = np.concatenate(obs, axis=0)
 
         # record the number of times we go off track or generate no rewards
@@ -97,76 +94,37 @@ class Environment:
         else:
             self.off_track_t = 0
 
-        # during training, only end when we go off track for more than specified steps
-        # or we go outside the map
+        # during training, only end when:
+        #   - we go off track for more than specified steps (no reward)
+        #   - or we go outside the map
         if not self.eval_run:
             if self.off_track_t >= self.max_off_track or rwd < -50.0:
-                self.off_track_t = self.max_off_track + 1
-                dne = 1.0
+                self.done = 1.0
             else:
-                dne = 0.0
+                self.done = 0.0
 
+        # accumulate rewards
         self.cumulative_reward += rwd
 
-        return self.state, rwd, dne, lbl
+        return self.state, rwd, self.done, lbl
 
     @property
     def is_done(self):
         """
-        check for eval or training end criterias
+        Enforce one way property of done
         """
-        eval_criteria = self.done_marker and self.eval_run
-        train_criteria = self.off_track_t >= self.max_off_track and not self.eval_run
-        return eval_criteria or train_criteria
+        return self.done
 
     def transform_obs(self, obs):
         """
         resize and norm
         """
-        # obs = obs[:80, ...]
         obs = cv2.resize(obs, dsize=self.image_size, interpolation=cv2.INTER_LINEAR)
-        # obs = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY)
-        # obs = np.expand_dims(obs, 0)
         obs = (obs - 127.5) / 127.5
 
         obs = np.transpose(obs, (2, 0, 1))
 
         return obs
-
-    def old_get_label(self, obs):
-        obs = np.uint8((obs * 127.5 + 127.5))
-
-        obs = np.transpose(obs, (1, 2, 0))
-        obs = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY)
-        obs = np.expand_dims(obs, 0)
-
-        obs = np.transpose(obs, (1, 2, 0))
-
-        # blur
-        obs = cv2.GaussianBlur(obs, (5, 5), 0)
-        # detect edges
-        obs = cv2.Canny(obs, 50, 150)
-        # cv2.imshow('something', obs)
-        # cv2.waitKey(100000)
-        # crop the image just above the car
-        obs = obs[38:40, 15:49]
-        # find the centre of the track
-        obs = cv2.findNonZero(obs)
-
-        if obs is not None:
-            obs = (
-                (obs[:, 0, 0].max() + obs[:, 0, 0].min())
-                / 2
-                / (self.image_size[1] - 30)
-            )
-            obs = (obs - 0.5) / 0.5
-        else:
-            obs = 0.0
-
-        steering = 0.8 * obs
-        accel = 0.1
-
-        return np.clip(np.array([steering, accel]), -0.99, 0.99)
 
     def get_label(self, obs):
         obs = obs[:, 15, :]
@@ -183,7 +141,6 @@ class Environment:
         accel = 0.1
 
         return np.clip(np.array([steering, accel]), -0.99, 0.99)
-
 
     def evaluate(self, set, net=None):
         if net is not None:
@@ -209,12 +166,10 @@ class Environment:
 
             if self.is_done:
                 eval_perf.append(self.cumulative_reward)
-                print(len(eval_perf))
                 self.reset()
 
         eval_perf = np.mean(np.array(eval_perf))
         return eval_perf
-
 
     def display(self, set, net=None):
 
@@ -233,7 +188,7 @@ class Environment:
             if self.is_done:
                 print(f"Total Reward: {self.cumulative_reward}")
                 self.reset()
-                action *= 0.0
+                action = np.zeros((set.num_actions))
 
             if net is not None:
                 output = net.actor(gpuize(obs, set.device).unsqueeze(0))
@@ -243,7 +198,8 @@ class Environment:
                 # print(action)
                 print(
                     net.critic.forward(
-                        gpuize(obs, set.device).unsqueeze(0), net.actor.infer(*output)[0]
+                        gpuize(obs, set.device).unsqueeze(0),
+                        net.actor.infer(*output)[0],
                     )[0]
                     .squeeze()
                     .item()

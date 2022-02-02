@@ -4,9 +4,9 @@ import sys
 import warnings
 
 import yaml
-from utils.helpers import *
 
 import wandb
+from utils.helpers import *
 
 
 def shutdown_handler(*_):

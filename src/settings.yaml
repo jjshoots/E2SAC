@@ -2,11 +2,11 @@
 num_envs: 1
 
 # training params
-buffer_size: 250000
+buffer_size: 150000
 buffer_size_debug: 10
 batch_size: 170
 start_epoch: 0
-epochs: 1000
+epochs: 700
 repeats_per_buffer: 5 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
 repeats_per_buffer_scale: -0.005
 critic_update_multiplier: 1

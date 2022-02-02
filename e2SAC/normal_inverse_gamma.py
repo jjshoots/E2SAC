@@ -64,7 +64,7 @@ def ShrunkenNormalInvGamma(gamma, nu, alpha, beta, clamp_mean=None, clamp_var=No
     return D.Normal(gamma, torch.sqrt(var))
 
 
-def NIG_uncertainty(gamma, nu, alpha, beta):
+def NIG_epistemic(gamma, nu, alpha, beta):
     """
     calculates the epistemic uncertainty of a distribution
     the value is effectively expectation of sigma square
@@ -78,6 +78,22 @@ def NIG_uncertainty(gamma, nu, alpha, beta):
     ), f"beta must be more than zero, min value is {beta.min()}"
 
     return torch.sqrt(beta / (alpha - 1) / nu)
+
+
+def NIG_aleatoric(gamma, nu, alpha, beta):
+    """
+    calculates the aleatoric uncertainty of a distribution
+    the value is effectively expectation of sigma square
+    """
+    assert torch.all(nu > 0.0), f"nu must be more than zero, min value is {nu.min()}"
+    assert torch.all(
+        alpha > 1.0
+    ), f"alpha must be more than one, min value is {alpha.min()}"
+    assert torch.all(
+        beta > 0.0
+    ), f"beta must be more than zero, min value is {beta.min()}"
+
+    return torch.sqrt(beta / (alpha - 1))
 
 
 def NIG_NLL(label, gamma, nu, alpha, beta, reduce=True):

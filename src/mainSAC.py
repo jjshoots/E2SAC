@@ -1,26 +1,25 @@
 import os
-import sys
 from signal import SIGINT, signal
 
-import cv2
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from PIL import Image, ImageDraw
+from PIL import Image
 
 import wandb
-from carracing import *
+from carracing import Environment
 from SAC.SAC import SAC
-from shebangs import *
-from utils.replay_buffer import *
+from shebangs import check_venv, parse_set, shutdown_handler
+from utils.helpers import Helpers, cpuize, gpuize
+from utils.replay_buffer import ReplayBuffer
 
 
 def train(set):
     env = setup_env(set)
     net, net_helper, optim_set, sched_set, optim_helper = setup_nets(set)
     memory = ReplayBuffer(set.buffer_size)
-    eval_perf = 0.0
+    eval_perf = -100.0
     max_eval_perf = -100.0
 
     for epoch in range(set.start_epoch, set.epochs):

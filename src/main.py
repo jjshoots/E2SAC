@@ -1,19 +1,17 @@
 import os
-import sys
 from signal import SIGINT, signal
 
-import cv2
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from PIL import Image, ImageDraw
+from PIL import Image
 
 import wandb
-from carracing import *
-from e2SAC.normal_inverse_gamma import *
+from carracing import Environment
 from e2SAC.UASAC import UASAC
-from shebangs import *
+from shebangs import check_venv, parse_set, shutdown_handler
+from utils.helpers import Helpers, cpuize, gpuize
 from utils.replay_buffer import ReplayBuffer
 
 
@@ -52,7 +50,7 @@ def train(set):
                     action = np.random.uniform(-1.0, 1.0, 2)
                 else:
                     output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                    action, ent, _ = net.actor.sample(*output)
+                    action, ent = net.actor.sample(*output)
                     action = cpuize(action)[0]
                     ent = cpuize(ent)[0]
 

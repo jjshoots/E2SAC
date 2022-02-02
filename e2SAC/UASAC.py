@@ -6,9 +6,8 @@ import torch.distributions as dist
 import torch.nn as nn
 import torch.nn.functional as func
 
-from e2SAC.normal_inverse_gamma import *
-from e2SAC.UASACNet import *
-from utils.neural_blocks import *
+import e2SAC.normal_inverse_gamma as NIG
+import e2SAC.UASACNet as UASACNet
 
 
 class TwinnedQNetwork(nn.Module):
@@ -20,8 +19,8 @@ class TwinnedQNetwork(nn.Module):
         super().__init__()
 
         # critic, clipped double Q
-        self.Q_network1 = Critic(num_actions)
-        self.Q_network2 = Critic(num_actions)
+        self.Q_network1 = UASACNet.Critic(num_actions)
+        self.Q_network2 = UASACNet.Critic(num_actions)
 
     def forward(self, states, actions):
         """
@@ -43,7 +42,7 @@ class GaussianActor(nn.Module):
 
     def __init__(self, num_actions):
         super().__init__()
-        self.net = Actor(num_actions)
+        self.net = UASACNet.Actor(num_actions)
 
     def forward(self, states):
         return self.net(states)
@@ -57,10 +56,7 @@ class GaussianActor(nn.Module):
             log_probs is of shape ** x num_actions
         """
         output = gamma, nu, alpha, beta
-        normals = ShrunkenNormalInvGamma(*output, clamp_mean=2.0, clamp_var=10.0)
-
-        # compute epistemic uncertainty
-        uncertainty = NIG_uncertainty(*output)
+        normals = NIG.ShrunkenNormalInvGamma(*output, clamp_mean=2.0, clamp_var=10.0)
 
         # sample from dist
         mu_samples = normals.rsample()
@@ -70,7 +66,7 @@ class GaussianActor(nn.Module):
         log_probs = normals.log_prob(mu_samples) - torch.log(1 - actions.pow(2) + 1e-6)
         entropies = log_probs.sum(dim=-1, keepdim=True)
 
-        return actions, entropies, uncertainty
+        return actions, entropies
 
     @staticmethod
     def infer(gamma, nu, alpha, beta):
@@ -167,7 +163,7 @@ class UASAC(nn.Module):
         with torch.no_grad():
             # sample the next actions based on the current policy
             output = self.actor(next_states)
-            next_actions, entropies, _ = self.actor.sample(*output)
+            next_actions, entropies = self.actor.sample(*output)
 
             next_q1, next_q2 = self.critic_target(next_states, next_actions)
 
@@ -207,7 +203,7 @@ class UASAC(nn.Module):
 
         # We re-sample actions to calculate expectations of Q.
         output = self.actor(states)
-        actions, entropies, uncertainty = self.actor.sample(*output)
+        actions, entropies = self.actor.sample(*output)
 
         # expectations of Q with clipped double Q
         q1, q2 = self.critic(states, actions)
@@ -220,35 +216,54 @@ class UASAC(nn.Module):
         else:
             rnf_loss = -(q * dones)
 
-        # supervised loss is NLL loss between label and output
-        sup_loss = NIG_NLL(torch.atanh(labels), *output, reduce=False)
+        # calculate some uncertainty values
+        epistemic = NIG.NIG_epistemic(*output)
+        aleatoric = NIG.NIG_aleatoric(*output)
+        uncertainty = torch.clamp(epistemic - aleatoric, 0.0, 1.0)
 
-        # supervision scale
-        sup_scale = (1.0 - torch.exp(-self.confidence_scale * uncertainty)).detach()
+        # negative log likelihood of some things
+        NLL_subopt = NIG.NIG_NLL(torch.atanh(labels), *output, reduce=False)
+        NLL_policy = NIG.NIG_NLL(output[0], *output, reduce=False)
 
-        # clamp if too low
-        sup_scale = torch.where(
-            sup_scale < self.confidence_cutoff, torch.zeros_like(sup_scale), sup_scale
-        )
-
-        # contraction map
-        sup_scale = torch.clamp(sup_scale, 0.0, self.sup_scale_mean).detach()
-
-        # update the mean of supervision scale
-        self.update_k_mean(sup_scale)
-
-        # NIG regularizer scale
-        output = self.actor(states)
+        # NIG regularizer
         reg_loss = 2 * output[1] + output[2]
 
-        return rnf_loss, sup_loss, sup_scale, reg_loss
+        if True:
+            # importance sampling
+            imp_scale = (-(NLL_subopt - NLL_policy)).exp().detach()
+
+            # rescale the supervision loss
+            sup_scale = 1.0 - (torch.exp(-self.confidence_scale * uncertainty) / imp_scale)
+
+            # clamp it
+            sup_scale = torch.clamp(sup_scale, 0.0, 1.0).detach()
+
+        else:
+            # supervision scale
+            sup_scale = (1.0 - torch.exp(-self.confidence_scale * uncertainty)).detach()
+
+            # clamp if too low
+            sup_scale = torch.where(
+                sup_scale < self.confidence_cutoff,
+                torch.zeros_like(sup_scale),
+                sup_scale,
+            )
+
+            # contraction map
+            sup_scale = torch.clamp(sup_scale, 0.0, self.sup_scale_mean).detach()
+
+            # update the mean of supervision scale
+            self.update_k_mean(sup_scale)
+
+        # sup_loss = NLL_subopt
+        return rnf_loss, NLL_subopt, sup_scale, reg_loss
 
     def calc_alpha_loss(self, states):
         if not self.entropy_tuning:
             return torch.zeros(1)
 
         output = self.actor(states)
-        _, entropies, _ = self.actor.sample(*output)
+        _, entropies = self.actor.sample(*output)
 
         # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.
         entropy_loss = (
