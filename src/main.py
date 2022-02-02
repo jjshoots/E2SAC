@@ -118,7 +118,11 @@ def train(set):
                         states, dones, labels
                     )
                     actor_loss = (
-                        (set.reg_lambda * regularizer * reg_loss).mean()
+                        (
+                            set.reg_lambda
+                            * (regularizer - regularizer.mean())
+                            * reg_loss
+                        ).mean()
                         + ((1.0 - sup_scale) * rnf_loss).mean()
                         + (sup_scale * sup_loss).mean()
                     )

@@ -134,10 +134,6 @@ class UASAC(nn.Module):
             else:
                 self.q_std = (1 - tau) * self.q_std + tau * q
 
-    def update_k_mean(self, k, tau=0.05):
-        k = torch.mean(k).detach()
-        self.sup_scale_mean = (1 - tau) * self.sup_scale_mean + tau * k
-
     def update_q_target(self, tau=0.005):
         # polyak averaging update for target q network
         for target, source in zip(
@@ -210,53 +206,28 @@ class UASAC(nn.Module):
         q, _ = torch.min(torch.cat((q1, q2), dim=-1), dim=-1, keepdim=True)
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
-        rnf_loss = 0.0
         if self.use_entropy:
             rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * dones)
         else:
             rnf_loss = -(q * dones)
 
-        # calculate some uncertainty values
-        epistemic = NIG.NIG_epistemic(*output)
-        aleatoric = NIG.NIG_aleatoric(*output)
-        uncertainty = torch.clamp(epistemic - aleatoric, 0.0, 1.0)
+        # supervisory loss is difference between predicted and label
+        sup_loss = NIG.SNIG_NLL(labels, *output)
 
-        # negative log likelihood of some things
-        NLL_subopt = NIG.NIG_NLL(torch.atanh(labels), *output, reduce=False)
-        NLL_policy = NIG.NIG_NLL(output[0], *output, reduce=False)
+        # importance sampling under full NIG distribution
+        NLL_subopt = -NIG.NIG_NLL(torch.atanh(labels), *output, reduce=False)
+        NLL_policy = -NIG.NIG_NLL(output[0], *output, reduce=False)
+        imp_scale = (NLL_subopt - NLL_policy).exp().detach()
+
+        # supervision scale calculation
+        sup_scale = imp_scale * torch.exp(-self.confidence_scale * output[1])
+        sup_scale = sup_scale.detach()
 
         # NIG regularizer
-        reg_loss = 2 * output[1] + output[2]
-
-        if True:
-            # importance sampling
-            imp_scale = (-(NLL_subopt - NLL_policy)).exp().detach()
-
-            # rescale the supervision loss
-            sup_scale = 1.0 - (torch.exp(-self.confidence_scale * uncertainty) / imp_scale)
-
-            # clamp it
-            sup_scale = torch.clamp(sup_scale, 0.0, 1.0).detach()
-
-        else:
-            # supervision scale
-            sup_scale = (1.0 - torch.exp(-self.confidence_scale * uncertainty)).detach()
-
-            # clamp if too low
-            sup_scale = torch.where(
-                sup_scale < self.confidence_cutoff,
-                torch.zeros_like(sup_scale),
-                sup_scale,
-            )
-
-            # contraction map
-            sup_scale = torch.clamp(sup_scale, 0.0, self.sup_scale_mean).detach()
-
-            # update the mean of supervision scale
-            self.update_k_mean(sup_scale)
+        reg_loss = output[1]
 
         # sup_loss = NLL_subopt
-        return rnf_loss, NLL_subopt, sup_scale, reg_loss
+        return rnf_loss, sup_loss, sup_scale, reg_loss
 
     def calc_alpha_loss(self, states):
         if not self.entropy_tuning:
