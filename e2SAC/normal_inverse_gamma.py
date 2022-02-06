@@ -138,7 +138,6 @@ def NIG_NLL_old(label, gamma, nu, alpha, beta, reduce=True):
     return torch.mean(nll) if reduce else nll
 
 
-
 def NIG_NLL(label, gamma, nu, alpha, beta, reduce=True):
     """
     Negative Log Likelihood loss between label and predicted output

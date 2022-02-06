@@ -16,7 +16,6 @@ from utils.replay_buffer import ReplayBuffer
 
 
 def train(set):
-
     env = setup_env(set)
     net, net_helper, optim_set, sched_set, optim_helper = setup_nets(set)
     memory = ReplayBuffer(set.buffer_size)
@@ -100,7 +99,6 @@ def train(set):
                 labels = gpuize(stuff[5], set.device)
 
                 # train critic
-                regularizer = None
                 for _ in range(set.critic_update_multiplier):
                     net.zero_grad()
                     q_loss, regularizer = net.calc_critic_loss(
@@ -114,15 +112,11 @@ def train(set):
                 # train actor
                 for _ in range(set.actor_update_multiplier):
                     net.zero_grad()
-                    rnf_loss, sup_loss, sup_scale, reg_loss = net.calc_actor_loss(
+                    rnf_loss, sup_loss, sup_scale, alpha, nu = net.calc_actor_loss(
                         states, dones, labels
                     )
                     actor_loss = (
-                        (
-                            set.reg_lambda
-                            * (regularizer - regularizer.mean())
-                            * reg_loss
-                        ).mean()
+                        (set.reg_lambda * (regularizer - 0.5) * nu).mean()
                         + ((1.0 - sup_scale) * rnf_loss).mean()
                         + (sup_scale * sup_loss).mean()
                     )
@@ -178,6 +172,10 @@ def train(set):
                         "max_eval_perf": max_eval_perf,
                         "mean_entropy": mean_entropy,
                         "sup_scale": sup_scale_mean,
+                        "alpha": alpha.mean(),
+                        "nu": nu.mean(),
+                        "reg_mean": regularizer.mean(),
+                        "reg_std": regularizer.mean(),
                         "sup_scale_std": sup_scale_std,
                         "log_alpha": net.log_alpha.item(),
                         "num_episodes": epoch,
@@ -236,7 +234,6 @@ def setup_nets(set):
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
         confidence_scale=set.confidence_scale,
-        confidence_cutoff=set.confidence_cutoff,
     ).to(set.device)
     actor_optim = optim.AdamW(net.actor.parameters(), lr=set.starting_LR, amsgrad=True)
     actor_sched = optim.lr_scheduler.StepLR(

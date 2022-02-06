@@ -6,7 +6,7 @@ import torch.distributions as dist
 import torch.nn as nn
 import torch.nn.functional as func
 
-import e2SAC.normal_inverse_gamma as NIG
+import e2SAC.derived_normals as DN
 import e2SAC.UASACNet as UASACNet
 
 
@@ -56,7 +56,7 @@ class GaussianActor(nn.Module):
             log_probs is of shape ** x num_actions
         """
         output = gamma, nu, alpha, beta
-        normals = NIG.ShrunkenNormalInvGamma(*output, clamp_mean=2.0, clamp_var=10.0)
+        normals = DN.Normal(*output)
 
         # sample from dist
         mu_samples = normals.rsample()
@@ -84,14 +84,12 @@ class UASAC(nn.Module):
         entropy_tuning=True,
         target_entropy=None,
         confidence_scale=3.0,
-        confidence_cutoff=0.2,
     ):
         super().__init__()
 
         self.num_actions = num_actions
         self.use_entropy = entropy_tuning
         self.confidence_scale = confidence_scale
-        self.confidence_cutoff = confidence_cutoff
 
         # actor head
         self.actor = GaussianActor(num_actions)
@@ -183,9 +181,9 @@ class UASAC(nn.Module):
         # update the q_std
         self.update_q_std(target_q)
 
-        # NIG regularizer scale
+        # DN regularizer scale
         regularizer = abs(curr_q1 - target_q) + abs(curr_q2 - target_q)
-        regularizer = regularizer / (self.q_std + 1e-6)
+        regularizer = regularizer / (self.q_std + 1e-6) + 1e-6
 
         return q_loss.mean(), regularizer.detach()
 
@@ -212,22 +210,22 @@ class UASAC(nn.Module):
             rnf_loss = -(q * dones)
 
         # supervisory loss is difference between predicted and label
-        sup_loss = NIG.SNIG_NLL(labels, *output)
+        sup_loss = func.mse_loss(labels, torch.tanh(output[0]), reduction='none')
 
-        # importance sampling under full NIG distribution
-        NLL_subopt = -NIG.NIG_NLL(torch.atanh(labels), *output, reduce=False)
-        NLL_policy = -NIG.NIG_NLL(output[0], *output, reduce=False)
+        # importance sampling under derived Normal
+        NLL_subopt = -DN.Normal_NLL(torch.atanh(labels), *output, reduce=False)
+        NLL_policy = -DN.Normal_NLL(output[0], *output, reduce=False)
         imp_scale = (NLL_subopt - NLL_policy).exp().detach()
 
         # supervision scale calculation
         sup_scale = imp_scale * torch.exp(-self.confidence_scale * output[1])
         sup_scale = sup_scale.detach()
 
-        # NIG regularizer
-        reg_loss = output[1]
+        # Derived Normal regularizer
+        alpha = output[2]
+        nu = output[1]
 
-        # sup_loss = NLL_subopt
-        return rnf_loss, sup_loss, sup_scale, reg_loss
+        return rnf_loss, sup_loss, sup_scale, alpha, nu
 
     def calc_alpha_loss(self, states):
         if not self.entropy_tuning:

@@ -50,8 +50,8 @@ class Actor(nn.Module):
 
         mu, lognu, logalpha, logbeta = torch.split(states, 1, dim=0)
 
-        nu = F.softplus(lognu) + 1e-6
-        alpha = F.softplus(logalpha) + 1.0 + 1e-6
+        nu = torch.clamp(F.softplus(lognu), 1e-6, 100.0)
+        alpha = F.softplus(logalpha) + 1e-6
         beta = F.softplus(logbeta) + 1e-6
 
         return torch.cat([mu, nu, alpha, beta], dim=0)
