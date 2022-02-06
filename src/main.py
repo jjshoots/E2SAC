@@ -77,9 +77,6 @@ def train(set):
         )
 
         """ TRAINING RUN """
-        sup_scale_std = 0
-        sup_scale_mean = 0
-
         dataloader = torch.utils.data.DataLoader(
             memory, batch_size=set.batch_size, shuffle=True, drop_last=False
         )
@@ -101,7 +98,7 @@ def train(set):
                 # train critic
                 for _ in range(set.critic_update_multiplier):
                     net.zero_grad()
-                    q_loss, regularizer = net.calc_critic_loss(
+                    q_loss = net.calc_critic_loss(
                         states, actions, rewards, next_states, dones
                     )
                     q_loss.backward()
@@ -112,15 +109,8 @@ def train(set):
                 # train actor
                 for _ in range(set.actor_update_multiplier):
                     net.zero_grad()
-                    rnf_loss, sup_loss, sup_scale, alpha, nu = net.calc_actor_loss(
-                        states, dones, labels
-                    )
-                    actor_loss = (
-                        (set.reg_lambda * (regularizer - 0.5) * nu).mean()
-                        + ((1.0 - sup_scale) * rnf_loss).mean()
-                        + (sup_scale * sup_loss).mean()
-                    )
-                    actor_loss.backward()
+                    rnf_loss, sup_scale = net.calc_actor_loss(states, dones, labels)
+                    rnf_loss.backward()
                     optim_set["actor"].step()
                     sched_set["actor"].step()
 
@@ -131,10 +121,6 @@ def train(set):
                         ent_loss.backward()
                         optim_set["alpha"].step()
                         sched_set["alpha"].step()
-
-                    # for logging
-                    sup_scale_mean = sup_scale.mean().item()
-                    sup_scale_std = sup_scale.std().item()
 
                 """ WEIGHTS SAVING """
                 net_weights = net_helper.training_checkpoint(
@@ -171,12 +157,8 @@ def train(set):
                         "eval_perf": eval_perf,
                         "max_eval_perf": max_eval_perf,
                         "mean_entropy": mean_entropy,
-                        "sup_scale": sup_scale_mean,
-                        "alpha": alpha.mean(),
-                        "nu": nu.mean(),
-                        "reg_mean": regularizer.mean(),
-                        "reg_std": regularizer.mean(),
-                        "sup_scale_std": sup_scale_std,
+                        "sup_scale": sup_scale.mean(),
+                        "sup_scale_std": sup_scale.std(),
                         "log_alpha": net.log_alpha.item(),
                         "num_episodes": epoch,
                         "num_transitions": memory.__len__(),

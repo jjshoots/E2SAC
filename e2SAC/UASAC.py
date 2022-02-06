@@ -37,7 +37,7 @@ class TwinnedQNetwork(nn.Module):
 
 class GaussianActor(nn.Module):
     """
-    Gaussian Actor Wrapper for Deep Evidential Regression
+    Gaussian Actor
     """
 
     def __init__(self, num_actions):
@@ -45,18 +45,19 @@ class GaussianActor(nn.Module):
         self.net = UASACNet.Actor(num_actions)
 
     def forward(self, states):
-        return self.net(states)
+        output = torch.tanh(self.net(states))
+        return output[0] * 2.0, output[1] * 10.0
 
     @staticmethod
-    def sample(gamma, nu, alpha, beta):
+    def sample(mu, sigma):
         """
         output:
             actions is of shape ** x num_actions
             entropies is of shape ** x 1
             log_probs is of shape ** x num_actions
         """
-        output = gamma, nu, alpha, beta
-        normals = DN.Normal(*output)
+        # lower bound sigma and bias it
+        normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
 
         # sample from dist
         mu_samples = normals.rsample()
@@ -69,8 +70,8 @@ class GaussianActor(nn.Module):
         return actions, entropies
 
     @staticmethod
-    def infer(gamma, nu, alpha, beta):
-        return torch.tanh(gamma)
+    def infer(mu, sigma):
+        return torch.tanh(mu)
 
 
 class UASAC(nn.Module):
@@ -181,11 +182,7 @@ class UASAC(nn.Module):
         # update the q_std
         self.update_q_std(target_q)
 
-        # DN regularizer scale
-        regularizer = abs(curr_q1 - target_q) + abs(curr_q2 - target_q)
-        regularizer = regularizer / (self.q_std + 1e-6) + 1e-6
-
-        return q_loss.mean(), regularizer.detach()
+        return q_loss.mean()
 
     def calc_actor_loss(self, states, dones, labels):
         """
@@ -210,22 +207,21 @@ class UASAC(nn.Module):
             rnf_loss = -(q * dones)
 
         # supervisory loss is difference between predicted and label
-        sup_loss = func.mse_loss(labels, torch.tanh(output[0]), reduction='none')
+        sup_loss = func.mse_loss(labels, actions, reduction='none')
 
-        # importance sampling under derived Normal
-        NLL_subopt = -DN.Normal_NLL(torch.atanh(labels), *output, reduce=False)
-        NLL_policy = -DN.Normal_NLL(output[0], *output, reduce=False)
-        imp_scale = (NLL_subopt - NLL_policy).exp().detach()
+        # calculate epistemic uncertainty
+        with torch.no_grad():
+            q1, q2 = self.critic(states, labels)
+            uncertainty = (q1 - q2).abs()
+            uncertainty = uncertainty / (self.q_std + 1e-6)
+            sup_scale = 1. - torch.exp(-self.confidence_scale * uncertainty)
 
-        # supervision scale calculation
-        sup_scale = imp_scale * torch.exp(-self.confidence_scale * output[1])
-        sup_scale = sup_scale.detach()
+        actor_loss = (
+            + ((1.0 - sup_scale) * rnf_loss).mean()
+            + (sup_scale * sup_loss).mean()
+        )
 
-        # Derived Normal regularizer
-        alpha = output[2]
-        nu = output[1]
-
-        return rnf_loss, sup_loss, sup_scale, alpha, nu
+        return actor_loss, sup_scale
 
     def calc_alpha_loss(self, states):
         if not self.entropy_tuning:

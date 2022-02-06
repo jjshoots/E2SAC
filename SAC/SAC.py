@@ -37,7 +37,7 @@ class TwinnedQNetwork(nn.Module):
 
 class GaussianActor(nn.Module):
     """
-    Gaussian Actor Wrapper for Deep Evidential Regression
+    Gaussian Actor
     """
 
     def __init__(self, num_actions):
