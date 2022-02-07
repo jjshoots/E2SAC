@@ -217,10 +217,9 @@ class UASAC(nn.Module):
             uncertainty = uncertainty / (self.q_std + 1e-6)
             sup_scale = 1. - torch.exp(-self.confidence_scale * uncertainty)
 
-        actor_loss = (
-            + ((1.0 - sup_scale) * rnf_loss).mean()
-            + (sup_scale * sup_loss).mean()
-        )
+        rnf_loss = ((1.0 - sup_scale) * rnf_loss).mean()
+        sup_loss = (sup_scale * sup_loss).mean()
+        actor_loss = rnf_loss + sup_loss
 
         log = dict()
         log['sup_scale'] = sup_scale.mean().detach()
