@@ -209,5 +209,6 @@ class SAC(nn.Module):
 
         log = dict()
         log['log_alpha'] = self.log_alpha.item()
+        log['mean_entropy'] = entropies.mean().detach()
 
         return entropy_loss, log

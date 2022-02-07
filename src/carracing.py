@@ -128,7 +128,7 @@ class Environment:
 
     def get_label(self, obs):
         obs = obs[:, 15, :]
-        obs = np.sum(obs, 0)
+        obs = np.sum(obs, axis=0)
         obs = obs[1:] - obs[:-1]
 
         rise = np.argmax(obs)

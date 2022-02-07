@@ -189,7 +189,7 @@ class UASAC(nn.Module):
         """
         states is of shape B x img_size
         dones is of shape B x 1
-        labels is of shape B x 3
+        labels is of shape B x 2
         """
         dones = 1.0 - dones
 
@@ -241,5 +241,6 @@ class UASAC(nn.Module):
 
         log = dict()
         log['log_alpha'] = self.log_alpha.item()
+        log['mean_entropy'] = entropies.mean().detach()
 
         return entropy_loss, log
