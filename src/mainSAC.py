@@ -39,19 +39,16 @@ def train(set):
 
         with torch.no_grad():
             video_log = []
-            mean_entropy = []
             while not env.is_done:
                 # get the initial state and label
                 obs, _, _, _ = env.get_state()
 
-                ent = 0.0
                 if epoch < set.exploration_epochs:
                     action = np.random.uniform(-1.0, 1.0, 2)
                 else:
                     output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                    action, ent = net.actor.sample(*output)
+                    action, _ = net.actor.sample(*output)
                     action = cpuize(action)[0]
-                    ent = cpuize(ent)[0]
 
                 # get the next state and other stuff
                 next_obs, rew, dne, _ = env.step(action)
@@ -60,13 +57,11 @@ def train(set):
                 memory.push((obs, action, rew, next_obs, dne))
 
                 # log progress
-                mean_entropy.append(ent)
                 frame = np.uint8(obs[:3, ...] * 127.5 + 127.5).transpose(1, 2, 0)
                 video_log.append(Image.fromarray(frame))
 
             # for logging
             to_log['total_reward'] = env.cumulative_reward
-            to_log['mean_entropy'] = np.mean(np.array(mean_entropy))
             video_log[0].save(
                 "./resource/video_log.gif",
                 save_all=True,
@@ -152,12 +147,12 @@ def train(set):
 
                 """ WANDB """
                 if set.wandb and i == 0 and j == 0:
-                    metrics = {
+                    log = {
                         "video": wandb.Video("./resource/video_log.gif"),
                         "epoch": epoch,
                         "num_transitions": memory.__len__(),
                     }
-                    to_log = {**to_log, **metrics}
+                    to_log = {**to_log, **log}
                     wandb.log(to_log)
 
 
