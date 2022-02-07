@@ -22,7 +22,7 @@ scheduler_gamma: 0.5
 
 # algorithm specifics
 reg_lambda: 0.001
-confidence_scale: 1.
+confidence_scale: 5.
 use_entropy: true
 target_entropy: -0.5
 

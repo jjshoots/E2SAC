@@ -6,8 +6,7 @@ import torch.distributions as dist
 import torch.nn as nn
 import torch.nn.functional as func
 
-from SAC.SACNet import *
-from utils.neural_blocks import *
+from SAC.SACNet import SACNet
 
 
 class TwinnedQNetwork(nn.Module):
@@ -19,8 +18,8 @@ class TwinnedQNetwork(nn.Module):
         super().__init__()
 
         # critic, clipped double Q
-        self.Q_network1 = Critic(num_actions)
-        self.Q_network2 = Critic(num_actions)
+        self.Q_network1 = SACNet.Critic(num_actions)
+        self.Q_network2 = SACNet.Critic(num_actions)
 
     def forward(self, states, actions):
         """
@@ -42,7 +41,7 @@ class GaussianActor(nn.Module):
 
     def __init__(self, num_actions):
         super().__init__()
-        self.net = Actor(num_actions)
+        self.net = SACNet.Actor(num_actions)
 
     def forward(self, states):
         output = torch.tanh(self.net(states))
@@ -57,7 +56,7 @@ class GaussianActor(nn.Module):
             log_probs is of shape ** x num_actions
         """
         # lower bound sigma and bias it
-        normals = dist.Normal(mu, F.softplus(sigma + 1) + 1e-6)
+        normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
 
         # sample from dist
         mu_samples = normals.rsample()
@@ -165,7 +164,9 @@ class SAC(nn.Module):
         q2_loss = func.mse_loss(curr_q2, target_q)
         q_loss = (q1_loss + q2_loss) / 2.0
 
-        return q_loss
+        log = dict()
+
+        return q_loss, log
 
     def calc_actor_loss(self, states, dones):
         """
@@ -183,13 +184,16 @@ class SAC(nn.Module):
         q, _ = torch.min(torch.cat((q1, q2), dim=-1), dim=-1, keepdim=True)
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
-        rnf_loss = 0.0
         if self.use_entropy:
             rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * dones) + 1e-6
         else:
-            rnf_loss = -(q * dones) + 1e-6
+            rnf_loss = -(q * dones)
 
-        return rnf_loss.mean()
+        actor_loss = rnf_loss.mean()
+
+        log = dict()
+
+        return actor_loss, log
 
     def calc_alpha_loss(self, states):
         if not self.entropy_tuning:
@@ -198,4 +202,12 @@ class SAC(nn.Module):
         output = self.actor(states)
         _, entropies = self.actor.sample(*output)
 
-        return (self.log_alpha * (self.target_entropy - entropies).detach()).mean()
+        # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.
+        entropy_loss = (
+            self.log_alpha * (self.target_entropy - entropies).detach()
+        ).mean()
+
+        log = dict()
+        log['log_alpha'] = self.log_alpha.item()
+
+        return entropy_loss, log

@@ -6,7 +6,6 @@ import torch.distributions as dist
 import torch.nn as nn
 import torch.nn.functional as func
 
-import e2SAC.derived_normals as DN
 import e2SAC.UASACNet as UASACNet
 
 
@@ -175,14 +174,16 @@ class UASAC(nn.Module):
             )
 
         # critic loss is mean squared TD errors
-        q1_loss = func.mse_loss(curr_q1, target_q, reduction="none")
-        q2_loss = func.mse_loss(curr_q2, target_q, reduction="none")
+        q1_loss = func.mse_loss(curr_q1, target_q)
+        q2_loss = func.mse_loss(curr_q2, target_q)
         q_loss = (q1_loss + q2_loss) / 2.0
 
         # update the q_std
         self.update_q_std(target_q)
 
-        return q_loss.mean()
+        log = dict()
+
+        return q_loss, log
 
     def calc_actor_loss(self, states, dones, labels):
         """
@@ -221,7 +222,11 @@ class UASAC(nn.Module):
             + (sup_scale * sup_loss).mean()
         )
 
-        return actor_loss, sup_scale
+        log = dict()
+        log['sup_scale'] = sup_scale.mean().detach()
+        log['sup_scale_std'] = sup_scale.std().detach()
+
+        return actor_loss, log
 
     def calc_alpha_loss(self, states):
         if not self.entropy_tuning:
@@ -235,4 +240,7 @@ class UASAC(nn.Module):
             self.log_alpha * (self.target_entropy - entropies).detach()
         ).mean()
 
-        return entropy_loss
+        log = dict()
+        log['log_alpha'] = self.log_alpha.item()
+
+        return entropy_loss, log
