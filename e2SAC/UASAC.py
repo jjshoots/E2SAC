@@ -182,6 +182,7 @@ class UASAC(nn.Module):
         self.update_q_std(target_q)
 
         log = dict()
+        log["q_std"] = self.q_std
 
         return q_loss, log
 
@@ -208,7 +209,8 @@ class UASAC(nn.Module):
             rnf_loss = -(q * dones)
 
         # supervisory loss is difference between predicted and label
-        sup_loss = func.mse_loss(labels, actions, reduction='none')
+        # sup_loss = func.mse_loss(labels, actions, reduction='none')
+        sup_loss = func.mse_loss(torch.atanh(labels), output[0], reduction='none')
 
         # calculate epistemic uncertainty
         with torch.no_grad():
@@ -224,6 +226,7 @@ class UASAC(nn.Module):
         log = dict()
         log['sup_scale'] = sup_scale.mean().detach()
         log['sup_scale_std'] = sup_scale.std().detach()
+        log["uncertainty"] = uncertainty.mean().detach()
 
         return actor_loss, log
 
