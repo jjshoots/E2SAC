@@ -209,8 +209,7 @@ class UASAC(nn.Module):
             rnf_loss = -(q * dones)
 
         # supervisory loss is difference between predicted and label
-        # sup_loss = func.mse_loss(labels, actions, reduction='none')
-        sup_loss = func.mse_loss(torch.atanh(labels), output[0], reduction='none')
+        sup_loss = func.mse_loss(labels, actions, reduction='none')
 
         # calculate epistemic uncertainty
         with torch.no_grad():
