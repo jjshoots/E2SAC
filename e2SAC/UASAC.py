@@ -52,9 +52,8 @@ class GaussianActor(nn.Module):
     def sample(mu, sigma):
         """
         output:
-            actions is of shape ** x num_actions
-            entropies is of shape ** x 1
-            log_probs is of shape ** x num_actions
+            actions is of shape B x num_actions
+            entropies is of shape B x 1
         """
         # lower bound sigma and bias it
         normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
@@ -144,8 +143,8 @@ class UASAC(nn.Module):
         self, states, actions, rewards, next_states, dones, gamma=0.99
     ):
         """
-        states is of shape B x img_size
-        actions is of shape B x 3
+        states is of shape B x input_shape
+        actions is of shape B x num_actions
         rewards is of shape B x 1
         dones is of shape B x 1
         """
@@ -185,9 +184,8 @@ class UASAC(nn.Module):
 
     def calc_actor_loss(self, states, dones, labels):
         """
-        states is of shape B x img_size
+        states is of shape B x input_shape
         dones is of shape B x 1
-        labels is of shape B x 2
         """
         dones = 1.0 - dones
 
@@ -227,6 +225,9 @@ class UASAC(nn.Module):
         return actor_loss, log
 
     def calc_alpha_loss(self, states):
+        """
+        states is of shape B x input_shape
+        """
         if not self.entropy_tuning:
             return torch.zeros(1)
 
