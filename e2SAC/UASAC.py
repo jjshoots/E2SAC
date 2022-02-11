@@ -9,29 +9,30 @@ import torch.nn.functional as func
 import e2SAC.UASACNet as UASACNet
 
 
-class TwinnedQNetwork(nn.Module):
+class Q_Ensemble(nn.Module):
     """
-    Twin Q Network
+    Q Network Ensembles
     """
 
-    def __init__(self, num_actions):
+    def __init__(self, num_actions, num_networks=2):
         super().__init__()
 
-        # critic, clipped double Q
-        self.Q_network1 = UASACNet.Critic(num_actions)
-        self.Q_network2 = UASACNet.Critic(num_actions)
+        networks = [UASACNet.Critic(num_actions) for _ in range(num_networks)]
+        self.networks = nn.ModuleList(networks)
 
     def forward(self, states, actions):
         """
-        states is of shape ** x num_inputs
-        actions is of shape ** x num_actions
-        output is a tuple of [** x 1], [** x 1]
+        states is of shape B x input_shape
+        actions is of shape B x num_actions
+        output is a tuple of B x num_networks
         """
-        # get q1 and q2
-        q1 = self.Q_network1(states, actions)
-        q2 = self.Q_network2(states, actions)
+        output = []
+        for network in self.networks:
+            output.append(network(states, actions))
 
-        return q1, q2
+        output = torch.cat(output, dim=-1)
+
+        return output
 
 
 class GaussianActor(nn.Module):
@@ -95,8 +96,8 @@ class UASAC(nn.Module):
         self.actor = GaussianActor(num_actions)
 
         # twin delayed Q networks
-        self.critic = TwinnedQNetwork(num_actions)
-        self.critic_target = TwinnedQNetwork(num_actions).eval()
+        self.critic = Q_Ensemble(num_actions)
+        self.critic_target = Q_Ensemble(num_actions).eval()
 
         # copy weights and disable gradients for the target network
         self.critic_target.load_state_dict(self.critic.state_dict())
@@ -150,8 +151,8 @@ class UASAC(nn.Module):
         """
         dones = 1.0 - dones
 
-        # current Q
-        curr_q1, curr_q2 = self.critic(states, actions)
+        # current Q, output is num_networks x B x 1
+        q_output = self.critic(states, actions)
 
         # target Q
         with torch.no_grad():
@@ -159,13 +160,11 @@ class UASAC(nn.Module):
             output = self.actor(next_states)
             next_actions, entropies = self.actor.sample(*output)
 
-            next_q1, next_q2 = self.critic_target(next_states, next_actions)
-
-            # concatenate both qs together then...
-            next_q = torch.cat((next_q1, next_q2), dim=-1)
+            # get the next q lists then...
+            next_q_output = self.critic_target(next_states, next_actions)
 
             # ...take the min at the cat dimension
-            next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
+            next_q, _ = torch.min(next_q_output, dim=-1, keepdim=True)
 
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
@@ -174,9 +173,7 @@ class UASAC(nn.Module):
             )
 
         # critic loss is mean squared TD errors
-        q1_loss = func.mse_loss(curr_q1, target_q)
-        q2_loss = func.mse_loss(curr_q2, target_q)
-        q_loss = (q1_loss + q2_loss) / 2.0
+        q_loss = ((q_output - target_q) ** 2).mean()
 
         # update the q_std
         self.update_q_std(target_q)
@@ -199,8 +196,8 @@ class UASAC(nn.Module):
         actions, entropies = self.actor.sample(*output)
 
         # expectations of Q with clipped double Q
-        q1, q2 = self.critic(states, actions)
-        q, _ = torch.min(torch.cat((q1, q2), dim=-1), dim=-1, keepdim=True)
+        q_output = self.critic(states, actions)
+        q, _ = torch.min(q_output, dim=-1, keepdim=True)
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         if self.use_entropy:
@@ -213,8 +210,8 @@ class UASAC(nn.Module):
 
         # calculate epistemic uncertainty
         with torch.no_grad():
-            q1, q2 = self.critic(states, labels)
-            uncertainty = (q1 - q2).abs()
+            q_output = self.critic(states, labels)
+            uncertainty = (q_output[..., [0]] - q_output[..., [1]]).abs()
             uncertainty = uncertainty / (self.q_std + 1e-6)
             sup_scale = 1. - torch.exp(-self.confidence_scale * uncertainty)
 

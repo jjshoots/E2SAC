@@ -200,7 +200,7 @@ class Environment:
                     net.critic.forward(
                         gpuize(obs, set.device).unsqueeze(0),
                         net.actor.infer(*output)[0],
-                    )[0]
+                    )[..., 0]
                     .squeeze()
                     .item()
                 )
