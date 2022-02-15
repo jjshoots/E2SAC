@@ -84,12 +84,14 @@ class UASAC(nn.Module):
         entropy_tuning=True,
         target_entropy=None,
         confidence_scale=3.0,
+        sup_lambda=10.0,
     ):
         super().__init__()
 
         self.num_actions = num_actions
         self.use_entropy = entropy_tuning
         self.confidence_scale = confidence_scale
+        self.sup_lambda = sup_lambda
 
         # actor head
         self.actor = GaussianActor(num_actions)
@@ -121,16 +123,12 @@ class UASAC(nn.Module):
             self.log_alpha = nn.Parameter(torch.tensor(0.0, requires_grad=True))
 
         # store some stuff
-        self.q_std = None
-        self.sup_scale_mean = 1.0
+        self.q_std = 1e-6
 
     def update_q_std(self, q, tau=0.05):
         q = torch.std(q).detach()
         if not torch.isnan(q):
-            if self.q_std is None:
-                self.q_std = q
-            else:
-                self.q_std = (1 - tau) * self.q_std + tau * q
+            self.q_std = (1 - tau) * self.q_std + tau * q
 
     def update_q_target(self, tau=0.005):
         # polyak averaging update for target q network
@@ -204,22 +202,29 @@ class UASAC(nn.Module):
             rnf_loss = -(q * dones)
 
         # supervisory loss is difference between predicted and label
-        sup_loss = func.mse_loss(labels, actions, reduction='none')
+        sup_loss = func.mse_loss(labels, actions, reduction="none")
+        sup_loss *= self.sup_lambda
 
         # calculate epistemic uncertainty
         with torch.no_grad():
             q_output = self.critic(states, labels)
             uncertainty = (q_output[..., [0]] - q_output[..., [1]]).abs()
             uncertainty = uncertainty / (self.q_std + 1e-6)
-            sup_scale = 1. - torch.exp(-self.confidence_scale * uncertainty)
+
+            # inverse exponential
+            # sup_scale = 1.0 - torch.exp(-self.confidence_scale * uncertainty)
+
+            # tanh
+            sup_scale = self.confidence_scale * uncertainty ** 2
+            sup_scale = torch.tanh(sup_scale)
 
         rnf_loss = ((1.0 - sup_scale) * rnf_loss).mean()
         sup_loss = (sup_scale * sup_loss).mean()
         actor_loss = rnf_loss + sup_loss
 
         log = dict()
-        log['sup_scale'] = sup_scale.mean().detach()
-        log['sup_scale_std'] = sup_scale.std().detach()
+        log["sup_scale"] = sup_scale.mean().detach()
+        log["sup_scale_std"] = sup_scale.std().detach()
         log["uncertainty"] = uncertainty.mean().detach()
 
         return actor_loss, log
@@ -240,7 +245,7 @@ class UASAC(nn.Module):
         ).mean()
 
         log = dict()
-        log['log_alpha'] = self.log_alpha.item()
-        log['mean_entropy'] = entropies.mean().detach()
+        log["log_alpha"] = self.log_alpha.item()
+        log["mean_entropy"] = entropies.mean().detach()
 
         return entropy_loss, log

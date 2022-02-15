@@ -6,32 +6,33 @@ import torch.distributions as dist
 import torch.nn as nn
 import torch.nn.functional as func
 
-from SAC.SACNet import SACNet
+import SAC.SACNet as SACNet
 
 
-class TwinnedQNetwork(nn.Module):
+class Q_Ensemble(nn.Module):
     """
-    Twin Q Network
+    Q Network Ensembles
     """
 
-    def __init__(self, num_actions):
+    def __init__(self, num_actions, num_networks=2):
         super().__init__()
 
-        # critic, clipped double Q
-        self.Q_network1 = SACNet.Critic(num_actions)
-        self.Q_network2 = SACNet.Critic(num_actions)
+        networks = [SACNet.Critic(num_actions) for _ in range(num_networks)]
+        self.networks = nn.ModuleList(networks)
 
     def forward(self, states, actions):
         """
-        states is of shape ** x num_inputs
-        actions is of shape ** x num_actions
-        output is a tuple of [** x 1], [** x 1]
+        states is of shape B x input_shape
+        actions is of shape B x num_actions
+        output is a tuple of B x num_networks
         """
-        # get q1 and q2
-        q1 = self.Q_network1(states, actions)
-        q2 = self.Q_network2(states, actions)
+        output = []
+        for network in self.networks:
+            output.append(network(states, actions))
 
-        return q1, q2
+        output = torch.cat(output, dim=-1)
+
+        return output
 
 
 class GaussianActor(nn.Module):
@@ -51,9 +52,8 @@ class GaussianActor(nn.Module):
     def sample(mu, sigma):
         """
         output:
-            actions is of shape ** x num_actions
-            entropies is of shape ** x 1
-            log_probs is of shape ** x num_actions
+            actions is of shape B x num_actions
+            entropies is of shape B x 1
         """
         # lower bound sigma and bias it
         normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
@@ -93,8 +93,8 @@ class SAC(nn.Module):
         self.actor = GaussianActor(num_actions)
 
         # twin delayed Q networks
-        self.critic = TwinnedQNetwork(num_actions)
-        self.critic_target = TwinnedQNetwork(num_actions).eval()
+        self.critic = Q_Ensemble(num_actions)
+        self.critic_target = Q_Ensemble(num_actions).eval()
 
         # copy weights and disable gradients for the target network
         self.critic_target.load_state_dict(self.critic.state_dict())
@@ -129,15 +129,15 @@ class SAC(nn.Module):
         self, states, actions, rewards, next_states, dones, gamma=0.99
     ):
         """
-        states is of shape B x img_size
-        actions is of shape B x 3
+        states is of shape B x input_shape
+        actions is of shape B x num_actions
         rewards is of shape B x 1
         dones is of shape B x 1
         """
         dones = 1.0 - dones
 
-        # current Q
-        curr_q1, curr_q2 = self.critic(states, actions)
+        # current Q, output is num_networks x B x 1
+        q_output = self.critic(states, actions)
 
         # target Q
         with torch.no_grad():
@@ -145,13 +145,11 @@ class SAC(nn.Module):
             output = self.actor(next_states)
             next_actions, entropies = self.actor.sample(*output)
 
-            next_q1, next_q2 = self.critic_target(next_states, next_actions)
-
-            # concatenate both qs together then...
-            next_q = torch.cat((next_q1, next_q2), dim=-1)
+            # get the next q lists then...
+            next_q_output = self.critic_target(next_states, next_actions)
 
             # ...take the min at the cat dimension
-            next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
+            next_q, _ = torch.min(next_q_output, dim=-1, keepdim=True)
 
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
@@ -160,9 +158,7 @@ class SAC(nn.Module):
             )
 
         # critic loss is mean squared TD errors
-        q1_loss = func.mse_loss(curr_q1, target_q)
-        q2_loss = func.mse_loss(curr_q2, target_q)
-        q_loss = (q1_loss + q2_loss) / 2.0
+        q_loss = ((q_output - target_q) ** 2).mean()
 
         log = dict()
 
@@ -170,7 +166,7 @@ class SAC(nn.Module):
 
     def calc_actor_loss(self, states, dones):
         """
-        states is of shape B x img_size
+        states is of shape B x input_shape
         dones is of shape B x 1
         """
         dones = 1.0 - dones
@@ -180,12 +176,12 @@ class SAC(nn.Module):
         actions, entropies = self.actor.sample(*output)
 
         # expectations of Q with clipped double Q
-        q1, q2 = self.critic(states, actions)
-        q, _ = torch.min(torch.cat((q1, q2), dim=-1), dim=-1, keepdim=True)
+        q_output = self.critic(states, actions)
+        q, _ = torch.min(q_output, dim=-1, keepdim=True)
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         if self.use_entropy:
-            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * dones) + 1e-6
+            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * dones)
         else:
             rnf_loss = -(q * dones)
 
@@ -196,6 +192,9 @@ class SAC(nn.Module):
         return actor_loss, log
 
     def calc_alpha_loss(self, states):
+        """
+        states is of shape B x input_shape
+        """
         if not self.entropy_tuning:
             return torch.zeros(1)
 
@@ -208,7 +207,7 @@ class SAC(nn.Module):
         ).mean()
 
         log = dict()
-        log['log_alpha'] = self.log_alpha.item()
-        log['mean_entropy'] = entropies.mean().detach()
+        log["log_alpha"] = self.log_alpha.item()
+        log["mean_entropy"] = entropies.mean().detach()
 
         return entropy_loss, log

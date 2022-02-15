@@ -13,7 +13,7 @@ critic_update_multiplier: 1
 actor_update_multiplier: 1
 
 # exploration settings
-exploration_epochs: 50
+exploration_epochs: 0
 
 # learning rate and scheduler
 starting_LR: 0.001
@@ -22,7 +22,8 @@ scheduler_gamma: 0.5
 
 # algorithm specifics
 reg_lambda: 0.001
-confidence_scale: 3.
+sup_lambda: 10.
+confidence_scale: 1.
 use_entropy: true
 target_entropy: -0.5
 

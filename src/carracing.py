@@ -137,7 +137,7 @@ class Environment:
         midpoint = (rise + fall) / 2.0
         midpoint = (midpoint / 64.0) - 0.5
 
-        steering = midpoint * 0.5
+        steering = midpoint * 2.5
         accel = 0.1
 
         return np.clip(np.array([steering, accel]), -0.99, 0.99)

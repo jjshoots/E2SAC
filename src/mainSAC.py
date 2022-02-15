@@ -21,15 +21,17 @@ def train(set):
     memory = ReplayBuffer(set.buffer_size)
 
     to_log = dict()
-    to_log['eval_perf'] = -100.0
-    to_log['max_eval_perf'] = -100.0
+    to_log["eval_perf"] = -100.0
+    to_log["max_eval_perf"] = -100.0
 
     for epoch in range(set.start_epoch, set.epochs):
         """EVAL RUN"""
         if epoch % set.eval_epoch_ratio == 0 and epoch != 0:
             # for logging
-            to_log['eval_perf'] = env.evaluate(set, net)
-            to_log['max_eval_perf'] = max([to_log['max_eval_perf'], to_log['eval_perf']])
+            to_log["eval_perf"] = env.evaluate(set, net)
+            to_log["max_eval_perf"] = max(
+                [to_log["max_eval_perf"], to_log["eval_perf"]]
+            )
 
         """ENVIRONMENT INTERACTION """
         env.reset()
@@ -61,7 +63,7 @@ def train(set):
                 video_log.append(Image.fromarray(frame))
 
             # for logging
-            to_log['total_reward'] = env.cumulative_reward
+            to_log["total_reward"] = env.cumulative_reward
             video_log[0].save(
                 "./resource/video_log.gif",
                 save_all=True,
@@ -121,10 +123,10 @@ def train(set):
 
                 """ WEIGHTS SAVING """
                 net_weights = net_helper.training_checkpoint(
-                    loss=-to_log['eval_perf'], batch=batch, epoch=epoch
+                    loss=-to_log["eval_perf"], batch=batch, epoch=epoch
                 )
                 net_optim_weights = optim_helper.training_checkpoint(
-                    loss=-to_log['eval_perf'], batch=batch, epoch=epoch
+                    loss=-to_log["eval_perf"], batch=batch, epoch=epoch
                 )
                 if net_weights != -1:
                     torch.save(net.state_dict(), net_weights)
