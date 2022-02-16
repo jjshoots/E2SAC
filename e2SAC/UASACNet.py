@@ -68,7 +68,7 @@ class Critic(nn.Module):
             _features_description, _activation_description
         )
 
-        _features_description = [64, 256, 256, 1]
+        _features_description = [64, 256, 256, 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -78,4 +78,15 @@ class Critic(nn.Module):
 
     def forward(self, states, actions):
         states = self.backbone(states)
-        return self.merge(states + self.action(actions))
+        states = self.merge(states + self.action(actions))
+
+        value, uncertainty = torch.split(states, 1, dim=-1)
+
+        uncertainty = torch.exp(-uncertainty)
+
+        return torch.stack((value, uncertainty), dim=0)
+
+
+
+
+

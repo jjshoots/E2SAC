@@ -11,7 +11,7 @@ import e2SAC.UASACNet as UASACNet
 
 class Q_Ensemble(nn.Module):
     """
-    Q Network Ensembles
+    Q Network Ensembles with uncertainty estimates
     """
 
     def __init__(self, num_actions, num_networks=2):
@@ -24,7 +24,7 @@ class Q_Ensemble(nn.Module):
         """
         states is of shape B x input_shape
         actions is of shape B x num_actions
-        output is a tuple of B x num_networks
+        output is a tuple of 2 x B x num_networks
         """
         output = []
         for network in self.networks:
@@ -149,7 +149,7 @@ class UASAC(nn.Module):
         dones = 1.0 - dones
 
         # current Q, output is num_networks x B x 1
-        q_output = self.critic(states, actions)
+        current_q, current_u = self.critic(states, actions)
 
         # target Q
         with torch.no_grad():
@@ -157,11 +157,12 @@ class UASAC(nn.Module):
             output = self.actor(next_states)
             next_actions, entropies = self.actor.sample(*output)
 
-            # get the next q lists then...
+            # get the next q lists and get the value, then...
             next_q_output = self.critic_target(next_states, next_actions)
+            next_q = next_q_output[0]
 
             # ...take the min at the cat dimension
-            next_q, _ = torch.min(next_q_output, dim=-1, keepdim=True)
+            next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
 
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
@@ -169,16 +170,28 @@ class UASAC(nn.Module):
                 + (-self.log_alpha.exp().detach() * entropies + gamma * next_q) * dones
             )
 
-        # critic loss is mean squared TD errors
-        q_loss = ((q_output - target_q) ** 2).mean()
+            # update the q_std
+            self.update_q_std(target_q)
 
-        # update the q_std
-        self.update_q_std(target_q)
+        # get total difference and max over normalized total errors
+        total_error = (current_q - target_q)
+        u_target = total_error.abs().detach() / self.q_std
+        u_target, _ = torch.max(u_target, dim=-1, keepdim=True)
+
+        # critic loss is mean squared TD errors
+        q_loss = (total_error ** 2).mean()
+
+        # uncertainty loss is distance to predicted normalized total error
+        u_loss = ((u_target - current_u) ** 2).mean()
+
+        critic_loss = q_loss + u_loss
 
         log = dict()
         log["q_std"] = self.q_std
+        log["u_std"] = u_loss.std().mean()
+        log["u_mean"] = u_loss.mean().detach()
 
-        return q_loss, log
+        return critic_loss, log
 
     def calc_actor_loss(self, states, dones, labels):
         """
@@ -192,8 +205,8 @@ class UASAC(nn.Module):
         actions, entropies = self.actor.sample(*output)
 
         # expectations of Q with clipped double Q
-        q_output = self.critic(states, actions)
-        q, _ = torch.min(q_output, dim=-1, keepdim=True)
+        q = self.critic(states, actions)[0]
+        q, _ = torch.min(q, dim=-1, keepdim=True)
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         if self.use_entropy:
@@ -205,11 +218,9 @@ class UASAC(nn.Module):
         sup_loss = func.mse_loss(labels, actions, reduction="none")
         sup_loss *= self.sup_lambda
 
-        # calculate epistemic uncertainty
+        # get estimate of uncertainty
         with torch.no_grad():
-            q_output = self.critic(states, labels)
-            uncertainty = (q_output[..., [0]] - q_output[..., [1]]).abs()
-            uncertainty = uncertainty / (self.q_std + 1e-6)
+            uncertainty = self.critic(states, labels)[1]
 
             # inverse exponential
             # sup_scale = 1.0 - torch.exp(-self.confidence_scale * uncertainty)
