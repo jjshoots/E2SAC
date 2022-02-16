@@ -8,7 +8,7 @@ import torch.optim as optim
 from PIL import Image
 
 import wandb
-from carracing import Environment
+from railway_env import Environment
 from e2SAC.UASAC import UASAC
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize
@@ -44,6 +44,8 @@ def train(set):
             while not env.is_done:
                 # get the initial state and label
                 obs, _, _, lbl = env.get_state()
+                print(obs.shape)
+                exit()
 
                 if epoch < set.exploration_epochs:
                     action = np.random.uniform(-1.0, 1.0, 2)
@@ -163,7 +165,7 @@ def display(set):
     env = setup_env(set)
 
     net = None
-    if True:
+    if False:
         net, _, _, _, _ = setup_nets(set)
 
     env.display(set, net)

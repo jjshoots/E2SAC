@@ -41,3 +41,17 @@ setup(
         "pillow",
     ],
 )
+
+setup(
+    name="railway_drone",
+    version="1.0.0",
+    install_requires=[
+        "wandb",
+        "torch",
+        "matplotlib",
+        "pthflops",
+        "gym[box2d]",
+        "opencv-python",
+        "pillow",
+    ],
+)

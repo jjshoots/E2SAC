@@ -174,7 +174,7 @@ class UASAC(nn.Module):
             self.update_q_std(target_q)
 
         # get total difference and max over normalized total errors
-        total_error = (current_q - target_q)
+        total_error = current_q - target_q
         u_target = total_error.abs().detach() / self.q_std
         u_target, _ = torch.max(u_target, dim=-1, keepdim=True)
 
@@ -215,9 +215,9 @@ class UASAC(nn.Module):
         sup_loss *= self.sup_lambda
 
         if self.use_entropy:
-            ent_loss = - self.log_alpha.exp().detach() * entropies * dones
+            ent_loss = -self.log_alpha.exp().detach() * entropies * dones
         else:
-            ent_loss = 0.
+            ent_loss = 0.0
 
         # get estimate of uncertainty
         with torch.no_grad():
