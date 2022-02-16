@@ -188,8 +188,7 @@ class UASAC(nn.Module):
 
         log = dict()
         log["q_std"] = self.q_std
-        log["u_std"] = u_loss.std().mean()
-        log["u_mean"] = u_loss.mean().detach()
+        log["u_loss"] = u_loss.mean().detach()
 
         return critic_loss, log
 
@@ -208,15 +207,17 @@ class UASAC(nn.Module):
         q = self.critic(states, actions)[0]
         q, _ = torch.min(q, dim=-1, keepdim=True)
 
-        # reinforcement target is maximization of (Q + alpha * entropy) * done
-        if self.use_entropy:
-            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * dones)
-        else:
-            rnf_loss = -(q * dones)
+        # reinforcement target is maximization of Q * done
+        rnf_loss = -(q * dones)
 
         # supervisory loss is difference between predicted and label
         sup_loss = func.mse_loss(labels, actions, reduction="none")
         sup_loss *= self.sup_lambda
+
+        if self.use_entropy:
+            ent_loss = - self.log_alpha.exp().detach() * entropies * dones
+        else:
+            ent_loss = 0.
 
         # get estimate of uncertainty
         with torch.no_grad():
@@ -231,7 +232,7 @@ class UASAC(nn.Module):
 
         rnf_loss = ((1.0 - sup_scale) * rnf_loss).mean()
         sup_loss = (sup_scale * sup_loss).mean()
-        actor_loss = rnf_loss + sup_loss
+        actor_loss = rnf_loss + sup_loss + ent_loss
 
         log = dict()
         log["sup_scale"] = sup_scale.mean().detach()
