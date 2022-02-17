@@ -44,8 +44,6 @@ def train(set):
             while not env.is_done:
                 # get the initial state and label
                 obs, _, _, lbl = env.get_state()
-                print(obs.shape)
-                exit()
 
                 if epoch < set.exploration_epochs:
                     action = np.random.uniform(-1.0, 1.0, 2)
