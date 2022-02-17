@@ -216,6 +216,7 @@ class UASAC(nn.Module):
 
         if self.use_entropy:
             ent_loss = - self.log_alpha.exp().detach() * entropies * dones
+            ent_loss = ent_loss.mean()
         else:
             ent_loss = 0.
 
@@ -230,8 +231,11 @@ class UASAC(nn.Module):
             sup_scale = self.confidence_scale * uncertainty ** 2
             sup_scale = torch.tanh(sup_scale)
 
+        # convex combo
         rnf_loss = ((1.0 - sup_scale) * rnf_loss).mean()
         sup_loss = (sup_scale * sup_loss).mean()
+
+        # sum the losses
         actor_loss = rnf_loss + sup_loss + ent_loss
 
         log = dict()
