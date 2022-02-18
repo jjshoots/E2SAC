@@ -21,9 +21,9 @@ scheduler_steps: 2
 scheduler_gamma: 0.5
 
 # algorithm specifics
-reg_lambda: 0.001
-sup_lambda: 10.
-confidence_scale: 10.
+supervision_lambda: 10.
+confidence_alpha: 10.
+confidence_beta: 4.
 use_entropy: true
 target_entropy: -0.5
 

@@ -81,6 +81,15 @@ def arg_parser():
     )
 
     parser.add_argument(
+        "--notes",
+        type=str,
+        nargs="?",
+        const=False,
+        default="",
+        help="Description of the run in wandb.",
+    )
+
+    parser.add_argument(
         "--id",
         type=str,
         nargs="?",
@@ -156,6 +165,7 @@ def parse_set():
             name=args.name + ", v=" + settings["net_version"]
             if args.name != ""
             else settings["net_version"],
+            notes=args.notes,
             id=args.id if args.id != "" else None,
         )
 

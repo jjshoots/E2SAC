@@ -68,7 +68,7 @@ class Critic(nn.Module):
             _features_description, _activation_description
         )
 
-        _features_description = [64, 256, 256, 1]
+        _features_description = [64, 64, 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]

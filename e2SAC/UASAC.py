@@ -62,11 +62,11 @@ class GaussianActor(nn.Module):
         mu_samples = normals.rsample()
         actions = torch.tanh(mu_samples)
 
-        # calculate entropies
+        # calculate log_probs
         log_probs = normals.log_prob(mu_samples) - torch.log(1 - actions.pow(2) + 1e-6)
-        entropies = log_probs.sum(dim=-1, keepdim=True)
+        log_probs = log_probs.sum(dim=-1, keepdim=True)
 
-        return actions, entropies
+        return actions, log_probs
 
     @staticmethod
     def infer(mu, sigma):
@@ -83,15 +83,17 @@ class UASAC(nn.Module):
         num_actions,
         entropy_tuning=True,
         target_entropy=None,
-        confidence_scale=3.0,
-        sup_lambda=10.0,
+        confidence_alpha=10.0,
+        confidence_beta=4.0,
+        supervision_lambda=10.0,
     ):
         super().__init__()
 
         self.num_actions = num_actions
         self.use_entropy = entropy_tuning
-        self.confidence_scale = confidence_scale
-        self.sup_lambda = sup_lambda
+        self.confidence_alpha = confidence_alpha
+        self.confidence_beta = confidence_beta
+        self.supervision_lambda = supervision_lambda
 
         # actor head
         self.actor = GaussianActor(num_actions)
@@ -155,11 +157,10 @@ class UASAC(nn.Module):
         with torch.no_grad():
             # sample the next actions based on the current policy
             output = self.actor(next_states)
-            next_actions, entropies = self.actor.sample(*output)
+            next_actions, log_probs = self.actor.sample(*output)
 
             # get the next q lists and get the value, then...
-            next_q_output = self.critic_target(next_states, next_actions)
-            next_q = next_q_output[0]
+            next_q = self.critic_target(next_states, next_actions)[0]
 
             # ...take the min at the cat dimension
             next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
@@ -167,14 +168,15 @@ class UASAC(nn.Module):
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
                 rewards
-                + (-self.log_alpha.exp().detach() * entropies + gamma * next_q) * dones
+                + (-self.log_alpha.exp().detach() * log_probs + gamma * next_q)
+                * dones
             )
 
             # update the q_std
             self.update_q_std(target_q)
 
         # get total difference and max over normalized total errors
-        total_error = (current_q - target_q)
+        total_error = current_q - target_q
         u_target = total_error.abs().detach() / self.q_std
         u_target, _ = torch.max(u_target, dim=-1, keepdim=True)
 
@@ -184,6 +186,7 @@ class UASAC(nn.Module):
         # uncertainty loss is distance to predicted normalized total error
         u_loss = ((u_target - current_u) ** 2).mean()
 
+        # critic loss is q error plus uncertainty error
         critic_loss = q_loss + u_loss
 
         log = dict()
@@ -212,23 +215,20 @@ class UASAC(nn.Module):
 
         # supervisory loss is difference between predicted and label
         sup_loss = func.mse_loss(labels, actions, reduction="none")
-        sup_loss *= self.sup_lambda
+        sup_loss *= self.supervision_lambda
 
         if self.use_entropy:
-            ent_loss = - self.log_alpha.exp().detach() * entropies * dones
+            ent_loss = self.log_alpha.exp().detach() * entropies * dones
             ent_loss = ent_loss.mean()
         else:
-            ent_loss = 0.
+            ent_loss = 0.0
 
         # get estimate of uncertainty
         with torch.no_grad():
             uncertainty = self.critic(states, labels)[1]
 
-            # inverse exponential
-            # sup_scale = 1.0 - torch.exp(-self.confidence_scale * uncertainty)
-
-            # tanh
-            sup_scale = self.confidence_scale * uncertainty ** 2
+            # tanh monotonic function
+            sup_scale = self.confidence_alpha * uncertainty ** self.confidence_beta
             sup_scale = torch.tanh(sup_scale)
 
         # convex combo
