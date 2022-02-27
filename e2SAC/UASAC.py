@@ -49,7 +49,7 @@ class GaussianActor(nn.Module):
         return output[0] * 2.0, output[1] * 10.0
 
     @staticmethod
-    def sample(mu, sigma):
+    def sample(mu, sigma, n_samples=1):
         """
         output:
             actions is of shape B x num_actions
@@ -59,7 +59,11 @@ class GaussianActor(nn.Module):
         normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
 
         # sample from dist
-        mu_samples = normals.rsample()
+        if n_samples > 1:
+            mu_samples = normals.rsample([n_samples])
+        else:
+            mu_samples = normals.rsample()
+
         actions = torch.tanh(mu_samples)
 
         # calculate log_probs
@@ -83,17 +87,21 @@ class UASAC(nn.Module):
         num_actions,
         entropy_tuning=True,
         target_entropy=None,
-        confidence_alpha=10.0,
-        confidence_beta=4.0,
+        confidence_lambda=10.0,
+        confidence_offset=4.0,
         supervision_lambda=10.0,
+        uncertainty_skew=0.1,
+        n_var_samples=32,
     ):
         super().__init__()
 
         self.num_actions = num_actions
         self.use_entropy = entropy_tuning
-        self.confidence_alpha = confidence_alpha
-        self.confidence_beta = confidence_beta
+        self.confidence_lambda = confidence_lambda
+        self.confidence_offset = confidence_offset
         self.supervision_lambda = supervision_lambda
+        self.uncertainty_skew = uncertainty_skew
+        self.n_var_samples = n_var_samples
 
         # actor head
         self.actor = GaussianActor(num_actions)
@@ -151,47 +159,69 @@ class UASAC(nn.Module):
         dones = 1.0 - dones
 
         # current Q, output is num_networks x B x 1
-        current_q, current_u = self.critic(states, actions)
+        current_q, current_epistemic = self.critic(states, actions)
 
         # target Q
         with torch.no_grad():
             # sample the next actions based on the current policy
+            # next_actions is of shape n_samples * B * num_actions
+            # log_probs is of shape n_samples * B * 1
             output = self.actor(next_states)
-            next_actions, log_probs = self.actor.sample(*output)
+            next_actions, log_probs = self.actor.sample(
+                *output, n_samples=self.n_var_samples
+            )
 
             # get the next q lists and get the value, then...
+            # next_q is of shape n_samples * B * 2
             next_q = self.critic_target(next_states, next_actions)[0]
 
             # ...take the min at the cat dimension
+            # next_q is of shape n_samples * B * 1
             next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
 
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
+            # target_q is of shape n_samples * B * 1
             target_q = (
                 rewards
-                + (-self.log_alpha.exp().detach() * log_probs + gamma * next_q)
-                * dones
+                + (-self.log_alpha.exp().detach() * log_probs + gamma * next_q) * dones
             )
 
             # update the q_std
             self.update_q_std(target_q)
 
-        # get total difference and max over normalized total errors
-        total_error = current_q - target_q
-        u_target = total_error.abs().detach() / self.q_std
-        u_target, _ = torch.max(u_target, dim=-1, keepdim=True)
+        # calculate expected loss in prediction of q
+        # take maximum amongst all networks
+        total_error = current_q.unsqueeze(0) - target_q
+        total_error = total_error.abs()
+        total_error = total_error.mean(dim=0)
+        total_error = total_error.max(dim=-1, keepdim=True)[0]
 
-        # critic loss is mean squared TD errors
+        # aleatoric uncertainty is just variance in the target
+        # take minimum amongst all networks
+        aleatoric = target_q.std(dim=0)
+        aleatoric = aleatoric.min(dim=-1, keepdim=True)[0]
+
+        # epistemic uncertainty is upper bound difference between total error and aleatoric
+        epistemic = torch.clamp(total_error - aleatoric, min=0.0)
+
+        # u_loss is upper bound on epistemic uncertainty, skewed assymetrically, normalized
+        u_loss = (total_error.detach() / self.q_std)
+        # u_loss = (epistemic.detach() / self.q_std) - current_epistemic
+        # u_loss = func.leaky_relu(u_loss, negative_slope=self.uncertainty_skew)
+        u_loss = (u_loss ** 2).mean()
+
+        # q_loss is just mse of total error
         q_loss = (total_error ** 2).mean()
 
-        # uncertainty loss is distance to predicted normalized total error
-        u_loss = ((u_target - current_u) ** 2).mean()
-
-        # critic loss is q error plus uncertainty error
+        # critic loss is q loss plus uncertainty loss
         critic_loss = q_loss + u_loss
 
         log = dict()
         log["q_std"] = self.q_std
         log["u_loss"] = u_loss.mean().detach()
+        log["aleatoric"] = aleatoric.mean().detach() / self.q_std
+        log["epistemic"] = epistemic.mean().detach() / self.q_std
+        log["error-aleatoric"] = (total_error - aleatoric).mean().detach()
 
         return critic_loss, log
 
@@ -206,8 +236,19 @@ class UASAC(nn.Module):
         output = self.actor(states)
         actions, entropies = self.actor.sample(*output)
 
+        # stack actions and labels to perform inference on both together
+        actions_labels = torch.stack((actions, labels), dim=0)
+
+        # put all actions and labels and states through critic
+        # shape is 2 x 2 x B x num_networks,
+        # value_uncertainty x actions_labels x batch x num_networks
+        combined_q = self.critic(states, actions_labels)
+
+        # splice the output to get what we want
+        q = combined_q[0, 0, ...]
+        epistemic = combined_q[1, 1, ...].detach()
+
         # expectations of Q with clipped double Q
-        q = self.critic(states, actions)[0]
         q, _ = torch.min(q, dim=-1, keepdim=True)
 
         # reinforcement target is maximization of Q * done
@@ -217,19 +258,19 @@ class UASAC(nn.Module):
         sup_loss = func.mse_loss(labels, actions, reduction="none")
         sup_loss *= self.supervision_lambda
 
+        # entropy calculation
         if self.use_entropy:
             ent_loss = self.log_alpha.exp().detach() * entropies * dones
             ent_loss = ent_loss.mean()
         else:
             ent_loss = 0.0
 
-        # get estimate of uncertainty
-        with torch.no_grad():
-            uncertainty = self.critic(states, labels)[1]
-
-            # tanh monotonic function
-            sup_scale = self.confidence_alpha * uncertainty ** self.confidence_beta
-            sup_scale = torch.tanh(sup_scale)
+        # tanh monotonic function
+        sup_scale = (
+            self.confidence_lambda
+            * torch.clamp(epistemic - self.confidence_offset, min=0.0) ** 2
+        )
+        sup_scale = torch.tanh(sup_scale)
 
         # convex combo
         rnf_loss = ((1.0 - sup_scale) * rnf_loss).mean()
@@ -241,7 +282,7 @@ class UASAC(nn.Module):
         log = dict()
         log["sup_scale"] = sup_scale.mean().detach()
         log["sup_scale_std"] = sup_scale.std().detach()
-        log["uncertainty"] = uncertainty.mean().detach()
+        log["uncertainty"] = epistemic.mean().detach()
 
         return actor_loss, log
 

@@ -8,7 +8,9 @@ import torch.optim as optim
 from PIL import Image
 
 import wandb
-from carracing import Environment
+from carracing_dr import Environment
+
+# from carracing import Environment
 from SAC.SAC import SAC
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize
@@ -162,7 +164,7 @@ def display(set):
     env = setup_env(set)
 
     net = None
-    if True:
+    if False:
         net, _, _, _, _ = setup_nets(set)
 
     env.display(set, net)
@@ -172,7 +174,7 @@ def evaluate(set):
     env = setup_env(set)
 
     net = None
-    if True:
+    if False:
         net, _, _, _, _ = setup_nets(set)
 
     print(env.evaluate(set, net))

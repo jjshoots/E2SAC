@@ -8,6 +8,9 @@ import torch.optim as optim
 from PIL import Image
 
 import wandb
+
+# from carracing_dr import Environment
+
 from carracing import Environment
 from e2SAC.UASAC import UASAC
 from shebangs import check_venv, parse_set, shutdown_handler
@@ -163,7 +166,7 @@ def display(set):
     env = setup_env(set)
 
     net = None
-    if True:
+    if False:
         net, _, _, _, _ = setup_nets(set)
 
     env.display(set, net)
@@ -208,9 +211,11 @@ def setup_nets(set):
         num_actions=set.num_actions,
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
-        confidence_alpha=set.confidence_alpha,
-        confidence_beta=set.confidence_beta,
+        confidence_lambda=set.confidence_lambda,
+        confidence_offset=set.confidence_offset,
         supervision_lambda=set.supervision_lambda,
+        uncertainty_skew=set.uncertainty_skew,
+        n_var_samples=set.n_var_samples,
     ).to(set.device)
     actor_optim = optim.AdamW(net.actor.parameters(), lr=set.starting_LR, amsgrad=True)
     actor_sched = optim.lr_scheduler.StepLR(

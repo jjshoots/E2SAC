@@ -72,7 +72,7 @@ def arg_parser():
     )
 
     parser.add_argument(
-        "--name",
+        "--wandb_name",
         type=str,
         nargs="?",
         const=False,
@@ -162,12 +162,15 @@ def parse_set():
             project=settings["wandb_project"],
             entity="jjshoots",
             config=settings,
-            name=args.name + ", v=" + settings["net_version"]
-            if args.name != ""
+            name=args.wandb_name + ", v=" + settings["net_version"]
+            if args.wandb_name != ""
             else settings["net_version"],
             notes=args.notes,
             id=args.id if args.id != "" else None,
         )
+
+        # also save the code if wandb
+        wandb.run.log_code(".")
 
         # set to be consistent with wandb config
         set = wandb.config
