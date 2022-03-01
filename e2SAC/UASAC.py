@@ -205,9 +205,8 @@ class UASAC(nn.Module):
         epistemic = torch.clamp(total_error - aleatoric, min=0.0)
 
         # u_loss is upper bound on epistemic uncertainty, skewed assymetrically, normalized
-        u_loss = (total_error.detach() / self.q_std)
-        # u_loss = (epistemic.detach() / self.q_std) - current_epistemic
-        # u_loss = func.leaky_relu(u_loss, negative_slope=self.uncertainty_skew)
+        u_loss = (epistemic.detach() / self.q_std) - current_epistemic
+        u_loss = func.leaky_relu(u_loss, negative_slope=self.uncertainty_skew)
         u_loss = (u_loss ** 2).mean()
 
         # q_loss is just mse of total error

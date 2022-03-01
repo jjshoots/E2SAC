@@ -23,8 +23,8 @@ scheduler_gamma: 0.5
 # algorithm specifics
 supervision_lambda: 10.
 confidence_lambda: 5.
-confidence_offset: 0.1
-uncertainty_skew: 0.1
+confidence_offset: 0.0
+uncertainty_skew: 0.5
 use_entropy: true
 target_entropy: -0.5
 n_var_samples: 32
