@@ -133,12 +133,12 @@ class UASAC(nn.Module):
             self.log_alpha = nn.Parameter(torch.tensor(0.0, requires_grad=True))
 
         # store some stuff
-        self.q_std = 1e-6
+        self.q_var = 1e-6
 
-    def update_q_std(self, q, tau=0.05):
-        q = torch.std(q).detach()
+    def update_q_var(self, q, tau=0.05):
+        q = torch.var(q).detach()
         if not torch.isnan(q):
-            self.q_std = (1 - tau) * self.q_std + tau * q
+            self.q_var = (1 - tau) * self.q_var + tau * q
 
     def update_q_target(self, tau=0.005):
         # polyak averaging update for target q network
@@ -186,40 +186,40 @@ class UASAC(nn.Module):
                 + (-self.log_alpha.exp().detach() * log_probs + gamma * next_q) * dones
             )
 
-            # update the q_std
-            self.update_q_std(target_q)
+            # update the q_var
+            self.update_q_var(target_q)
 
         # calculate expected loss in prediction of q
         # take maximum amongst all networks
-        total_error = current_q.unsqueeze(0) - target_q
-        total_error = total_error.abs()
+        total_error = (current_q.unsqueeze(0) - target_q) ** 2
         total_error = total_error.mean(dim=0)
         total_error = total_error.max(dim=-1, keepdim=True)[0]
 
         # aleatoric uncertainty is just variance in the target
         # take minimum amongst all networks
-        aleatoric = target_q.std(dim=0)
+        aleatoric = target_q.var(dim=0)
         aleatoric = aleatoric.min(dim=-1, keepdim=True)[0]
 
         # epistemic uncertainty is upper bound difference between total error and aleatoric
         epistemic = torch.clamp(total_error - aleatoric, min=0.0)
 
         # u_loss is upper bound on epistemic uncertainty, skewed assymetrically, normalized
-        u_loss = (epistemic.detach() / self.q_std) - current_epistemic
-        u_loss = func.leaky_relu(u_loss, negative_slope=self.uncertainty_skew)
-        u_loss = (u_loss ** 2).mean()
+        u_loss = (epistemic.detach() / self.q_var) - current_epistemic
+        # u_loss = func.leaky_relu(u_loss, negative_slope=self.uncertainty_skew)
+        u_loss = u_loss ** 2
+        u_loss = u_loss.mean()
 
         # q_loss is just mse of total error
-        q_loss = (total_error ** 2).mean()
+        q_loss = total_error.mean()
 
         # critic loss is q loss plus uncertainty loss
         critic_loss = q_loss + u_loss
 
         log = dict()
-        log["q_std"] = self.q_std
+        log["q_std"] = self.q_var
         log["u_loss"] = u_loss.mean().detach()
-        log["aleatoric"] = aleatoric.mean().detach() / self.q_std
-        log["epistemic"] = epistemic.mean().detach() / self.q_std
+        log["aleatoric"] = aleatoric.mean().detach() / self.q_var
+        log["epistemic"] = epistemic.mean().detach() / self.q_var
         log["error-aleatoric"] = (total_error - aleatoric).mean().detach()
 
         return critic_loss, log
