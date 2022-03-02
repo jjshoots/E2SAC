@@ -164,7 +164,6 @@ class SAC(nn.Module):
         critic_loss = q_loss
 
         log = dict()
-        log["q_std"] = self.q_std
 
         return critic_loss, log
 
