@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import math
 import warnings
 
 import torch
@@ -159,7 +160,7 @@ class UASAC(nn.Module):
         dones = 1.0 - dones
 
         # current Q, output is num_networks x B x 1
-        current_q, current_epistemic = self.critic(states, actions)
+        current_q, current_u = self.critic(states, actions)
 
         # target Q
         with torch.no_grad():
@@ -189,38 +190,44 @@ class UASAC(nn.Module):
             # update the q_var
             self.update_q_var(target_q)
 
-        # calculate expected loss in prediction of q
-        # take maximum amongst all networks
-        total_error = (current_q.unsqueeze(0) - target_q) ** 2
-        total_error = total_error.mean(dim=0)
-        total_error = total_error.max(dim=-1, keepdim=True)[0]
+        # # calculate expected loss in prediction of q
+        # # take maximum amongst all networks
+        # total_error = (current_q.unsqueeze(0) - target_q) ** 2
+        # total_error = total_error.mean(dim=0)
+        # total_error = total_error.max(dim=-1, keepdim=True)[0]
 
-        # aleatoric uncertainty is just variance in the target
-        # take minimum amongst all networks
-        aleatoric = target_q.var(dim=0)
-        aleatoric = aleatoric.min(dim=-1, keepdim=True)[0]
+        # # aleatoric uncertainty is just variance in the target
+        # # take minimum amongst all networks
+        # aleatoric = target_q.var(dim=0)
+        # aleatoric = aleatoric.min(dim=-1, keepdim=True)[0]
 
-        # epistemic uncertainty is upper bound difference between total error and aleatoric
-        epistemic = torch.clamp(total_error - aleatoric, min=0.0)
+        # # epistemic uncertainty is upper bound difference between total error and aleatoric
+        # epistemic = torch.clamp(total_error - aleatoric, min=0.0)
 
-        # u_loss is upper bound on epistemic uncertainty, skewed assymetrically, normalized
-        u_loss = (epistemic.detach() / self.q_var) - current_epistemic
-        # u_loss = func.leaky_relu(u_loss, negative_slope=self.uncertainty_skew)
-        u_loss = u_loss ** 2
-        u_loss = u_loss.mean()
+        # # u_loss is upper bound on epistemic uncertainty, skewed assymetrically, normalized
+        # u_loss = (epistemic.detach() / self.q_var) - current_epistemic
+        # # u_loss = func.leaky_relu(u_loss, negative_slope=self.uncertainty_skew)
+        # u_loss = u_loss ** 2
+        # u_loss = u_loss.mean()
 
-        # q_loss is just mse of total error
-        q_loss = total_error.mean()
+        # # q_loss is just mse of total error
+        # q_loss = total_error.mean()
+
+        # calculate mean bellman error, take maximum amongst all networks
+        q_loss = (current_q - target_q.mean(dim=0)) ** 2
+        q_loss = q_loss.max(dim=-1, keepdim=True)[0]
+
+        # calculate epistemic prediction error, assymetrically skew
+        u_loss = q_loss.detach() - current_u
+        u_loss = func.leaky_relu(u_loss, negative_slope=self.uncertainty_skew)
 
         # critic loss is q loss plus uncertainty loss
-        critic_loss = q_loss + u_loss
+        critic_loss = q_loss.mean() + u_loss.mean()
 
         log = dict()
-        log["q_std"] = self.q_var
+        log["q_std"] = math.sqrt(self.q_var)
+        log["q_loss"] = q_loss.mean().detach()
         log["u_loss"] = u_loss.mean().detach()
-        log["aleatoric"] = aleatoric.mean().detach() / self.q_var
-        log["epistemic"] = epistemic.mean().detach() / self.q_var
-        log["error-aleatoric"] = (total_error - aleatoric).mean().detach()
 
         return critic_loss, log
 
@@ -245,7 +252,7 @@ class UASAC(nn.Module):
 
         # splice the output to get what we want
         q = combined_q[0, 0, ...]
-        epistemic = combined_q[1, 1, ...].detach()
+        epistemic = combined_q[1, 1, ...].detach() / self.q_var
 
         # expectations of Q with clipped double Q
         q, _ = torch.min(q, dim=-1, keepdim=True)
@@ -281,7 +288,7 @@ class UASAC(nn.Module):
         log = dict()
         log["sup_scale"] = sup_scale.mean().detach()
         log["sup_scale_std"] = sup_scale.std().detach()
-        log["uncertainty"] = epistemic.mean().detach()
+        log["uncertainty"] = epistemic.mean().detach() / self.q_var
 
         return actor_loss, log
 
