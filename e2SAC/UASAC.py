@@ -218,7 +218,7 @@ class UASAC(nn.Module):
         q_loss = q_loss.max(dim=-1, keepdim=True)[0]
 
         # calculate epistemic prediction error, assymetrically skew
-        u_loss = q_loss.detach() - current_u
+        u_loss = (q_loss.detach() - current_u) ** 2
         # u_loss = func.leaky_relu(u_loss, negative_slope=self.uncertainty_skew)
 
         # critic loss is q loss plus uncertainty loss
