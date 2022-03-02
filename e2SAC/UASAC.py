@@ -137,7 +137,7 @@ class UASAC(nn.Module):
         self.q_var = 1e-6
 
     def update_q_var(self, q, tau=0.05):
-        q = torch.var(q).detach()
+        q = torch.var(q).detach() + 1e-6
         if not torch.isnan(q):
             self.q_var = (1 - tau) * self.q_var + tau * q
 
@@ -219,7 +219,7 @@ class UASAC(nn.Module):
 
         # calculate epistemic prediction error, assymetrically skew
         u_loss = q_loss.detach() - current_u
-        u_loss = func.leaky_relu(u_loss, negative_slope=self.uncertainty_skew)
+        # u_loss = func.leaky_relu(u_loss, negative_slope=self.uncertainty_skew)
 
         # critic loss is q loss plus uncertainty loss
         critic_loss = q_loss.mean() + u_loss.mean()
@@ -288,7 +288,7 @@ class UASAC(nn.Module):
         log = dict()
         log["sup_scale"] = sup_scale.mean().detach()
         log["sup_scale_std"] = sup_scale.std().detach()
-        log["uncertainty"] = epistemic.mean().detach() / self.q_var
+        log["uncertainty"] = epistemic.mean().detach()
 
         return actor_loss, log
 
