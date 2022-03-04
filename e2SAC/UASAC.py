@@ -180,7 +180,7 @@ class UASAC(nn.Module):
             # next_q is of shape n_samples * B * 1
             next_qs, _ = torch.min(next_qs, dim=-1, keepdim=True)
 
-            # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
+            # TD learning, Q_target = R + dones * (gamma*nextQ + entropy)
             # target_q is of shape n_samples * B * 1
             target_qs = (
                 rewards
