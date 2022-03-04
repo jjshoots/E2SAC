@@ -194,8 +194,8 @@ class UASAC(nn.Module):
         q_loss = bellman_error ** 2
 
         # calculate epistemic prediction error
-        bellman_error = bellman_error.max(dim=-1)[0]
-        target_q_var = target_q_var.min(dim=-1)[0]
+        bellman_error = bellman_error.max(dim=-1, keepdim=True)[0]
+        target_q_var = target_q_var.min(dim=-1, keepdim=True)[0]
         target_u_ratio = bellman_error.detach() / target_q_var.detach()
         u_loss = (target_u_ratio - current_u_ratio) ** 2
 
