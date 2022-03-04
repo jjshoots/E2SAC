@@ -201,9 +201,7 @@ class UASAC(nn.Module):
         u_loss = (current_u_ratio - target_u_ratio) ** 2
 
         # critic loss is q loss plus uncertainty loss, scale losses to have the same mag
-        critic_loss = (
-            q_loss.mean() + u_loss.mean() * (q_loss.mean() / u_loss.mean()).detach()
-        )
+        critic_loss = q_loss.mean() + u_loss.mean()
 
         log = dict()
         log["q_std"] = target_q_std.mean().detach()
@@ -254,11 +252,14 @@ class UASAC(nn.Module):
             ent_loss = 0.0
 
         # tanh monotonic function
-        sup_scale = (
-            self.confidence_lambda
-            * torch.clamp(u_ratio - self.confidence_offset, min=0.0) ** 2
-        )
-        sup_scale = torch.tanh(sup_scale)
+        # sup_scale = (
+        #     self.confidence_lambda
+        #     * torch.clamp(u_ratio - self.confidence_offset, min=0.0) ** 2
+        # )
+        # sup_scale = torch.tanh(sup_scale)
+
+        # just use u_ratio as sup_scale directly
+        sup_scale = torch.clamp(u_ratio, max=1.0)
 
         # convex combo
         rnf_loss = ((1.0 - sup_scale) * rnf_loss).mean()
