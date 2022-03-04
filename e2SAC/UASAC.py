@@ -186,24 +186,27 @@ class UASAC(nn.Module):
                 rewards
                 + (-self.log_alpha.exp().detach() * log_probs + gamma * next_qs) * dones
             )
-            target_q_mean = target_qs.mean(dim=0)
-            target_q_var = target_qs.std(dim=0)
+
+            # get the expected values and variance
+            target_q_exp = target_qs.mean(dim=0)
+            target_q_std = target_qs.std(dim=0)
 
         # calculate expected bellman error
-        bellman_error = (current_q - target_q_mean).abs()
+        bellman_error = (current_q - target_q_exp).abs()
         q_loss = bellman_error ** 2
 
-        # calculate epistemic prediction error
-        bellman_error = bellman_error.max(dim=-1, keepdim=True)[0]
-        target_q_var = target_q_var.min(dim=-1, keepdim=True)[0]
-        target_u_ratio = bellman_error.detach() / target_q_var.detach()
-        u_loss = (target_u_ratio - current_u_ratio) ** 2
+        # calculate ratio between epistemic and aleatoric
+        target_u_ratio = bellman_error / (target_q_std + 1e-6)
+        target_u_ratio = torch.clamp(target_u_ratio, max=1.0).detach()
+        u_loss = (current_u_ratio - target_u_ratio) ** 2
 
-        # critic loss is q loss plus uncertainty loss
-        critic_loss = q_loss.mean() + u_loss.mean()
+        # critic loss is q loss plus uncertainty loss, scale losses to have the same mag
+        critic_loss = (
+            q_loss.mean() + u_loss.mean() * (q_loss.mean() / u_loss.mean()).detach()
+        )
 
         log = dict()
-        log["q_std"] = target_q_var.mean().detach()
+        log["q_std"] = target_q_std.mean().detach()
         log["u_ratio"] = target_u_ratio.mean().detach()
         log["q_loss"] = q_loss.mean().detach()
         log["u_loss"] = u_loss.mean().detach()
@@ -227,11 +230,11 @@ class UASAC(nn.Module):
         # put all actions and labels and states through critic
         # shape is 2 x 2 x B x num_networks,
         # value_uncertainty x actions_labels x batch x num_networks
-        combined_q = self.critic(states, actions_labels)
+        critic_output = self.critic(states, actions_labels)
 
         # splice the output to get what we want
-        q = combined_q[0, 0, ...]
-        u_ratio = combined_q[1, 1, ...].detach()
+        q = critic_output[0, 0, ...]
+        u_ratio = critic_output[1, 1, ...].detach()
 
         # expectations of Q with clipped double Q
         q, _ = torch.min(q, dim=-1, keepdim=True)
