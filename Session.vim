@@ -11,8 +11,9 @@ set shortmess=aoO
 argglobal
 %argdel
 $argadd .
-edit src/main.py
+edit e2SAC/UASAC.py
 argglobal
+balt src/settings.yaml
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -21,14 +22,18 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal nofen
-let s:l = 39 - ((8 * winheight(0) + 22) / 45)
+let s:l = 197 - ((26 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 39
-normal! 0
+keepjumps 197
+normal! 013|
+if exists(':tcd') == 2 | tcd ~/Sandboxes/e2SAC | endif
 tabnext 1
-badd +0 src/main.py
+badd +195 ~/Sandboxes/e2SAC/e2SAC/UASAC.py
+badd +23 ~/Sandboxes/e2SAC/src/settings.yaml
+badd +109 ~/Sandboxes/e2SAC/src/main.py
+badd +87 ~/Sandboxes/e2SAC/e2SAC/UASACNet.py
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
@@ -39,7 +44,6 @@ if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :
