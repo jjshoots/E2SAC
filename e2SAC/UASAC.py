@@ -188,6 +188,7 @@ class UASAC(nn.Module):
             )
 
             # get the expected values and variance
+            target_q_var = target_q.std(dim=0) + 1e-6
             target_q = target_q.mean(dim=0)
             self.update_q_std(target_q)
 
@@ -195,8 +196,9 @@ class UASAC(nn.Module):
         bellman_error = (current_q - target_q).abs()
         q_loss = bellman_error ** 2
 
-        # calculate absolute epistemic uncertainty
-        u_loss = (current_u - bellman_error) ** 2
+        # calculate absolute epistemic uncertainty, take upper bound
+        bellman_error = bellman_error.max(dim=-1, keepdim=True)[0]
+        u_loss = (current_u - bellman_error.detach()) ** 2
 
         # critic loss is q loss plus uncertainty loss, scale losses to have the same mag
         critic_loss = q_loss.mean() + u_loss.mean()
@@ -206,6 +208,7 @@ class UASAC(nn.Module):
         log["q_std"] = self.q_std
         log["q_loss"] = q_loss.mean().detach()
         log["u_loss"] = u_loss.mean().detach()
+        log["u_ratio"] = (bellman_error / target_q_var).mean().detach()
 
         return critic_loss, log
 
@@ -231,6 +234,9 @@ class UASAC(nn.Module):
         # splice the output to get what we want, rescale epistemic
         expected_q = critic_output[0, 0, ...]
         uncertainty = critic_output[1, 1, ...].detach() / self.q_std
+
+        a = critic_output[0, 0, ...] + critic_output[1, 0, ...]
+        b = critic_output[0, 1, ...] + critic_output[1, 1, ...]
 
         # expectations of Q with clipped double Q
         expected_q, _ = torch.min(expected_q, dim=-1, keepdim=True)
@@ -267,6 +273,14 @@ class UASAC(nn.Module):
         log["sup_scale"] = sup_scale.mean().detach()
         log["sup_scale_std"] = sup_scale.std().detach()
         log["uncertainty"] = uncertainty.mean().detach()
+        log["supremum_difference"] = (
+            (
+                (critic_output[0, 0, ...] + critic_output[1, 0, ...])
+                - (critic_output[0, 1, ...] + critic_output[1, 1, ...])
+            )
+            .mean()
+            .detach()
+        )
 
         return actor_loss, log
 

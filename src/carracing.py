@@ -1,5 +1,3 @@
-import copy
-
 import cv2
 import gym
 import numpy as np
@@ -18,7 +16,7 @@ class Environment:
         self.image_size = image_size
         self.frame_stack = 4
 
-        self.env = gym.make("CarRacing-v0", verbose=verbose)
+        self.env = gym.make("CarRacing-v1", verbose=verbose)
         self.state = np.zeros((1, *self.image_size))
         self.num_actions = 2
 
@@ -39,14 +37,15 @@ class Environment:
         self.eval_run = False
 
     def reset(self):
+        self.off_track_t = 0
+        self.done = 0
+        self.cumulative_reward = 0
+
         self.env.reset()
         for _ in range(50):
             self.off_track_t = 0
             self.step(np.zeros(self.num_actions), startup=True)
 
-        self.off_track_t = 0
-        self.done = 0
-        self.cumulative_reward = 0
         self.state = np.concatenate(
             [self.transform_obs(self.env.env.state)] * self.frame_stack, 0
         )
@@ -200,9 +199,11 @@ class Environment:
                     net.critic.forward(
                         gpuize(obs, set.device).unsqueeze(0),
                         net.actor.infer(*output)[0],
-                    )[..., 0]
+                    )
                     .squeeze()
-                    .item()
+                    # .squeeze(0)[-1, ...]
+                    # .std()
+                    # .item()
                 )
             else:
                 action = lbl
