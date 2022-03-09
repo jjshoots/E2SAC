@@ -1,83 +1,59 @@
 import os
-import sys
 from signal import SIGINT, signal
 
-import cv2
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from PIL import Image, ImageDraw
+from PIL import Image
 
 import wandb
-from carracing import *
-from e2SAC.normal_inverse_gamma import *
+
+# from carracing_dr import Environment
+
+from carracing import Environment
 from e2SAC.UASAC import UASAC
-from shebangs import *
+from shebangs import check_venv, parse_set, shutdown_handler
+from utils.helpers import Helpers, cpuize, gpuize
 from utils.replay_buffer import ReplayBuffer
 
 
 def train(set):
-
     env = setup_env(set)
     net, net_helper, optim_set, sched_set, optim_helper = setup_nets(set)
     memory = ReplayBuffer(set.buffer_size)
-    eval_perf = -100.0
-    max_eval_perf = -100.0
+
+    to_log = dict()
+    to_log["eval_perf"] = -100.0
+    to_log["max_eval_perf"] = -100.0
 
     for epoch in range(set.start_epoch, set.epochs):
         """EVAL RUN"""
         if epoch % set.eval_epoch_ratio == 0 and epoch != 0:
-            eval_perf = []
-
-            env.reset()
-            env.eval()
-            net.eval()
-            net.zero_grad()
-
-            while len(eval_perf) < set.eval_num_traj:
-                with torch.no_grad():
-                    # get the initial state and action
-                    obs, _, _, _ = env.get_state()
-
-                    output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                    action = net.actor.infer(*output)
-                    action = cpuize(action)[0]
-
-                    # get the next state and reward
-                    _, _, _, _ = env.step(action)
-
-                    if env.is_done:
-                        eval_perf.append(env.cumulative_reward)
-                        env.reset()
-
             # for logging
-            eval_perf = np.mean(np.array(eval_perf))
-            max_eval_perf = max([max_eval_perf, eval_perf])
+            to_log["eval_perf"] = env.evaluate(set, net)
+            to_log["max_eval_perf"] = max(
+                [to_log["max_eval_perf"], to_log["eval_perf"]]
+            )
 
         """ENVIRONMENT INTERACTION """
-        total_reward = []
-        mean_entropy = []
-        video_log = []
-
         env.reset()
         env.train()
         net.eval()
         net.zero_grad()
 
         with torch.no_grad():
+            video_log = []
             while not env.is_done:
                 # get the initial state and label
                 obs, _, _, lbl = env.get_state()
 
-                ent = 0.0
                 if epoch < set.exploration_epochs:
                     action = np.random.uniform(-1.0, 1.0, 2)
                 else:
                     output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                    action, ent, _ = net.actor.sample(*output)
+                    action, _ = net.actor.sample(*output)
                     action = cpuize(action)[0]
-                    ent = cpuize(ent)[0]
 
                 # get the next state and other stuff
                 next_obs, rew, dne, _ = env.step(action)
@@ -86,26 +62,21 @@ def train(set):
                 memory.push((obs, action, rew, next_obs, dne, lbl))
 
                 # log progress
-                mean_entropy.append(ent)
                 frame = np.uint8(obs[:3, ...] * 127.5 + 127.5).transpose(1, 2, 0)
                 video_log.append(Image.fromarray(frame))
 
-        # for logging
-        total_reward = env.cumulative_reward
-        mean_entropy = np.mean(np.array(mean_entropy))
-        video_log[0].save(
-            "./resource/video_log.gif",
-            save_all=True,
-            append_images=video_log[1:],
-            optimize=False,
-            duration=20,
-            loop=0,
-        )
+            # for logging
+            to_log["total_reward"] = env.cumulative_reward
+            video_log[0].save(
+                "./resource/video_log.gif",
+                save_all=True,
+                append_images=video_log[1:],
+                optimize=False,
+                duration=20,
+                loop=0,
+            )
 
         """ TRAINING RUN """
-        sup_scale_std = 0
-        sup_scale_mean = 0
-
         dataloader = torch.utils.data.DataLoader(
             memory, batch_size=set.batch_size, shuffle=True, drop_last=False
         )
@@ -125,12 +96,12 @@ def train(set):
                 labels = gpuize(stuff[5], set.device)
 
                 # train critic
-                regularizer = None
                 for _ in range(set.critic_update_multiplier):
                     net.zero_grad()
-                    q_loss, regularizer = net.calc_critic_loss(
+                    q_loss, log = net.calc_critic_loss(
                         states, actions, rewards, next_states, dones
                     )
+                    to_log = {**to_log, **log}
                     q_loss.backward()
                     optim_set["critic"].step()
                     sched_set["critic"].step()
@@ -139,36 +110,27 @@ def train(set):
                 # train actor
                 for _ in range(set.actor_update_multiplier):
                     net.zero_grad()
-                    rnf_loss, sup_loss, sup_scale, reg_loss = net.calc_actor_loss(
-                        states, dones, labels
-                    )
-                    actor_loss = (
-                        (set.reg_lambda * regularizer * reg_loss).mean()
-                        + ((1.0 - sup_scale) * rnf_loss).mean()
-                        + (sup_scale * sup_loss).mean()
-                    )
-                    actor_loss.backward()
+                    rnf_loss, log = net.calc_actor_loss(states, dones, labels)
+                    to_log = {**to_log, **log}
+                    rnf_loss.backward()
                     optim_set["actor"].step()
                     sched_set["actor"].step()
 
                     # train entropy regularizer
                     if net.use_entropy:
                         net.zero_grad()
-                        ent_loss = net.calc_alpha_loss(states)
+                        ent_loss, log = net.calc_alpha_loss(states)
+                        to_log = {**to_log, **log}
                         ent_loss.backward()
                         optim_set["alpha"].step()
                         sched_set["alpha"].step()
 
-                    # for logging
-                    sup_scale_mean = sup_scale.mean().item()
-                    sup_scale_std = sup_scale.std().item()
-
                 """ WEIGHTS SAVING """
                 net_weights = net_helper.training_checkpoint(
-                    loss=-eval_perf, batch=batch, epoch=epoch
+                    loss=-to_log["eval_perf"], batch=batch, epoch=epoch
                 )
                 net_optim_weights = optim_helper.training_checkpoint(
-                    loss=-eval_perf, batch=batch, epoch=epoch
+                    loss=-to_log["eval_perf"], batch=batch, epoch=epoch
                 )
                 if net_weights != -1:
                     torch.save(net.state_dict(), net_weights)
@@ -191,105 +153,33 @@ def train(set):
 
                 """ WANDB """
                 if set.wandb and i == 0 and j == 0:
-                    metrics = {
+                    log = {
                         "video": wandb.Video("./resource/video_log.gif"),
                         "epoch": epoch,
-                        "total_reward": total_reward,
-                        "eval_perf": eval_perf,
-                        "max_eval_perf": max_eval_perf,
-                        "mean_entropy": mean_entropy,
-                        "sup_scale": sup_scale_mean,
-                        "sup_scale_std": sup_scale_std,
-                        "log_alpha": net.log_alpha.item(),
-                        "num_episodes": epoch,
                         "num_transitions": memory.__len__(),
                     }
-                    wandb.log(metrics)
+                    to_log = {**to_log, **log}
+                    wandb.log(to_log)
 
 
 def display(set):
-
-    use_net = False
-
     env = setup_env(set)
-    env.eval()
+
     net = None
-    if use_net:
+    if True:
         net, _, _, _, _ = setup_nets(set)
-        net.eval()
 
-    action = np.zeros((set.num_actions))
-
-    cv2.namedWindow("display", cv2.WINDOW_NORMAL)
-
-    while True:
-        obs, rwd, dne, lbl = env.step(action)
-
-        if env.is_done:
-            print(f"Total Reward: {env.cumulative_reward}")
-            env.reset()
-            action *= 0.0
-
-        if use_net:
-            output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-            # action = cpuize(net.actor.sample(*output)[0][0])
-            action = cpuize(net.actor.infer(*output))[0]
-
-            # print(action)
-            print(
-                net.critic.forward(
-                    gpuize(obs, set.device).unsqueeze(0), net.actor.infer(*output)[0]
-                )[0]
-                .squeeze()
-                .item()
-            )
-        else:
-            action = lbl
-
-        display = obs[:3, ...]
-        display = np.uint8((display * 127.5 + 127.5))
-        display = np.transpose(display, (1, 2, 0))
-        cv2.imshow("display", display)
-        cv2.waitKey(int(1000 / 15))
+    env.display(set, net)
 
 
 def evaluate(set):
-
-    use_net = False
+    env = setup_env(set)
 
     net = None
-    if use_net:
+    if False:
         net, _, _, _, _ = setup_nets(set)
-        net.eval()
 
-    env = setup_env(set)
-    env.reset()
-    env.eval()
-
-    eval_perf = []
-
-    while len(eval_perf) < set.eval_num_traj:
-        with torch.no_grad():
-            # get the initial state and action
-            obs, _, _, lbl = env.get_state()
-
-            if use_net:
-                output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                action = net.actor.infer(*output)
-                action = cpuize(action)[0]
-            else:
-                action = lbl
-
-            # get the next state and reward
-            _, _, _, _ = env.step(action)
-
-            if env.is_done:
-                eval_perf.append(env.cumulative_reward)
-                print(len(eval_perf))
-                env.reset()
-
-    eval_perf = np.mean(np.array(eval_perf))
-    print(eval_perf)
+    print(env.evaluate(set, net))
 
 
 def setup_env(set):
@@ -321,8 +211,11 @@ def setup_nets(set):
         num_actions=set.num_actions,
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
-        confidence_scale=set.confidence_scale,
-        confidence_cutoff=set.confidence_cutoff,
+        confidence_lambda=set.confidence_lambda,
+        confidence_offset=set.confidence_offset,
+        supervision_lambda=set.supervision_lambda,
+        uncertainty_skew=set.uncertainty_skew,
+        n_var_samples=set.n_var_samples,
     ).to(set.device)
     actor_optim = optim.AdamW(net.actor.parameters(), lr=set.starting_LR, amsgrad=True)
     actor_sched = optim.lr_scheduler.StepLR(

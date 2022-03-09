@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from utils.neural_blocks import *
+from utils.neural_blocks import Neural_blocks
 
 
 class Backbone(nn.Module):

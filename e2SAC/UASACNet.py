@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from utils.neural_blocks import *
+from utils.neural_blocks import Neural_blocks
 
 
 class Backbone(nn.Module):
@@ -13,7 +13,7 @@ class Backbone(nn.Module):
     def __init__(self):
         super().__init__()
 
-        channels = [12, 128, 128, 128, 8]
+        channels = [12, 128, 128, 128, 4]
         kernels = [3] * (len(channels) - 1)
         pooling = [2] * (len(channels) - 1)
         activation = ["lrelu"] * len(kernels)
@@ -36,7 +36,7 @@ class Actor(nn.Module):
 
         self.backbone = Backbone()
 
-        _features_description = [128, 128, num_actions * 4]
+        _features_description = [64, num_actions * 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -45,16 +45,10 @@ class Actor(nn.Module):
         )
 
     def forward(self, states):
-        states = self.backbone(states)
-        states = self.net(states).reshape(-1, 4, self.num_actions).permute(1, 0, 2)
+        output = self.backbone(states)
+        output = self.net(output).reshape(-1, 2, self.num_actions).permute(1, 0, 2)
 
-        mu, lognu, logalpha, logbeta = torch.split(states, 1, dim=0)
-
-        nu = F.softplus(lognu) + 1e-6
-        alpha = F.softplus(logalpha) + 1.0 + 1e-6
-        beta = F.softplus(logbeta) + 1e-6
-
-        return torch.cat([mu, nu, alpha, beta], dim=0)
+        return output
 
 
 class Critic(nn.Module):
@@ -68,13 +62,13 @@ class Critic(nn.Module):
 
         self.backbone = Backbone()
 
-        _features_description = [num_actions, 128]
+        _features_description = [num_actions, 64]
         _activation_description = ["identity"] * (len(_features_description) - 1)
         self.action = Neural_blocks.generate_linear_stack(
             _features_description, _activation_description
         )
 
-        _features_description = [128, 128, 128, 1]
+        _features_description = [64, 256, 256, 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -84,4 +78,16 @@ class Critic(nn.Module):
 
     def forward(self, states, actions):
         states = self.backbone(states)
-        return self.merge(states + self.action(actions))
+
+        actions = self.action(actions)
+
+        if len(actions.shape) != len(states.shape):
+            states = states.unsqueeze(0)
+
+        output = self.merge(states + actions)
+
+        value, uncertainty = torch.split(output, 1, dim=-1)
+
+        uncertainty = torch.exp(-uncertainty)
+
+        return torch.stack((value, uncertainty), dim=0)

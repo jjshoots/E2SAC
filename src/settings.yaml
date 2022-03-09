@@ -2,19 +2,18 @@
 num_envs: 1
 
 # training params
-buffer_size: 250000
-buffer_size_debug: 10
+buffer_size: 150000
+buffer_size_debug: 100
 batch_size: 170
 start_epoch: 0
-epochs: 1000
+epochs: 700
 repeats_per_buffer: 5 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
 repeats_per_buffer_scale: -0.005
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 
 # exploration settings
-exploration_epochs: 50
-transitions_per_epoch: 1000
+exploration_epochs: 0
 
 # learning rate and scheduler
 starting_LR: 0.001
@@ -22,14 +21,16 @@ scheduler_steps: 2
 scheduler_gamma: 0.5
 
 # algorithm specifics
-reg_lambda: 0.05
-confidence_scale: 1.
-confidence_cutoff: 0.08
+supervision_lambda: 10.
+confidence_lambda: 5.
+confidence_offset: 0.1
+uncertainty_skew: 0.5
 use_entropy: true
 target_entropy: -0.5
+n_var_samples: 32
 
 # eval settings
-eval_num_traj: 100
+eval_num_traj: 20
 eval_epoch_ratio: 20
 
 # helper params

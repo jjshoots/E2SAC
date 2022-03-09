@@ -4,9 +4,9 @@ import sys
 import warnings
 
 import yaml
-from utils.helpers import *
 
 import wandb
+from utils.helpers import *
 
 
 def shutdown_handler(*_):
@@ -72,12 +72,21 @@ def arg_parser():
     )
 
     parser.add_argument(
-        "--name",
+        "--wandb_name",
         type=str,
         nargs="?",
         const=False,
         default="",
         help="Name of the run in wandb.",
+    )
+
+    parser.add_argument(
+        "--notes",
+        type=str,
+        nargs="?",
+        const=False,
+        default="",
+        help="Description of the run in wandb.",
     )
 
     parser.add_argument(
@@ -129,11 +138,6 @@ def parse_set():
     settings["buffer_size"] = (
         settings["buffer_size_debug"] if args.debug else settings["buffer_size"]
     )
-    settings["transitions_per_epoch"] = (
-        settings["buffer_size_debug"]
-        if args.debug
-        else settings["transitions_per_epoch"]
-    )
     # when formatting net_version, assert that only either args or settings
     # file have a value, not both
     if settings["net_version"] == "" and args.net_version == "":
@@ -158,11 +162,15 @@ def parse_set():
             project=settings["wandb_project"],
             entity="jjshoots",
             config=settings,
-            name=args.name + ", v=" + settings["net_version"]
-            if args.name != ""
+            name=args.wandb_name + ", v=" + settings["net_version"]
+            if args.wandb_name != ""
             else settings["net_version"],
+            notes=args.notes,
             id=args.id if args.id != "" else None,
         )
+
+        # also save the code if wandb
+        wandb.run.log_code(".")
 
         # set to be consistent with wandb config
         set = wandb.config
