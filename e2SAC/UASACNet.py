@@ -5,25 +5,6 @@ import torch.nn.functional as F
 from utils.neural_blocks import Neural_blocks
 
 
-class Backbone(nn.Module):
-    """
-    Backbone for Net
-    """
-
-    def __init__(self):
-        super().__init__()
-
-        channels = [12, 128, 128, 128, 4]
-        kernels = [3] * (len(channels) - 1)
-        pooling = [2] * (len(channels) - 1)
-        activation = ["lrelu"] * len(kernels)
-        self.net = Neural_blocks.generate_conv_stack(
-            channels, kernels, pooling, activation, norm="non"
-        )
-
-    def forward(self, state):
-        return self.net(state).flatten(1, -1)
-
 
 class Actor(nn.Module):
     """
@@ -34,9 +15,7 @@ class Actor(nn.Module):
         super().__init__()
         self.num_actions = num_actions
 
-        self.backbone = Backbone()
-
-        _features_description = [64, num_actions * 2]
+        _features_description = [28, 32, 32, num_actions * 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -45,8 +24,7 @@ class Actor(nn.Module):
         )
 
     def forward(self, states):
-        output = self.backbone(states)
-        output = self.net(output).reshape(-1, 2, self.num_actions).permute(1, 0, 2)
+        output = self.net(states).reshape(-1, 2, self.num_actions).permute(1, 0, 2)
 
         return output
 
@@ -60,15 +38,19 @@ class Critic(nn.Module):
         super().__init__()
         self.num_actions = num_actions
 
-        self.backbone = Backbone()
-
         _features_description = [num_actions, 64]
         _activation_description = ["identity"] * (len(_features_description) - 1)
         self.action = Neural_blocks.generate_linear_stack(
             _features_description, _activation_description
         )
 
-        _features_description = [64, 256, 256, 2]
+        _features_description = [28, 64]
+        _activation_description = ["identity"] * (len(_features_description) - 1)
+        self.state = Neural_blocks.generate_linear_stack(
+            _features_description, _activation_description
+        )
+
+        _features_description = [64, 256, 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -77,9 +59,8 @@ class Critic(nn.Module):
         )
 
     def forward(self, states, actions):
-        states = self.backbone(states)
-
         actions = self.action(actions)
+        states = self.state(states)
 
         if len(actions.shape) != len(states.shape):
             states = states.unsqueeze(0)
