@@ -4,7 +4,7 @@ num_envs: 1
 # training params
 buffer_size: 2000000
 buffer_size_debug: 100
-batch_size: 4096
+batch_size: 32768
 start_epoch: 0
 epochs: 5000
 repeats_per_buffer: 5 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
