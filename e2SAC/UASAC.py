@@ -91,8 +91,8 @@ class UASAC(nn.Module):
         confidence_lambda=10.0,
         confidence_offset=4.0,
         supervision_lambda=10.0,
-        uncertainty_skew=0.1,
         n_var_samples=32,
+        exploration_lambda=1.0
     ):
         super().__init__()
 
@@ -101,8 +101,8 @@ class UASAC(nn.Module):
         self.confidence_lambda = confidence_lambda
         self.confidence_offset = confidence_offset
         self.supervision_lambda = supervision_lambda
-        self.uncertainty_skew = uncertainty_skew
         self.n_var_samples = n_var_samples
+        self.exploration_lambda = exploration_lambda
 
         # actor head
         self.actor = GaussianActor(num_actions)
@@ -235,14 +235,14 @@ class UASAC(nn.Module):
         expected_q = critic_output[0, 0, ...]
         uncertainty = critic_output[1, 1, ...].detach() / self.q_std
 
-        a = critic_output[0, 0, ...] + critic_output[1, 0, ...]
-        b = critic_output[0, 1, ...] + critic_output[1, 1, ...]
-
         # expectations of Q with clipped double Q
         expected_q, _ = torch.min(expected_q, dim=-1, keepdim=True)
 
         # reinforcement target is maximization of Q * done
         rnf_loss = -(expected_q * dones)
+
+        # exploration motivation
+        exp_loss = (critic_output[1, 0, ...] * self.exploration_lambda).mean()
 
         # supervisory loss is difference between predicted and label
         sup_loss = func.mse_loss(labels, actions, reduction="none")
@@ -267,12 +267,13 @@ class UASAC(nn.Module):
         sup_loss = (sup_scale * sup_loss).mean()
 
         # sum the losses
-        actor_loss = rnf_loss + sup_loss + ent_loss
+        actor_loss = rnf_loss + sup_loss + ent_loss + exp_loss
 
         log = dict()
         log["sup_scale"] = sup_scale.mean().detach()
         log["sup_scale_std"] = sup_scale.std().detach()
         log["uncertainty"] = uncertainty.mean().detach()
+        log["exploration_loss"] = exp_loss.mean().detach()
         log["supremum_difference"] = (
             (
                 (critic_output[0, 0, ...] + critic_output[1, 0, ...])
