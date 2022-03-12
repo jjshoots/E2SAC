@@ -4,7 +4,7 @@ num_envs: 1
 # training params
 buffer_size: 2000000
 buffer_size_debug: 100
-batch_size: 32768
+batch_size: 256
 start_epoch: 0
 epochs: 5000
 repeats_per_buffer: 5 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
@@ -26,7 +26,7 @@ confidence_lambda: 5.
 confidence_offset: 0.1
 uncertainty_skew: 0.5
 use_entropy: true
-target_entropy: -5.0
+target_entropy: -8.0
 n_var_samples: 32
 
 # eval settings
