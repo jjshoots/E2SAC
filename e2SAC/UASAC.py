@@ -257,7 +257,7 @@ class UASAC(nn.Module):
         sup_scale = (
             self.confidence_lambda
             * torch.clamp(uncertainty - self.confidence_offset, min=0.0) ** 2
-        )
+        ).mean(dim=-1, keepdim=True)
         sup_scale = torch.tanh(sup_scale) * 0.
 
         # convex combo
