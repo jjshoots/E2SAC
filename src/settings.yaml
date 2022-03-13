@@ -1,7 +1,7 @@
 # training params
 buffer_size: 150000
 buffer_size_debug: 100
-batch_size: 170
+batch_size: 150
 start_epoch: 0
 epochs: 700
 repeats_per_buffer: 5 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
@@ -23,7 +23,7 @@ confidence_lambda: 5.
 confidence_offset: 0.1
 use_entropy: true
 target_entropy: -0.5
-n_var_samples: 32
+n_var_samples: 8
 exploration_lambda: 1.0
 
 # eval settings
@@ -31,7 +31,7 @@ eval_num_traj: 20
 eval_epoch_ratio: 20
 
 # helper params
-wandb_project: 'e2SAC'
+wandb_project: 'e2SAC_carracing'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''

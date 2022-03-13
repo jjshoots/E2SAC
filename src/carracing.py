@@ -199,8 +199,7 @@ class Environment:
                     net.critic.forward(
                         gpuize(obs, set.device).unsqueeze(0),
                         net.actor.infer(*output)[0],
-                    )
-                    .squeeze()
+                    ).squeeze()
                     # .squeeze(0)[-1, ...]
                     # .std()
                     # .item()

@@ -92,7 +92,7 @@ class UASAC(nn.Module):
         confidence_offset=4.0,
         supervision_lambda=10.0,
         n_var_samples=32,
-        exploration_lambda=1.0
+        exploration_lambda=1.0,
     ):
         super().__init__()
 
@@ -165,50 +165,48 @@ class UASAC(nn.Module):
         # target Q
         with torch.no_grad():
             # sample the next actions based on the current policy
-            # next_actions is of shape n_samples * B * num_actions
-            # log_probs is of shape n_samples * B * 1
             output = self.actor(next_states)
             next_actions, log_probs = self.actor.sample(
                 *output, n_samples=self.n_var_samples
             )
 
-            # get the next q lists and get the value, then...
-            # next_q is of shape n_samples * B * 2
-            next_qs = self.critic_target(next_states, next_actions)[0]
+            # get the next q and u lists and get the value, then...
+            next_q, next_u = self.critic_target(next_states, next_actions)
 
             # ...take the min at the cat dimension
-            # next_q is of shape n_samples * B * 1
-            next_qs, _ = torch.min(next_qs, dim=-1, keepdim=True)
+            next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
+            next_u, _ = torch.min(next_u, dim=-1, keepdim=True)
 
-            # TD learning, Q_target = R + dones * (gamma*nextQ + entropy)
-            # target_q is of shape n_samples * B * 1
+            # Q_target = reward + dones * (gamma * next_q + entropy_bonus)
             target_q = (
                 rewards
-                + (-self.log_alpha.exp().detach() * log_probs + gamma * next_qs) * dones
+                + (-self.log_alpha.exp().detach() * log_probs + gamma * next_q) * dones
             )
+            target_q = target_q.mean(dim=0)
+
+            # U_target = max(bellman_error) + dones * (gamma * mean(next_U))
+            bellman_error = (current_q - target_q).abs()
+            bellman_error = bellman_error.min(dim=-1, keepdim=True)[0]
+            next_u = next_u.mean(dim=0)
+            target_u = bellman_error + (gamma * next_u) * dones
 
             # get the expected values and variance
-            target_q_var = target_q.std(dim=0) + 1e-6
-            target_q = target_q.mean(dim=0)
             self.update_q_std(target_q)
 
-        # calculate expected bellman error
-        bellman_error = (current_q - target_q).abs()
-        q_loss = bellman_error ** 2
-
-        # calculate absolute epistemic uncertainty, take upper bound
-        bellman_error = bellman_error.max(dim=-1, keepdim=True)[0]
-        u_loss = (current_u - bellman_error.detach()) ** 2
+        # compare predictions with targets to form loss
+        q_loss = ((current_q - target_q) ** 2).mean()
+        u_loss = ((current_u - target_u) ** 2).mean()
 
         # critic loss is q loss plus uncertainty loss, scale losses to have the same mag
-        critic_loss = q_loss.mean() + u_loss.mean()
+        critic_loss = q_loss + u_loss
 
         log = dict()
         log["bellman_error"] = bellman_error.mean().detach()
+        log["target_u"] = target_u.mean().detach()
+        log["target_q"] = target_q.mean().detach()
         log["q_std"] = self.q_std
         log["q_loss"] = q_loss.mean().detach()
         log["u_loss"] = u_loss.mean().detach()
-        log["u_ratio"] = (bellman_error / target_q_var).mean().detach()
 
         return critic_loss, log
 
@@ -233,7 +231,7 @@ class UASAC(nn.Module):
 
         # splice the output to get what we want, rescale epistemic
         expected_q = critic_output[0, 0, ...]
-        uncertainty = critic_output[1, 1, ...].detach() / self.q_std
+        uncertainty = critic_output[1, 1, ...].detach() / expected_q.detach()
 
         # expectations of Q with clipped double Q
         expected_q, _ = torch.min(expected_q, dim=-1, keepdim=True)
@@ -242,7 +240,7 @@ class UASAC(nn.Module):
         rnf_loss = -(expected_q * dones)
 
         # exploration motivation
-        exp_loss = (critic_output[1, 0, ...] * self.exploration_lambda).mean()
+        # exp_loss = (critic_output[1, 0, ...] * self.exploration_lambda).mean()
 
         # supervisory loss is difference between predicted and label
         sup_loss = func.mse_loss(labels, actions, reduction="none")
@@ -260,28 +258,20 @@ class UASAC(nn.Module):
             self.confidence_lambda
             * torch.clamp(uncertainty - self.confidence_offset, min=0.0) ** 2
         )
-        sup_scale = torch.tanh(sup_scale)
+        sup_scale = torch.tanh(sup_scale) * 0.
 
         # convex combo
         rnf_loss = ((1.0 - sup_scale) * rnf_loss).mean()
         sup_loss = (sup_scale * sup_loss).mean()
 
         # sum the losses
-        actor_loss = rnf_loss + sup_loss + ent_loss + exp_loss
+        actor_loss = rnf_loss + sup_loss + ent_loss
 
         log = dict()
         log["sup_scale"] = sup_scale.mean().detach()
         log["sup_scale_std"] = sup_scale.std().detach()
         log["uncertainty"] = uncertainty.mean().detach()
-        log["exploration_loss"] = exp_loss.mean().detach()
-        log["supremum_difference"] = (
-            (
-                (critic_output[0, 0, ...] + critic_output[1, 0, ...])
-                - (critic_output[0, 1, ...] + critic_output[1, 1, ...])
-            )
-            .mean()
-            .detach()
-        )
+        # log["exploration_loss"] = exp_loss.mean().detach()
 
         return actor_loss, log
 
