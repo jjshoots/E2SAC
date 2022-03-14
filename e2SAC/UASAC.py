@@ -286,8 +286,8 @@ class UASAC(nn.Module):
         _, entropies = self.actor.sample(*output)
 
         # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.
-        entropy_loss = (
-            self.log_alpha * (self.target_entropy - entropies).detach()
+        entropy_loss = -(
+            self.log_alpha * (self.target_entropy + entropies).detach()
         ).mean()
 
         log = dict()
