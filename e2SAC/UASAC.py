@@ -240,7 +240,7 @@ class UASAC(nn.Module):
         rnf_loss = -(expected_q * dones)
 
         # exploration motivation
-        # exp_loss = (critic_output[1, 0, ...] * self.exploration_lambda).mean()
+        exp_loss = (critic_output[1, 0, ...] * self.exploration_lambda).mean()
 
         # supervisory loss is difference between predicted and label
         sup_loss = func.mse_loss(labels, actions, reduction="none")
@@ -271,7 +271,7 @@ class UASAC(nn.Module):
         log["sup_scale"] = sup_scale.mean().detach()
         log["sup_scale_std"] = sup_scale.std().detach()
         log["uncertainty"] = uncertainty.mean().detach()
-        # log["exploration_loss"] = exp_loss.mean().detach()
+        log["exploration_loss"] = exp_loss.mean().detach()
 
         return actor_loss, log
 
