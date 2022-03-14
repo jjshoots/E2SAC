@@ -259,7 +259,7 @@ class UASAC(nn.Module):
         sup_scale = (
             self.confidence_lambda
             * torch.clamp(uncertainty - self.confidence_offset, min=0.0) ** 2
-        )
+        ).mean(dim=-1, keepdim=True)
         sup_scale = torch.tanh(sup_scale)
 
         # convex combo
@@ -296,8 +296,8 @@ class UASAC(nn.Module):
         _, entropies = self.actor.sample(*output)
 
         # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.
-        entropy_loss = (
-            self.log_alpha * (self.target_entropy - entropies).detach()
+        entropy_loss = -(
+            self.log_alpha * (self.target_entropy + entropies).detach()
         ).mean()
 
         log = dict()
