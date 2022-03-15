@@ -186,8 +186,8 @@ class UASAC(nn.Module):
 
             # U_target = max(bellman_error) + dones * (gamma * mean(next_U))
             bellman_error = (current_q - target_q).abs()
-            bellman_error = bellman_error.min(dim=-1, keepdim=True)[0]
-            next_u = next_u.mean(dim=0)
+            bellman_error = bellman_error.mean(dim=-1, keepdim=True)[0]
+            next_u = next_u.min(dim=0)[0]
             target_u = bellman_error + (gamma * next_u) * dones
 
             # get the expected values and variance
@@ -231,7 +231,7 @@ class UASAC(nn.Module):
 
         # splice the output to get what we want, rescale epistemic
         expected_q = critic_output[0, 0, ...]
-        uncertainty = critic_output[1, 1, ...].detach() / expected_q.detach()
+        uncertainty = abs(critic_output[1, 1, ...].detach() / expected_q.detach())
 
         # expectations of Q with clipped double Q
         expected_q, _ = torch.min(expected_q, dim=-1, keepdim=True)
