@@ -19,12 +19,10 @@ scheduler_gamma: 0.5
 
 # algorithm specifics
 supervision_lambda: 10.
-confidence_lambda: 5.
-confidence_offset: 0.1
+confidence_lambda: 10.
 use_entropy: true
 target_entropy: 0.5
-n_var_samples: 8
-exploration_lambda: 1.0
+n_var_samples: 32
 
 # eval settings
 eval_num_traj: 20

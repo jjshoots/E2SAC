@@ -212,10 +212,8 @@ def setup_nets(set):
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
         confidence_lambda=set.confidence_lambda,
-        confidence_offset=set.confidence_offset,
         supervision_lambda=set.supervision_lambda,
         n_var_samples=set.n_var_samples,
-        exploration_lambda=set.exploration_lambda,
     ).to(set.device)
     actor_optim = optim.AdamW(net.actor.parameters(), lr=set.starting_LR, amsgrad=True)
     actor_sched = optim.lr_scheduler.StepLR(
