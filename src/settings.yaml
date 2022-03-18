@@ -21,7 +21,11 @@ scheduler_gamma: 0.5
 supervision_lambda: 10.
 confidence_lambda: 5.
 use_entropy: true
+<<<<<<< HEAD
 target_entropy: 0.5
+=======
+target_entropy: -2.0
+>>>>>>> carracing
 n_var_samples: 32
 
 # eval settings
