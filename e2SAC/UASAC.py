@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import math
 import warnings
 
 import torch
@@ -231,12 +230,14 @@ class UASAC(nn.Module):
         """ SUPERVISION SCALE DERIVATION """
         # uncertainty is upper bound difference between suboptimal and learned
         uncertainty = (
-            (critic_output[0, 1, ...] + critic_output[1, 1, ...]).max(
-                dim=-1, keepdim=True
-            )[0]
-            - (critic_output[0, 0, ...] + critic_output[1, 0, ...]).min(
-                dim=-1, keepdim=True
-            )[0]
+            (
+                critic_output[0, 1, ...].mean(dim=-1, keepdim=True)
+                + critic_output[1, 1, ...].max(dim=-1, keepdim=True)[0]
+            )
+            - (
+                critic_output[0, 0, ...].mean(dim=-1, keepdim=True)
+                + critic_output[1, 0, ...].min(dim=-1, keepdim=True)[0]
+            )
         ).detach()
 
         # normalize uncertainty
@@ -304,3 +305,4 @@ class UASAC(nn.Module):
         log["mean_entropy"] = -log_probs.mean().detach()
 
         return entropy_loss, log
+
