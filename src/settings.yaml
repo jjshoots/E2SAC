@@ -1,4 +1,9 @@
-# number of environments to run in parallel
+# env type
+env_name: 'AntPyBulletEnv-v0'
+# env_name: 'HopperPyBulletEnv-v0'
+# env_name: 'HumanoidPyBulletEnv-v0'
+# env_name: 'HalfCheetahPyBulletEnv-v0'
+
 # training params
 buffer_size: 2000000
 buffer_size_debug: 100
@@ -21,9 +26,8 @@ scheduler_gamma: 0.5
 # algorithm specifics
 supervision_lambda: 10.
 confidence_lambda: 5.
-confidence_offset: 0.1
 use_entropy: true
-target_entropy: -8.0
+target_entropy: null
 n_var_samples: 32
 
 # eval settings
@@ -31,10 +35,11 @@ eval_num_traj: 20
 eval_epoch_ratio: 20
 
 # helper params
-wandb_project: 'e2SAC_ant'
+wandb_project: 'e2SAC_pybullet_gym'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''
 net_number: 0
 epoch_interval: 1
 batch_interval: -1
+

@@ -113,7 +113,7 @@ class Environment:
 
         if net is not None:
             net.eval()
-        self.env = gym.make("HopperPyBulletEnv-v0")
+        self.env = gym.make(self.env_name)
         self.env.render()
         self.eval()
         self.reset()
