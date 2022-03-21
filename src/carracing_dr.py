@@ -1,5 +1,7 @@
+import os
 import cv2
 import gym
+import glob
 import numpy as np
 
 from utils.helpers import cpuize, gpuize
@@ -12,6 +14,12 @@ class Environment:
 
     def __init__(self, image_size=(64, 64), verbose=False):
         super().__init__()
+
+        current_file_path = os.path.dirname(os.path.abspath(__file__))
+        tex_dir = current_file_path + "/../railway_drone/models/textures/"
+        self.texture_paths = glob.glob(
+            os.path.join(tex_dir, "**", "*.jpg"), recursive=True
+        )
 
         self.image_size = image_size
         self.frame_stack = 4
@@ -37,25 +45,27 @@ class Environment:
         self.eval_run = False
 
     def reset(self):
-        self.off_track_t = 0
-        self.done = 0
-        self.cumulative_reward = 0
+        self.dr_rate = 0
+        self.dr_interval = 50
+        self.update_texture()
 
         self.env.reset()
         for _ in range(50):
             self.off_track_t = 0
             self.step(np.zeros(self.num_actions), startup=True)
 
+        self.off_track_t = 0
+        self.done = 0
+        self.cumulative_reward = 0
         self.state = np.concatenate(
             [self.transform_obs(self.env.env.state)] * self.frame_stack, 0
         )
 
     def get_state(self):
-        label = self.get_label(self.transform_obs(self.env.env.state))
+        label = self.get_label(self.transform_obs(self.env.env.state, randomize=True))
         return self.state, None, None, label
 
     def step(self, action, startup=False):
-
         """
         actions are expected to be of shape [2]
 
@@ -77,7 +87,7 @@ class Environment:
         lbl = None
         for i in range(self.frame_stack):
             observation, reward, done, _ = self.env.step(action)
-            obs.append(self.transform_obs(observation))
+            obs.append(self.transform_obs(observation, randomize=True))
             rwd += reward
             self.done = max(done, self.done)
 
@@ -105,6 +115,11 @@ class Environment:
         # accumulate rewards
         self.cumulative_reward += rwd
 
+        self.dr_rate += 1
+        if self.dr_rate % self.dr_interval == 0:
+            self.dr_rate = 0
+            self.update_texture()
+
         return self.state, rwd, self.done, lbl
 
     @property
@@ -114,14 +129,20 @@ class Environment:
         """
         return self.done
 
-    def transform_obs(self, obs):
+    def transform_obs(self, obs, randomize=False):
         """
-        resize and norm
+        resize and norm and domain randomization
         """
         obs = cv2.resize(obs, dsize=self.image_size, interpolation=cv2.INTER_LINEAR)
         obs = (obs - 127.5) / 127.5
 
         obs = np.transpose(obs, (2, 0, 1))
+
+        if randomize:
+            grass = np.expand_dims(obs[1, ...] > -0.3, 0)
+            grass = np.repeat(grass, 3, axis=0).astype(np.float64)
+
+            obs = self.current_texture * grass * obs[[1]] + obs * (1 - grass)
 
         return obs
 
@@ -140,6 +161,20 @@ class Environment:
         accel = 0.1
 
         return np.clip(np.array([steering, accel]), -0.99, 0.99)
+
+    def update_texture(self):
+        texture_path = self.texture_paths[
+            np.random.randint(0, len(self.texture_paths) - 1)
+        ]
+        texture = cv2.imread(texture_path)
+        texture = cv2.resize(texture, self.image_size)
+        texture = np.transpose(texture, (2, 0, 1))
+
+        texture = (texture - 127.5) / 127.5
+
+        texture = np.nan_to_num(texture)
+
+        self.current_texture = texture
 
     def evaluate(self, set, net=None):
         if net is not None:
@@ -170,7 +205,7 @@ class Environment:
         eval_perf = np.mean(np.array(eval_perf))
         return eval_perf
 
-    def display(self, set, net=None, transformed=False):
+    def display(self, set, net=None):
 
         if net is not None:
             net.eval()
@@ -179,8 +214,7 @@ class Environment:
 
         action = np.zeros((set.num_actions))
 
-        if transformed:
-            cv2.namedWindow("display", cv2.WINDOW_NORMAL)
+        cv2.namedWindow("display", cv2.WINDOW_NORMAL)
 
         while True:
             obs, rwd, dne, lbl = self.step(action)
@@ -195,21 +229,21 @@ class Environment:
                 # action = cpuize(net.actor.sample(*output)[0][0])
                 action = cpuize(net.actor.infer(*output))[0]
 
+                # print(action)
                 print(
                     net.critic.forward(
                         gpuize(obs, set.device).unsqueeze(0),
                         net.actor.infer(*output)[0],
                     ).squeeze()
+                    # .squeeze(0)[-1, ...]
+                    # .std()
+                    # .item()
                 )
             else:
                 action = lbl
 
-            if transformed:
-                display = obs[:3, ...]
-                display = np.uint8((display * 127.5 + 127.5))
-                display = np.transpose(display, (1, 2, 0))
-                cv2.imshow("display", display)
-            else:
-                self.env.render()
-
+            display = obs[:3, ...]
+            display = np.uint8((display * 127.5 + 127.5))
+            display = np.transpose(display, (1, 2, 0))
+            cv2.imshow("display", display)
             cv2.waitKey(int(1000 / 15))

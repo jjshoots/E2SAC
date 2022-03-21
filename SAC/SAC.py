@@ -202,15 +202,15 @@ class SAC(nn.Module):
             return torch.zeros(1)
 
         output = self.actor(states)
-        _, entropies = self.actor.sample(*output)
+        _, log_probs = self.actor.sample(*output)
 
         # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.
-        entropy_loss = (
-            self.log_alpha * (self.target_entropy - entropies).detach()
+        entropy_loss = -(
+            self.log_alpha * (self.target_entropy + log_probs).detach()
         ).mean()
 
         log = dict()
         log["log_alpha"] = self.log_alpha.item()
-        log["mean_entropy"] = entropies.mean().detach()
+        log["mean_entropy"] = -log_probs.mean().detach()
 
         return entropy_loss, log

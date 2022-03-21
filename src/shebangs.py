@@ -127,7 +127,6 @@ def parse_set():
         settings = yaml.load(f, Loader=yaml.FullLoader)
 
     # format settings a bit
-    settings["num_envs"] = 1 if args.display else settings["num_envs"]
     settings["device"] = get_device()
     settings["step_sched_num"] = (
         settings["repeats_per_buffer"]
