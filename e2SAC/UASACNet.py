@@ -46,7 +46,7 @@ class Actor(nn.Module):
 
     def forward(self, states):
         output = self.backbone(states)
-        output = self.net(output).reshape(*states.shape[:-1], 2, self.num_actions)
+        output = self.net(output).reshape(*output.shape[:-1], 2, self.num_actions)
         output = torch.movedim(output, -2, 0)
 
         return output
