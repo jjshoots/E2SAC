@@ -1,7 +1,8 @@
-import gym
 import time
-import pybulletgym
+
+import gym
 import numpy as np
+import pybulletgym
 
 from utils.helpers import cpuize, gpuize
 

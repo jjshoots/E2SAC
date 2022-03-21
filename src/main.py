@@ -8,8 +8,8 @@ import torch.optim as optim
 from PIL import Image
 
 import wandb
-from pybullet_env import Environment
 from e2SAC.UASAC import UASAC
+from pybullet_env import Environment
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize
 from utils.replay_buffer import ReplayBuffer
