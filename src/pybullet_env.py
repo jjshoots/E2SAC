@@ -11,7 +11,7 @@ class Environment:
     Wrapper for OpenAI gym environments that outputs suboptimal actions also
     """
 
-    def __init__(self, env_name, action_repeat=4):
+    def __init__(self, env_name):
         super().__init__()
 
         self.env_name = env_name
@@ -20,8 +20,6 @@ class Environment:
         self.state_size = self.state.shape[0]
         self.num_actions = self.env.action_space.shape[0]
         self.do_nothing = np.zeros(self.num_actions)
-
-        self.action_repeat = action_repeat
 
         self.done = 0
         self.cumulative_reward = 0
@@ -59,7 +57,7 @@ class Environment:
         """
         action = action.squeeze()
 
-        # step through the env for action_repeat times
+        # step through the env
         self.state, reward, self.done, _ = self.env.step(action)
 
         # accumulate rewards
