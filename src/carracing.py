@@ -170,7 +170,7 @@ class Environment:
         eval_perf = np.mean(np.array(eval_perf))
         return eval_perf
 
-    def display(self, set, net=None):
+    def display(self, set, net=None, transformed=False):
 
         if net is not None:
             net.eval()
@@ -179,7 +179,8 @@ class Environment:
 
         action = np.zeros((set.num_actions))
 
-        cv2.namedWindow("display", cv2.WINDOW_NORMAL)
+        if transformed:
+            cv2.namedWindow("display", cv2.WINDOW_NORMAL)
 
         while True:
             obs, rwd, dne, lbl = self.step(action)
@@ -194,21 +195,21 @@ class Environment:
                 # action = cpuize(net.actor.sample(*output)[0][0])
                 action = cpuize(net.actor.infer(*output))[0]
 
-                # print(action)
                 print(
                     net.critic.forward(
                         gpuize(obs, set.device).unsqueeze(0),
                         net.actor.infer(*output)[0],
                     ).squeeze()
-                    # .squeeze(0)[-1, ...]
-                    # .std()
-                    # .item()
                 )
             else:
                 action = lbl
 
-            display = obs[:3, ...]
-            display = np.uint8((display * 127.5 + 127.5))
-            display = np.transpose(display, (1, 2, 0))
-            cv2.imshow("display", display)
+            if transformed:
+                display = obs[:3, ...]
+                display = np.uint8((display * 127.5 + 127.5))
+                display = np.transpose(display, (1, 2, 0))
+                cv2.imshow("display", display)
+            else:
+                self.env.render()
+
             cv2.waitKey(int(1000 / 15))

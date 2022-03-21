@@ -305,4 +305,3 @@ class UASAC(nn.Module):
         log["mean_entropy"] = -log_probs.mean().detach()
 
         return entropy_loss, log
-
