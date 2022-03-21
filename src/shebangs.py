@@ -107,6 +107,15 @@ def arg_parser():
         help="Network weights number.",
     )
 
+    parser.add_argument(
+        "--env_name",
+        type=str,
+        nargs="?",
+        const=False,
+        default="",
+        help="Environment name from pybullet gym.",
+    )
+
     return parser.parse_args()
 
 

@@ -4,12 +4,17 @@ metric:
   name: max_eval_perf
   goal: maximize
 parameters:
-  reg_lambda:
-    min: +0.001
-    max: +0.100
+  env_name:
+    values:
+      [
+        'AntPyBulletEnv-v0',
+        'HopperPyBulletEnv-v0',
+        'HumanoidPyBulletEnv-v0',
+        'HalfCheetahPyBulletEnv-v0',
+      ]
 command:
   - python3
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--name=e2sac_sweep"
+  - "--wandb_name=something_here"
