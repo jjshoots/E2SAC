@@ -15,10 +15,10 @@ class Q_Ensemble(nn.Module):
     Q Network Ensembles with uncertainty estimates
     """
 
-    def __init__(self, num_actions, num_networks=2):
+    def __init__(self, num_actions, state_size, num_networks=2):
         super().__init__()
 
-        networks = [UASACNet.Critic(num_actions) for _ in range(num_networks)]
+        networks = [UASACNet.Critic(num_actions, state_size) for _ in range(num_networks)]
         self.networks = nn.ModuleList(networks)
 
     def forward(self, states, actions):
@@ -41,9 +41,9 @@ class GaussianActor(nn.Module):
     Gaussian Actor
     """
 
-    def __init__(self, num_actions):
+    def __init__(self, num_actions, state_size):
         super().__init__()
-        self.net = UASACNet.Actor(num_actions)
+        self.net = UASACNet.Actor(num_actions, state_size)
 
     def forward(self, states):
         output = torch.tanh(self.net(states))
@@ -86,6 +86,7 @@ class UASAC(nn.Module):
     def __init__(
         self,
         num_actions,
+        state_size,
         entropy_tuning=True,
         target_entropy=None,
         confidence_lambda=10.0,
@@ -97,6 +98,7 @@ class UASAC(nn.Module):
         super().__init__()
 
         self.num_actions = num_actions
+        self.state_size = state_size
         self.use_entropy = entropy_tuning
         self.confidence_lambda = confidence_lambda
         self.confidence_offset = confidence_offset
@@ -105,11 +107,11 @@ class UASAC(nn.Module):
         self.n_var_samples = n_var_samples
 
         # actor head
-        self.actor = GaussianActor(num_actions)
+        self.actor = GaussianActor(num_actions, state_size)
 
         # twin delayed Q networks
-        self.critic = Q_Ensemble(num_actions)
-        self.critic_target = Q_Ensemble(num_actions).eval()
+        self.critic = Q_Ensemble(num_actions, state_size)
+        self.critic_target = Q_Ensemble(num_actions, state_size).eval()
 
         # copy weights and disable gradients for the target network
         self.critic_target.load_state_dict(self.critic.state_dict())

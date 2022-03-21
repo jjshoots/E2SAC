@@ -1,4 +1,3 @@
-import cv2
 import gym
 import time
 import pybulletgym
@@ -12,12 +11,13 @@ class Environment:
     Wrapper for OpenAI gym environments that outputs suboptimal actions also
     """
 
-    def __init__(self, action_repeat=4):
+    def __init__(self, env_name, action_repeat=4):
         super().__init__()
 
-        self.env = gym.make("AntPyBulletEnv-v0")
+        self.env_name = env_name
+        self.env = gym.make(env_name)
         self.state = np.zeros_like(self.env.reset())
-        self.num_state = self.state.shape[0]
+        self.state_size = self.state.shape[0]
         self.num_actions = self.env.action_space.shape[0]
         self.do_nothing = np.zeros(self.num_actions)
 
@@ -113,7 +113,7 @@ class Environment:
 
         if net is not None:
             net.eval()
-        self.env = gym.make("AntPyBulletEnv-v0")
+        self.env = gym.make("HopperPyBulletEnv-v0")
         self.env.render()
         self.eval()
         self.reset()

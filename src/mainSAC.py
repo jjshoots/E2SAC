@@ -8,7 +8,7 @@ import torch.optim as optim
 from PIL import Image
 
 import wandb
-from ant import Environment
+from pybullet_env import Environment
 from SAC.SAC import SAC
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize
@@ -165,8 +165,9 @@ def evaluate(set):
 
 
 def setup_env(set):
-    env = Environment()
+    env = Environment(set.env_name)
     set.num_actions = env.num_actions
+    set.state_size = env.state_size
 
     return env
 
@@ -191,6 +192,7 @@ def setup_nets(set):
     # set up networks and optimizers
     net = SAC(
         num_actions=set.num_actions,
+        state_size=set.state_size,
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
     ).to(set.device)
@@ -262,5 +264,3 @@ if __name__ == "__main__":
 
     """ SCRIPTS END """
 
-    if set.shutdown:
-        os.system("poweroff")

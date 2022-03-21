@@ -1,6 +1,4 @@
 # number of environments to run in parallel
-num_envs: 1
-
 # training params
 buffer_size: 2000000
 buffer_size_debug: 100
@@ -24,7 +22,6 @@ scheduler_gamma: 0.5
 supervision_lambda: 10.
 confidence_lambda: 5.
 confidence_offset: 0.1
-uncertainty_skew: 0.5
 use_entropy: true
 target_entropy: -8.0
 n_var_samples: 32

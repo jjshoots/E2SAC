@@ -8,8 +8,7 @@ import torch.optim as optim
 from PIL import Image
 
 import wandb
-
-from ant import Environment
+from pybullet_env import Environment
 from e2SAC.UASAC import UASAC
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize
@@ -167,8 +166,9 @@ def evaluate(set):
 
 
 def setup_env(set):
-    env = Environment()
+    env = Environment(set.env_name)
     set.num_actions = env.num_actions
+    set.state_size = env.state_size
 
     return env
 
@@ -193,6 +193,7 @@ def setup_nets(set):
     # set up networks and optimizers
     net = UASAC(
         num_actions=set.num_actions,
+        state_size=set.state_size,
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
         confidence_lambda=set.confidence_lambda,
