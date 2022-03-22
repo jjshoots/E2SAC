@@ -8,3 +8,4 @@
 /.vim
 */*.egg-info
 */__pycache__
+*/archive

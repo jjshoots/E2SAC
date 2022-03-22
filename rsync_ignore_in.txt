@@ -14,3 +14,4 @@ sync*
 /.vim
 */*egg-info
 */__pycache__
+*/archive

@@ -1,15 +1,16 @@
 # env type
-env_name: 'AntPyBulletEnv-v0'
+env_name: ''
+# env_name: 'AntPyBulletEnv-v0'
 # env_name: 'HopperPyBulletEnv-v0'
 # env_name: 'HumanoidPyBulletEnv-v0'
 # env_name: 'HalfCheetahPyBulletEnv-v0'
 
 # training params
-buffer_size: 2000000
+buffer_size: 20000000
 buffer_size_debug: 100
 batch_size: 256
 start_epoch: 0
-epochs: 5000
+epochs: 1000
 repeats_per_buffer: 5 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
 repeats_per_buffer_scale: 0.0
 critic_update_multiplier: 1
@@ -35,7 +36,7 @@ eval_num_traj: 20
 eval_epoch_ratio: 20
 
 # helper params
-wandb_project: 'e2SAC_pybullet_gym'
+wandb_project: 'e2SAC_pybullet'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''
