@@ -67,15 +67,15 @@ def get_log(run_uri, keys):
 
 if __name__ == "__main__":
     # parameters
-    num_episodes = 221
+    num_episodes = 501
 
     # list of algorithms and their corresponding uris
     runs = {}
     runs["E2SAC"] = [
         "jjshoots/e2SAC_carracing/2harp7lx",
         "jjshoots/e2SAC_carracing/39eqsvgc",
-        "jjshoots/e2SAC_carracing/187jct65",
-        "jjshoots/e2SAC_carracing/hhqifik6",
+        # "jjshoots/e2SAC_carracing/187jct65",
+        # "jjshoots/e2SAC_carracing/hhqifik6",
     ]
     runs["SAC"] = [
         "jjshoots/e2SAC_carracing/163xcgc0",
