@@ -1,16 +1,13 @@
 # env type
+# env_name: 'CartPole-v1'
 env_name: 'MountainCar-v0'
-# env_name: 'AntPyBulletEnv-v0'
-# env_name: 'HopperPyBulletEnv-v0'
-# env_name: 'HumanoidPyBulletEnv-v0'
-# env_name: 'HalfCheetahPyBulletEnv-v0'
 
 # training params
-buffer_size: 20000000
+buffer_size: 200000
 buffer_size_debug: 100
 batch_size: 256
 start_epoch: 0
-epochs: 1000
+epochs: 200
 repeats_per_buffer: 5 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
 repeats_per_buffer_scale: 0.0
 critic_update_multiplier: 1
@@ -25,11 +22,9 @@ scheduler_steps: 2
 scheduler_gamma: 0.5
 
 # algorithm specifics
-supervision_lambda: 10.
-confidence_lambda: 5.
-use_entropy: true
-target_entropy: null
-n_var_samples: 32
+supervision_lambda: 10.0
+confidence_lambda: 5.0
+exploration_epsilon: 0.05
 
 # eval settings
 eval_num_traj: 20

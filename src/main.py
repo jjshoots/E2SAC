@@ -9,7 +9,7 @@ from PIL import Image
 
 import wandb
 from DDQN.DDQN import DDQN
-from gym_env import Environment
+from discrete_env import Environment
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize
 from utils.replay_buffer import ReplayBuffer
@@ -47,8 +47,8 @@ def train(set):
                 if epoch < set.exploration_epochs:
                     action = np.random.uniform(-1.0, 1.0, 2)
                 else:
-                    output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                    action, _ = net.actor.sample(*output)
+                    output = net(gpuize(obs, set.device).unsqueeze(0))
+                    action, _ = net.sample(*output)
                     action = cpuize(action)[0]
 
                 # get the next state and other stuff
@@ -82,32 +82,14 @@ def train(set):
                 # train critic
                 for _ in range(set.critic_update_multiplier):
                     net.zero_grad()
-                    q_loss, log = net.calc_critic_loss(
+                    q_loss, log = net.calc_loss(
                         states, actions, rewards, next_states, dones
                     )
                     to_log = {**to_log, **log}
                     q_loss.backward()
-                    optim_set["critic"].step()
-                    sched_set["critic"].step()
+                    optim_set["ddqn"].step()
+                    sched_set["ddqn"].step()
                     net.update_q_target()
-
-                # train actor
-                for _ in range(set.actor_update_multiplier):
-                    net.zero_grad()
-                    rnf_loss, log = net.calc_actor_loss(states, dones, labels)
-                    to_log = {**to_log, **log}
-                    rnf_loss.backward()
-                    optim_set["actor"].step()
-                    sched_set["actor"].step()
-
-                    # train entropy regularizer
-                    if net.use_entropy:
-                        net.zero_grad()
-                        ent_loss, log = net.calc_alpha_loss(states)
-                        to_log = {**to_log, **log}
-                        ent_loss.backward()
-                        optim_set["alpha"].step()
-                        sched_set["alpha"].step()
 
                 """ WEIGHTS SAVING """
                 net_weights = net_helper.training_checkpoint(
@@ -200,9 +182,7 @@ def setup_nets(set):
         supervision_lambda=set.supervision_lambda,
         n_var_samples=set.n_var_samples,
     ).to(set.device)
-    ddqn_optim = optim.AdamW(
-        net.parameters(), lr=set.starting_LR, amsgrad=True
-    )
+    ddqn_optim = optim.AdamW(net.parameters(), lr=set.starting_LR, amsgrad=True)
     ddqn_sched = optim.lr_scheduler.StepLR(
         ddqn_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma
     )

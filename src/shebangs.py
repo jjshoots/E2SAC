@@ -164,7 +164,9 @@ def parse_set():
     # when formatting env_name, assert that only either args or settings
     # file have a value, not both
     if settings["env_name"] == "" and args.env_name == "":
-        raise AssertionError("need to provide env_name in either settings.yaml or in args.")
+        raise AssertionError(
+            "need to provide env_name in either settings.yaml or in args."
+        )
     elif settings["env_name"] != "" and args.env_name == "":
         settings["env_name"] = settings["env_name"]
     elif settings["env_name"] == "" and args.env_name != "":
