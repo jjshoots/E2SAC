@@ -1,5 +1,5 @@
 # env type
-env_name: ''
+env_name: 'MountainCar-v0'
 # env_name: 'AntPyBulletEnv-v0'
 # env_name: 'HopperPyBulletEnv-v0'
 # env_name: 'HumanoidPyBulletEnv-v0'

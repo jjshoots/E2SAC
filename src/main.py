@@ -8,8 +8,8 @@ import torch.optim as optim
 from PIL import Image
 
 import wandb
-from e2SAC.UASAC import UASAC
-from pybullet_env import Environment
+from DDQN.DDQN import DDQN
+from gym_env import Environment
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize
 from utils.replay_buffer import ReplayBuffer
@@ -191,7 +191,7 @@ def setup_nets(set):
     )
 
     # set up networks and optimizers
-    net = UASAC(
+    net = DDQN(
         num_actions=set.num_actions,
         state_size=set.state_size,
         entropy_tuning=set.use_entropy,
@@ -200,30 +200,18 @@ def setup_nets(set):
         supervision_lambda=set.supervision_lambda,
         n_var_samples=set.n_var_samples,
     ).to(set.device)
-    actor_optim = optim.AdamW(net.actor.parameters(), lr=set.starting_LR, amsgrad=True)
-    actor_sched = optim.lr_scheduler.StepLR(
-        actor_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma
+    ddqn_optim = optim.AdamW(
+        net.parameters(), lr=set.starting_LR, amsgrad=True
     )
-    critic_optim = optim.AdamW(
-        net.critic.parameters(), lr=set.starting_LR, amsgrad=True
-    )
-    critic_sched = optim.lr_scheduler.StepLR(
-        critic_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma
-    )
-    alpha_optim = optim.AdamW([net.log_alpha], lr=set.starting_LR, amsgrad=True)
-    alpha_sched = optim.lr_scheduler.StepLR(
-        alpha_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma
+    ddqn_sched = optim.lr_scheduler.StepLR(
+        ddqn_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma
     )
 
     optim_set = dict()
-    optim_set["actor"] = actor_optim
-    optim_set["critic"] = critic_optim
-    optim_set["alpha"] = alpha_optim
+    optim_set["ddqn"] = ddqn_optim
 
     sched_set = dict()
-    sched_set["actor"] = actor_sched
-    sched_set["critic"] = critic_sched
-    sched_set["alpha"] = alpha_sched
+    sched_set["ddqn"] = ddqn_sched
 
     # get latest weight files
     net_weights = net_helper.get_weight_file()
@@ -242,7 +230,6 @@ def setup_nets(set):
 
         net_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
         optim_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
-        # set.start_epoch = checkpoint['epoch']
         print(
             f"Lowest Running Loss for Net: {net_helper.lowest_running_loss} @ epoch {set.start_epoch}"
         )
