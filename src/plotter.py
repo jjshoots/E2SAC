@@ -9,17 +9,14 @@ import wandb
 # normal imports
 import numpy as np
 import matplotlib.patches as patches
-import sys
-import pickle
-import pandas as pd
-import copy
-import functools
-import json
-import os
+from matplotlib import rcParams
+from matplotlib import rc
 
-import itertools as it
-import random
-import inspect
+# plotting styles
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_style("white")
 
 # See warnings only once
 import warnings
@@ -33,16 +30,6 @@ import logging
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-
-# plotting styles
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-sns.set_style("white")
-
-# Matplotlib params
-from matplotlib import rcParams
-from matplotlib import rc
 
 rcParams["legend.loc"] = "best"
 rcParams["pdf.fonttype"] = 42
@@ -73,13 +60,23 @@ if __name__ == "__main__":
     runs = {}
     runs["E2SAC"] = [
         "jjshoots/e2SAC_carracing/2harp7lx",
-        "jjshoots/e2SAC_carracing/39eqsvgc",
-        # "jjshoots/e2SAC_carracing/187jct65",
-        # "jjshoots/e2SAC_carracing/hhqifik6",
     ]
     runs["SAC"] = [
-        "jjshoots/e2SAC_carracing/163xcgc0",
-        "jjshoots/e2SAC_carracing/3l1muf0x",
+        # ANT
+        "jjshoots/e2SAC_pybullet/13h1m9xi",
+        "jjshoots/e2SAC_pybullet/3b5j9b7m",
+        "jjshoots/e2SAC_pybullet/2peczyr9",
+        "jjshoots/e2SAC_pybullet/1c6y8gu6",
+        "jjshoots/e2SAC_pybullet/91w6nx7m",
+        "jjshoots/e2SAC_pybullet/19ohj3hi",
+        "jjshoots/e2SAC_pybullet/2nptl9ih",
+        "jjshoots/e2SAC_pybullet/3uptzvr4",
+
+        # HOPPER
+        "jjshoots/e2SAC_pybullet/28o1jyka",
+        "jjshoots/e2SAC_pybullet/208rjk0x",
+        "jjshoots/e2SAC_pybullet/2yno2ni6",
+        "jjshoots/e2SAC_pybullet/jrtr337s",
     ]
 
     # list of algorithms we have

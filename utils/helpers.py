@@ -2,11 +2,8 @@
 import os
 import time
 
-import cv2
 import numpy as np
 import torch
-from pthflops import count_ops
-
 
 class Helpers:
     def __init__(
@@ -35,7 +32,7 @@ class Helpers:
         self.increment = increment
         self.interval = epoch_interval if epoch_interval > 0 else batch_interval
         self.use_epoch = epoch_interval > 0
-        self.previous_step = 0
+        self.previous_save_step = 0
         self.skips = 0
         self.max_skips = max_skips
 
@@ -91,8 +88,8 @@ class Helpers:
             self.running_loss += loss
             self.iter_passed += 1.0
 
-        if step % self.interval == 0 and step != 0 and step != self.previous_step:
-            self.previous_step = step
+        if step % self.interval == 0 and step != 0 and step != self.previous_save_step:
+            self.previous_save_step = step
 
             # at the moment, no way to evaluate the current state of training, so we just record the current running loss
             avg_loss = self.running_loss / self.iter_passed
@@ -245,50 +242,15 @@ def gpuize(input, device):
 
 
 def cpuize(input):
-    return input.detach().cpu().numpy()
-
-
-def saliency_to_contour(
-    input, original_image, fastener_area_threshold, input_output_ratio
-):
-    """
-    converts saliency map to pseudo segmentation
-    expects input of dim 2
-    fastener_area_threshold is minimum area of output object BEFORE scaling to input size
-    """
-    # find contours in the image
-    threshold = input.detach().cpu().squeeze().numpy().astype(np.uint8)
-    contours, _ = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-    # draw contours
-    contour_image = None
-    contour_number = 0
-    if original_image != None:
-        contour_image = original_image.squeeze().to("cpu").detach().numpy()
-
-    for contour in contours:
-        if cv2.contourArea(contour) > fastener_area_threshold:
-            contour *= input_output_ratio
-            contour_number += 1
-            if original_image != None:
-                x, y, w, h = cv2.boundingRect(contour)
-                contour_image = contour_image.astype(np.float32)
-                cv2.rectangle(contour_image, (x, y), (x + w, y + h), 1, 2)
-
-    # return drawn image
-    return contour_image, contour_number
+    if torch.is_tensor(input):
+        return input.detach().cpu().numpy()
+    else:
+        return input
 
 
 def network_stats(network, input_image):
+    from pthflops import count_ops
+
     total_params = sum(p.numel() for p in network.parameters() if p.requires_grad)
     count_ops(network, input_image)
     print(f"Total number of Parameters: {total_params}")
-
-
-def fgsm_attack(data, epsilon=0.1):
-    # Create the perturbed data by adjusting each pixel of the input data
-    data = data + epsilon * data.grad.data.sign()
-    # Adding clipping to maintain [0,1] range
-    data = torch.clamp(data, 0, 1)
-
-    return data
