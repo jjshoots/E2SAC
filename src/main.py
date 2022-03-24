@@ -3,7 +3,6 @@ from signal import SIGINT, signal
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.optim as optim
 from PIL import Image
 
@@ -77,10 +76,17 @@ def train(set):
             )
 
         """ TRAINING RUN """
+        # load the replay buffer through pytorch dataloader
         dataloader = torch.utils.data.DataLoader(
             memory, batch_size=set.batch_size, shuffle=True, drop_last=False
         )
 
+        # step all the LR schedulers
+        if epoch != 0:
+            for sched_key in sched_set:
+                sched_set[sched_key].step()
+
+        # step through the replay buffer for specified number of times
         for i in range(
             int(set.repeats_per_buffer + set.repeats_per_buffer_scale * epoch)
         ):
@@ -104,7 +110,6 @@ def train(set):
                     to_log = {**to_log, **log}
                     q_loss.backward()
                     optim_set["critic"].step()
-                    sched_set["critic"].step()
                     net.update_q_target()
 
                 # train actor
@@ -114,7 +119,6 @@ def train(set):
                     to_log = {**to_log, **log}
                     rnf_loss.backward()
                     optim_set["actor"].step()
-                    sched_set["actor"].step()
 
                     # train entropy regularizer
                     if net.use_entropy:
@@ -123,7 +127,6 @@ def train(set):
                         to_log = {**to_log, **log}
                         ent_loss.backward()
                         optim_set["alpha"].step()
-                        sched_set["alpha"].step()
 
                 """ WEIGHTS SAVING """
                 net_weights = net_helper.training_checkpoint(
@@ -166,7 +169,7 @@ def display(set):
     env = setup_env(set)
 
     net = None
-    if True:
+    if False:
         net, _, _, _, _ = setup_nets(set)
 
     env.display(set, net)

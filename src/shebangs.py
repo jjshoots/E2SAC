@@ -1,12 +1,13 @@
 import argparse
 import os
 import sys
+import time
 import warnings
 
-import yaml
-
+import numpy as np
 import wandb
-from utils.helpers import *
+import yaml
+from utils.helpers import get_device
 
 
 def shutdown_handler(*_):
@@ -129,10 +130,7 @@ def parse_set():
     # format settings a bit
     settings["device"] = get_device()
     settings["step_sched_num"] = (
-        settings["repeats_per_buffer"]
-        * settings["epochs"]
-        * settings["buffer_size"]
-        / settings["scheduler_steps"]
+        settings["repeats_per_buffer"] / settings["scheduler_steps"]
     )
     settings["buffer_size"] = (
         settings["buffer_size_debug"] if args.debug else settings["buffer_size"]
@@ -190,6 +188,6 @@ def get_base_prefix_compat():
 
 
 def check_venv():
-    if not get_base_prefix_compat() != sys.prefix:
+    if get_base_prefix_compat() == sys.prefix:
         time.sleep(10)
         warnings.warn("Not in venv.")

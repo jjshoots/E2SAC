@@ -71,7 +71,6 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/19ohj3hi",
         "jjshoots/e2SAC_pybullet/2nptl9ih",
         "jjshoots/e2SAC_pybullet/3uptzvr4",
-
         # HOPPER
         "jjshoots/e2SAC_pybullet/28o1jyka",
         "jjshoots/e2SAC_pybullet/208rjk0x",
