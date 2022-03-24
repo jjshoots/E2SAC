@@ -3,9 +3,7 @@ from signal import SIGINT, signal
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.optim as optim
-from PIL import Image
 
 import wandb
 from DDQN.DDQN import DDQN
@@ -47,8 +45,8 @@ def train(set):
                 if epoch < set.exploration_epochs:
                     action = np.random.uniform(-1.0, 1.0, 2)
                 else:
-                    output = net(gpuize(obs, set.device).unsqueeze(0))
-                    action = cpuize(net.sample(*output))
+                    q = net(gpuize(obs, set.device).unsqueeze(0))
+                    action = cpuize(net.sample(q))
 
                 # get the next state and other stuff
                 next_obs, rew, dne, _ = env.step(action)
@@ -78,16 +76,15 @@ def train(set):
                 dones = gpuize(stuff[4], set.device)
 
                 # train
-                for _ in range(set.critic_update_multiplier):
-                    net.zero_grad()
-                    loss, log = net.calc_loss(
-                        states, actions, rewards, next_states, dones
-                    )
-                    to_log = {**to_log, **log}
-                    loss.backward()
-                    optim_set["ddqn"].step()
-                    sched_set["ddqn"].step()
-                    net.update_q_target()
+                net.zero_grad()
+                loss, log = net.calc_loss(
+                    states, actions, rewards, next_states, dones
+                )
+                to_log = {**to_log, **log}
+                loss.backward()
+                optim_set["ddqn"].step()
+                sched_set["ddqn"].step()
+                net.update_q_target()
 
                 """ WEIGHTS SAVING """
                 net_weights = net_helper.training_checkpoint(
@@ -174,7 +171,6 @@ def setup_nets(set):
     net = DDQN(
         num_actions=set.num_actions,
         state_size=set.state_size,
-        confidence_lambda=set.confidence_lambda,
         exploration_epsilon=set.exploration_epsilon,
     ).to(set.device)
     ddqn_optim = optim.AdamW(net.parameters(), lr=set.starting_LR, amsgrad=True)

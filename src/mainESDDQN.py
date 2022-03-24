@@ -3,12 +3,10 @@ from signal import SIGINT, signal
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.optim as optim
-from PIL import Image
 
 import wandb
-from DDQN.DDQN import DDQN
+from ESDDQN.ESDDQN import ESDDQN
 from discrete_env import Environment
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize
@@ -171,7 +169,7 @@ def setup_nets(set):
     )
 
     # set up networks and optimizers
-    net = DDQN(
+    net = ESDDQN(
         num_actions=set.num_actions,
         state_size=set.state_size,
         confidence_lambda=set.confidence_lambda,

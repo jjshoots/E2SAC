@@ -9,6 +9,14 @@ setup(
 )
 
 setup(
+    name="SAC",
+    version="1.0.0",
+    install_requires=[
+        "torch",
+    ],
+)
+
+setup(
     name="DDQN",
     version="1.0.0",
     install_requires=[
@@ -17,7 +25,7 @@ setup(
 )
 
 setup(
-    name="SAC",
+    name="ESDDQN",
     version="1.0.0",
     install_requires=[
         "torch",
