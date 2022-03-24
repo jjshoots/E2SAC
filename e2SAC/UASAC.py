@@ -132,14 +132,6 @@ class UASAC(nn.Module):
         else:
             self.log_alpha = nn.Parameter(torch.tensor(0.0, requires_grad=True))
 
-        # store some stuff
-        self.q_std = 1e-6
-
-    def update_q_std(self, q, tau=0.05):
-        q = torch.std(q).detach() + 1e-6
-        if not torch.isnan(q):
-            self.q_std = (1 - tau) * self.q_std + tau * q
-
     def update_q_target(self, tau=0.005):
         # polyak averaging update for target q network
         for target, source in zip(
