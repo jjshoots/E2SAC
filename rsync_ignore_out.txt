@@ -1,3 +1,4 @@
+/experiments
 /optim_weights
 /venv
 /wandb
@@ -5,5 +6,5 @@
 /resource
 /.git
 /.vim
-*/*egg-info
+*/*.egg-info
 */__pycache__

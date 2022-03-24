@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+import torch.nn.functional as func
 
 from utils.neural_blocks import Neural_blocks
 
@@ -46,7 +46,8 @@ class Actor(nn.Module):
 
     def forward(self, states):
         output = self.backbone(states)
-        output = self.net(output).reshape(-1, 2, self.num_actions).permute(1, 0, 2)
+        output = self.net(output).reshape(*output.shape[:-1], 2, self.num_actions)
+        output = torch.movedim(output, -2, 0)
 
         return output
 
@@ -78,10 +79,16 @@ class Critic(nn.Module):
 
     def forward(self, states, actions):
         states = self.backbone(states)
-        states = self.merge(states + self.action(actions))
 
-        value, uncertainty = torch.split(states, 1, dim=-1)
+        actions = self.action(actions)
 
-        uncertainty = torch.exp(-uncertainty)
+        if len(actions.shape) != len(states.shape):
+            states = states.unsqueeze(0)
+
+        output = self.merge(states + actions)
+
+        value, uncertainty = torch.split(output, 1, dim=-1)
+
+        uncertainty = func.softplus(uncertainty)
 
         return torch.stack((value, uncertainty), dim=0)

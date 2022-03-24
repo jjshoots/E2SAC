@@ -72,12 +72,21 @@ def arg_parser():
     )
 
     parser.add_argument(
-        "--name",
+        "--wandb_name",
         type=str,
         nargs="?",
         const=False,
         default="",
         help="Name of the run in wandb.",
+    )
+
+    parser.add_argument(
+        "--notes",
+        type=str,
+        nargs="?",
+        const=False,
+        default="",
+        help="Description of the run in wandb.",
     )
 
     parser.add_argument(
@@ -118,7 +127,6 @@ def parse_set():
         settings = yaml.load(f, Loader=yaml.FullLoader)
 
     # format settings a bit
-    settings["num_envs"] = 1 if args.display else settings["num_envs"]
     settings["device"] = get_device()
     settings["step_sched_num"] = (
         settings["repeats_per_buffer"]
@@ -153,11 +161,15 @@ def parse_set():
             project=settings["wandb_project"],
             entity="jjshoots",
             config=settings,
-            name=args.name + ", v=" + settings["net_version"]
-            if args.name != ""
+            name=args.wandb_name + ", v=" + settings["net_version"]
+            if args.wandb_name != ""
             else settings["net_version"],
+            notes=args.notes,
             id=args.id if args.id != "" else None,
         )
+
+        # also save the code if wandb
+        wandb.run.log_code(".")
 
         # set to be consistent with wandb config
         set = wandb.config

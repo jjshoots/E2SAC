@@ -62,11 +62,11 @@ class GaussianActor(nn.Module):
         mu_samples = normals.rsample()
         actions = torch.tanh(mu_samples)
 
-        # calculate entropies
+        # calculate log_probs
         log_probs = normals.log_prob(mu_samples) - torch.log(1 - actions.pow(2) + 1e-6)
-        entropies = log_probs.sum(dim=-1, keepdim=True)
+        log_probs = log_probs.sum(dim=-1, keepdim=True)
 
-        return actions, entropies
+        return actions, log_probs
 
     @staticmethod
     def infer(mu, sigma):
@@ -137,32 +137,35 @@ class SAC(nn.Module):
         dones = 1.0 - dones
 
         # current Q, output is num_networks x B x 1
-        q_output = self.critic(states, actions)
+        current_q = self.critic(states, actions)
 
         # target Q
         with torch.no_grad():
             # sample the next actions based on the current policy
             output = self.actor(next_states)
-            next_actions, entropies = self.actor.sample(*output)
+            next_actions, log_probs = self.actor.sample(*output)
 
             # get the next q lists then...
-            next_q_output = self.critic_target(next_states, next_actions)
+            next_q = self.critic_target(next_states, next_actions)
 
             # ...take the min at the cat dimension
-            next_q, _ = torch.min(next_q_output, dim=-1, keepdim=True)
+            next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
 
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
                 rewards
-                + (-self.log_alpha.exp().detach() * entropies + gamma * next_q) * dones
+                + (-self.log_alpha.exp().detach() * log_probs + gamma * next_q) * dones
             )
 
         # critic loss is mean squared TD errors
-        q_loss = ((q_output - target_q) ** 2).mean()
+        q_loss = ((current_q - target_q) ** 2).mean()
+
+        # critic loss is q error
+        critic_loss = q_loss
 
         log = dict()
 
-        return q_loss, log
+        return critic_loss, log
 
     def calc_actor_loss(self, states, dones):
         """
@@ -176,8 +179,8 @@ class SAC(nn.Module):
         actions, entropies = self.actor.sample(*output)
 
         # expectations of Q with clipped double Q
-        q_output = self.critic(states, actions)
-        q, _ = torch.min(q_output, dim=-1, keepdim=True)
+        q = self.critic(states, actions)
+        q, _ = torch.min(q, dim=-1, keepdim=True)
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         if self.use_entropy:
@@ -199,15 +202,15 @@ class SAC(nn.Module):
             return torch.zeros(1)
 
         output = self.actor(states)
-        _, entropies = self.actor.sample(*output)
+        _, log_probs = self.actor.sample(*output)
 
         # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.
-        entropy_loss = (
-            self.log_alpha * (self.target_entropy - entropies).detach()
+        entropy_loss = -(
+            self.log_alpha * (self.target_entropy + log_probs).detach()
         ).mean()
 
         log = dict()
         log["log_alpha"] = self.log_alpha.item()
-        log["mean_entropy"] = entropies.mean().detach()
+        log["mean_entropy"] = -log_probs.mean().detach()
 
         return entropy_loss, log
