@@ -3,9 +3,7 @@ from signal import SIGINT, signal
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.optim as optim
-from PIL import Image
 
 import wandb
 from e2SAC.UASAC import UASAC
@@ -21,8 +19,8 @@ def train(set):
     memory = ReplayBuffer(set.buffer_size)
 
     to_log = dict()
-    to_log["eval_perf"] = -100.0
-    to_log["max_eval_perf"] = -100.0
+    to_log["eval_perf"] = -np.inf
+    to_log["max_eval_perf"] = -np.inf
 
     for epoch in range(set.start_epoch, set.epochs):
         """EVAL RUN"""
