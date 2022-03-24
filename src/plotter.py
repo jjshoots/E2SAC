@@ -9,17 +9,14 @@ import wandb
 # normal imports
 import numpy as np
 import matplotlib.patches as patches
-import sys
-import pickle
-import pandas as pd
-import copy
-import functools
-import json
-import os
+from matplotlib import rcParams
+from matplotlib import rc
 
-import itertools as it
-import random
-import inspect
+# plotting styles
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_style("white")
 
 # See warnings only once
 import warnings
@@ -33,16 +30,6 @@ import logging
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-
-# plotting styles
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-sns.set_style("white")
-
-# Matplotlib params
-from matplotlib import rcParams
-from matplotlib import rc
 
 rcParams["legend.loc"] = "best"
 rcParams["pdf.fonttype"] = 42
