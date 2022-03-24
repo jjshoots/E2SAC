@@ -10,11 +10,13 @@ buffer_size: 20000000
 buffer_size_debug: 100
 batch_size: 256
 start_epoch: 0
+<<<<<<< Updated upstream
 epochs: 1000
+=======
+epochs: 500
+>>>>>>> Stashed changes
 repeats_per_buffer: 5 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
 repeats_per_buffer_scale: 0.0
-critic_update_multiplier: 1
-actor_update_multiplier: 1
 
 # exploration settings
 exploration_epochs: 0
@@ -25,18 +27,24 @@ scheduler_steps: 2
 scheduler_gamma: 0.5
 
 # algorithm specifics
+<<<<<<< Updated upstream
 supervision_lambda: 10.
 confidence_lambda: 5.
 use_entropy: true
 target_entropy: null
 n_var_samples: 32
+=======
+confidence_lambda: 5.0
+supervision_lambda: 5.0
+exploration_epsilon: 0.05
+>>>>>>> Stashed changes
 
 # eval settings
 eval_num_traj: 20
 eval_epoch_ratio: 20
 
 # helper params
-wandb_project: 'e2SAC_pybullet'
+wandb_project: 'ESDDQN'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''
