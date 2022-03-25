@@ -49,9 +49,9 @@ def train(set):
                 if memory.len < set.exploration_steps:
                     action = env.env.action_space.sample()
                 else:
-                    output = net.actor(gpuize(obs, set.device))
+                    output = net.actor(gpuize(obs, set.device).unsqueeze(0))
                     action, _ = net.actor.sample(*output)
-                    action = cpuize(action)
+                    action = cpuize(action).squeeze(0)
 
                 # get the next state and other stuff
                 next_obs, rew, dne, _ = env.step(action)

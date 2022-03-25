@@ -59,23 +59,17 @@ if __name__ == "__main__":
     # list of algorithms and their corresponding uris
     runs = {}
     runs["E2SAC"] = [
-        "jjshoots/e2SAC_carracing/2harp7lx",
     ]
     runs["SAC"] = [
         # ANT
-        "jjshoots/e2SAC_pybullet/13h1m9xi",
-        "jjshoots/e2SAC_pybullet/3b5j9b7m",
-        "jjshoots/e2SAC_pybullet/2peczyr9",
-        "jjshoots/e2SAC_pybullet/1c6y8gu6",
-        "jjshoots/e2SAC_pybullet/91w6nx7m",
-        "jjshoots/e2SAC_pybullet/19ohj3hi",
-        "jjshoots/e2SAC_pybullet/2nptl9ih",
-        "jjshoots/e2SAC_pybullet/3uptzvr4",
-        # HOPPER
-        "jjshoots/e2SAC_pybullet/28o1jyka",
-        "jjshoots/e2SAC_pybullet/208rjk0x",
-        "jjshoots/e2SAC_pybullet/2yno2ni6",
-        "jjshoots/e2SAC_pybullet/jrtr337s",
+        "jjshoots/e2SAC_pybullet/27cjzt50",
+        "jjshoots/e2SAC_pybullet/6vgj57fp",
+        "jjshoots/e2SAC_pybullet/1l2a1jz3",
+        "jjshoots/e2SAC_pybullet/110jrok2",
+        "jjshoots/e2SAC_pybullet/1xyiilpo",
+        "jjshoots/e2SAC_pybullet/2x5hkmbc",
+        "jjshoots/e2SAC_pybullet/13r7w035",
+        "jjshoots/e2SAC_pybullet/3pmbwojt",
     ]
 
     # list of algorithms we have

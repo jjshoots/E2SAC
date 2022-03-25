@@ -31,12 +31,18 @@ class Environment:
 
         # load suboptimal policy
         self.device = get_device()
-        self.suboptimal_actor = Suboptimal_Actor(
-            num_actions=self.num_actions, state_size=self.state_size
-        ).to(self.device)
-        self.suboptimal_actor.load_state_dict(
-            torch.load(f"./suboptimal_policies/{env_name}.pth")
-        )
+        try:
+            self.suboptimal_actor = Suboptimal_Actor(
+                num_actions=self.num_actions, state_size=self.state_size
+            ).to(self.device)
+            self.suboptimal_actor.load_state_dict(
+                torch.load(f"./suboptimal_policies/{env_name}.pth")
+            )
+        except:
+            print("--------------------------------------------------")
+            print(f"No subotpimal actor found for env {env_name}")
+            print("--------------------------------------------------")
+            self.suboptimal_actor = None
 
         self.reset()
 
@@ -88,9 +94,12 @@ class Environment:
         return self.done
 
     def get_label(self, obs):
-        action = self.suboptimal_actor(gpuize(obs, self.device))
-        action = cpuize(action)
-        return action
+        if self.suboptimal_actor is not None:
+            action = self.suboptimal_actor(gpuize(obs, self.device))
+            action = cpuize(action)
+            return action
+        else:
+            return self.do_nothing
 
     def evaluate(self, set, net=None):
         if net is not None:
