@@ -138,12 +138,6 @@ def parse_set():
 
     # format settings a bit
     settings["device"] = get_device()
-    settings["step_sched_num"] = (
-        settings["repeats_per_buffer"]
-        * settings["epochs"]
-        * settings["buffer_size"]
-        / settings["scheduler_steps"]
-    )
     settings["buffer_size"] = (
         settings["buffer_size_debug"] if args.debug else settings["buffer_size"]
     )
@@ -164,7 +158,9 @@ def parse_set():
     # when formatting env_name, assert that only either args or settings
     # file have a value, not both
     if settings["env_name"] == "" and args.env_name == "":
-        raise AssertionError("need to provide env_name in either settings.yaml or in args.")
+        raise AssertionError(
+            "need to provide env_name in either settings.yaml or in args."
+        )
     elif settings["env_name"] != "" and args.env_name == "":
         settings["env_name"] = settings["env_name"]
     elif settings["env_name"] == "" and args.env_name != "":

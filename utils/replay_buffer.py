@@ -15,6 +15,10 @@ class ReplayBuffer(Dataset):
     def __len__(self):
         return min(self.mem_size, self.counter)
 
+    @property
+    def len(self):
+        return self.__len__()
+
     def __getitem__(self, idx):
         data = []
         for item in self.memory:
@@ -58,7 +62,7 @@ class ReplayBuffer(Dataset):
             mem_size = 0
             for thing in self.memory:
                 mem_size += thing.nbytes
-            print(f'Replay Buffer Size: {mem_size} bytes.')
+            print(f"Replay Buffer Size: {mem_size} bytes.")
 
         # assert that the number of lists in memory is same as data to push
         assert len(data) == len(

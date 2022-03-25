@@ -15,23 +15,27 @@ from utils.replay_buffer import ReplayBuffer
 
 def train(set):
     env = setup_env(set)
-    net, net_helper, optim_set, sched_set, optim_helper = setup_nets(set)
+    net, net_helper, optim_set, optim_helper = setup_nets(set)
     memory = ReplayBuffer(set.buffer_size)
 
     to_log = dict()
+    to_log["epoch"] = 0
     to_log["eval_perf"] = -np.inf
     to_log["max_eval_perf"] = -np.inf
+    last_eval_step = 0
 
-    for epoch in range(set.start_epoch, set.epochs):
+    while memory.len <= set.total_steps:
+        to_log["epoch"] += 1
+
         """EVAL RUN"""
-        if epoch % set.eval_epoch_ratio == 0 and epoch != 0:
-            # for logging
+        if memory.len - last_eval_step > set.eval_steps_ratio:
+            last_eval_step = memory.len
             to_log["eval_perf"] = env.evaluate(set, net)
             to_log["max_eval_perf"] = max(
                 [to_log["max_eval_perf"], to_log["eval_perf"]]
             )
 
-        """ENVIRONMENT INTERACTION """
+        """ENVIRONMENT INTERACTION"""
         env.reset()
         env.train()
         net.eval()
@@ -42,8 +46,8 @@ def train(set):
                 # get the initial state and label
                 obs, _, _, lbl = env.get_state()
 
-                if epoch < set.exploration_epochs:
-                    action = np.random.uniform(-1.0, 1.0, 2)
+                if memory.len < set.exploration_steps:
+                    action = env.env.action_space.sample()
                 else:
                     output = net.actor(gpuize(obs, set.device).unsqueeze(0))
                     action, _ = net.actor.sample(*output)
@@ -58,18 +62,17 @@ def train(set):
             # for logging
             to_log["total_reward"] = env.cumulative_reward
 
-        """ TRAINING RUN """
+        """TRAINING RUN"""
         dataloader = torch.utils.data.DataLoader(
             memory, batch_size=set.batch_size, shuffle=True, drop_last=False
         )
 
-        for i in range(
-            int(set.repeats_per_buffer + set.repeats_per_buffer_scale * epoch)
+        for repeat_num in range(
+            int(set.repeats_per_buffer + set.repeats_per_buffer_scale * to_log["epoch"])
         ):
-            for j, stuff in enumerate(dataloader):
+            for batch_num, stuff in enumerate(dataloader):
                 net.train()
 
-                batch = int(set.buffer_size / set.batch_size) * i + j
                 states = gpuize(stuff[0], set.device)
                 actions = gpuize(stuff[1], set.device)
                 rewards = gpuize(stuff[2], set.device)
@@ -86,7 +89,6 @@ def train(set):
                     to_log = {**to_log, **log}
                     q_loss.backward()
                     optim_set["critic"].step()
-                    sched_set["critic"].step()
                     net.update_q_target()
 
                 # train actor
@@ -96,7 +98,6 @@ def train(set):
                     to_log = {**to_log, **log}
                     rnf_loss.backward()
                     optim_set["actor"].step()
-                    sched_set["actor"].step()
 
                     # train entropy regularizer
                     if net.use_entropy:
@@ -105,14 +106,13 @@ def train(set):
                         to_log = {**to_log, **log}
                         ent_loss.backward()
                         optim_set["alpha"].step()
-                        sched_set["alpha"].step()
 
-                """ WEIGHTS SAVING """
+                """WEIGHTS SAVING"""
                 net_weights = net_helper.training_checkpoint(
-                    loss=-to_log["eval_perf"], batch=batch, epoch=epoch
+                    loss=-to_log["eval_perf"], batch=0, epoch=to_log["epoch"]
                 )
                 net_optim_weights = optim_helper.training_checkpoint(
-                    loss=-to_log["eval_perf"], batch=batch, epoch=epoch
+                    loss=-to_log["eval_perf"], batch=0, epoch=to_log["epoch"]
                 )
                 if net_weights != -1:
                     torch.save(net.state_dict(), net_weights)
@@ -120,26 +120,18 @@ def train(set):
                     optim_dict = dict()
                     for key in optim_set:
                         optim_dict[key] = optim_set[key].state_dict()
-                    sched_dict = dict()
-                    for key in optim_set:
-                        sched_dict[key] = sched_set[key].state_dict()
                     torch.save(
                         {
                             "optim": optim_dict,
-                            "sched": sched_dict,
                             "lowest_running_loss": optim_helper.lowest_running_loss,
-                            "epoch": epoch,
+                            "epoch": to_log["epoch"],
                         },
                         net_optim_weights,
                     )
 
-                """ WANDB """
-                if set.wandb and i == 0 and j == 0:
-                    log = {
-                        "epoch": epoch,
-                        "num_transitions": memory.__len__(),
-                    }
-                    to_log = {**to_log, **log}
+                """WANDB"""
+                if set.wandb and repeat_num == 0 and batch_num == 0:
+                    to_log["num_transitions"] = memory.len
                     wandb.log(to_log)
 
 
@@ -148,7 +140,7 @@ def display(set):
 
     net = None
     if True:
-        net, _, _, _, _ = setup_nets(set)
+        net, _, _, _ = setup_nets(set)
 
     env.display(set, net)
 
@@ -158,7 +150,7 @@ def evaluate(set):
 
     net = None
     if False:
-        net, _, _, _, _ = setup_nets(set)
+        net, _, _, _ = setup_nets(set)
 
     print(env.evaluate(set, net))
 
@@ -198,30 +190,18 @@ def setup_nets(set):
         supervision_lambda=set.supervision_lambda,
         n_var_samples=set.n_var_samples,
     ).to(set.device)
-    actor_optim = optim.AdamW(net.actor.parameters(), lr=set.starting_LR, amsgrad=True)
-    actor_sched = optim.lr_scheduler.StepLR(
-        actor_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma
+    actor_optim = optim.AdamW(
+        net.actor.parameters(), lr=set.learning_rate, amsgrad=True
     )
     critic_optim = optim.AdamW(
-        net.critic.parameters(), lr=set.starting_LR, amsgrad=True
+        net.critic.parameters(), lr=set.learning_rate, amsgrad=True
     )
-    critic_sched = optim.lr_scheduler.StepLR(
-        critic_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma
-    )
-    alpha_optim = optim.AdamW([net.log_alpha], lr=set.starting_LR, amsgrad=True)
-    alpha_sched = optim.lr_scheduler.StepLR(
-        alpha_optim, step_size=set.step_sched_num, gamma=set.scheduler_gamma
-    )
+    alpha_optim = optim.AdamW([net.log_alpha], lr=set.learning_rate, amsgrad=True)
 
     optim_set = dict()
     optim_set["actor"] = actor_optim
     optim_set["critic"] = critic_optim
     optim_set["alpha"] = alpha_optim
-
-    sched_set = dict()
-    sched_set["actor"] = actor_sched
-    sched_set["critic"] = critic_sched
-    sched_set["alpha"] = alpha_sched
 
     # get latest weight files
     net_weights = net_helper.get_weight_file()
@@ -235,17 +215,12 @@ def setup_nets(set):
 
         for opt_key in optim_set:
             optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
-        for sch_key in sched_set:
-            sched_set[sch_key].load_state_dict(checkpoint["optim"][sch_key])
 
         net_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
         optim_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
-        # set.start_epoch = checkpoint['epoch']
-        print(
-            f"Lowest Running Loss for Net: {net_helper.lowest_running_loss} @ epoch {set.start_epoch}"
-        )
+        print(f"Lowest Running Loss for Net: {net_helper.lowest_running_loss}")
 
-    return net, net_helper, optim_set, sched_set, optim_helper
+    return net, net_helper, optim_set, optim_helper
 
 
 if __name__ == "__main__":

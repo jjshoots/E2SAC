@@ -17,7 +17,9 @@ class Q_Ensemble(nn.Module):
     def __init__(self, num_actions, state_size, num_networks=2):
         super().__init__()
 
-        networks = [UASACNet.Critic(num_actions, state_size) for _ in range(num_networks)]
+        networks = [
+            UASACNet.Critic(num_actions, state_size) for _ in range(num_networks)
+        ]
         self.networks = nn.ModuleList(networks)
 
     def forward(self, states, actions):
