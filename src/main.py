@@ -29,7 +29,7 @@ def train(set):
 
         """EVAL RUN"""
         if memory.len - last_eval_step > set.eval_steps_ratio:
-            last_eval_step = memory.len
+            last_eval_step += set.eval_steps_ratio
             to_log["eval_perf"] = env.evaluate(set, net)
             to_log["max_eval_perf"] = max(
                 [to_log["max_eval_perf"], to_log["eval_perf"]]
