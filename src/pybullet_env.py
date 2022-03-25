@@ -1,10 +1,12 @@
 import time
 
+import torch
 import gym
 import numpy as np
 import pybulletgym
 
-from utils.helpers import cpuize, gpuize
+from utils.helpers import cpuize, gpuize, get_device
+from suboptimal_policy import Suboptimal_Actor
 
 
 class Environment:
@@ -26,6 +28,15 @@ class Environment:
         self.cumulative_reward = 0
 
         self.eval_run = False
+
+        # load suboptimal policy
+        self.device = get_device()
+        self.suboptimal_actor = Suboptimal_Actor(
+            num_actions=self.num_actions, state_size=self.state_size
+        ).to(self.device)
+        self.suboptimal_actor.load_state_dict(
+            torch.load(f"./suboptimal_policies/{env_name}.pth")
+        )
 
         self.reset()
 
@@ -77,7 +88,9 @@ class Environment:
         return self.done
 
     def get_label(self, obs):
-        return self.do_nothing
+        action = self.suboptimal_actor(gpuize(obs, self.device))
+        action = cpuize(action)
+        return action
 
     def evaluate(self, set, net=None):
         if net is not None:
@@ -138,9 +151,6 @@ class Environment:
                         gpuize(obs, set.device).unsqueeze(0),
                         net.actor.infer(*output),
                     ).squeeze()
-                    # .squeeze(0)[-1, ...]
-                    # .std()
-                    # .item()
                 )
             else:
                 action = lbl

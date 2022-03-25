@@ -49,9 +49,9 @@ def train(set):
                 if memory.len < set.exploration_steps:
                     action = env.env.action_space.sample()
                 else:
-                    output = net.actor(gpuize(obs, set.device).unsqueeze(0))
+                    output = net.actor(gpuize(obs, set.device))
                     action, _ = net.actor.sample(*output)
-                    action = cpuize(action)[0]
+                    action = cpuize(action)
 
                 # get the next state and other stuff
                 next_obs, rew, dne, _ = env.step(action)
@@ -138,7 +138,7 @@ def display(set):
     env = setup_env(set)
 
     net = None
-    if True:
+    if False:
         net, _, _, _ = setup_nets(set)
 
     env.display(set, net)
@@ -186,6 +186,7 @@ def setup_nets(set):
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
     ).to(set.device)
+
     actor_optim = optim.AdamW(
         net.actor.parameters(), lr=set.learning_rate, amsgrad=True
     )
@@ -215,6 +216,9 @@ def setup_nets(set):
         net_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
         optim_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
         print(f"Lowest Running Loss for Net: {net_helper.lowest_running_loss}")
+
+    # torch.save(net.actor.net.state_dict(), f"./{set.env_name}.pth")
+    # exit()
 
     return net, net_helper, optim_set, optim_helper
 
