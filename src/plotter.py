@@ -63,19 +63,7 @@ if __name__ == "__main__":
     ]
     runs["SAC"] = [
         # ANT
-        "jjshoots/e2SAC_pybullet/13h1m9xi",
-        "jjshoots/e2SAC_pybullet/3b5j9b7m",
-        "jjshoots/e2SAC_pybullet/2peczyr9",
-        "jjshoots/e2SAC_pybullet/1c6y8gu6",
-        "jjshoots/e2SAC_pybullet/91w6nx7m",
-        "jjshoots/e2SAC_pybullet/19ohj3hi",
-        "jjshoots/e2SAC_pybullet/2nptl9ih",
-        "jjshoots/e2SAC_pybullet/3uptzvr4",
         # HOPPER
-        "jjshoots/e2SAC_pybullet/28o1jyka",
-        "jjshoots/e2SAC_pybullet/208rjk0x",
-        "jjshoots/e2SAC_pybullet/2yno2ni6",
-        "jjshoots/e2SAC_pybullet/jrtr337s",
     ]
 
     # list of algorithms we have

@@ -21,7 +21,7 @@ n_var_samples: 32
 
 # eval settings
 eval_num_episodes: 20
-eval_steps_ratio: 20
+eval_steps_ratio: 5000
 
 # helper params
 wandb_project: 'e2SAC_carracing'

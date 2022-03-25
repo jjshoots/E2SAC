@@ -145,7 +145,10 @@ def parse_set():
         raise AssertionError(
             "net_version cannot be set in both settings.yaml and in args."
         )
-    args.net_version = settings["net_version"]
+    if not args.debug:
+        args.net_version = settings["net_version"]
+    else:
+        args.net_version = "debug"
 
     # merge args and settings
     settings = dict({**settings, **vars(args)})

@@ -149,7 +149,7 @@ class Environment:
 
         eval_perf = []
 
-        while len(eval_perf) < set.eval_num_traj:
+        while len(eval_perf) < set.eval_num_episodes:
             # get the initial state and action
             obs, _, _, lbl = self.get_state()
 
