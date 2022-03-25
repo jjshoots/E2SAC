@@ -5,8 +5,9 @@ import time
 import warnings
 
 import numpy as np
-import wandb
 import yaml
+
+import wandb
 from utils.helpers import get_device
 
 
@@ -129,9 +130,6 @@ def parse_set():
 
     # format settings a bit
     settings["device"] = get_device()
-    settings["step_sched_num"] = (
-        settings["repeats_per_buffer"] / settings["scheduler_steps"]
-    )
     settings["buffer_size"] = (
         settings["buffer_size_debug"] if args.debug else settings["buffer_size"]
     )
