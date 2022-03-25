@@ -3,8 +3,7 @@ buffer_size: 150000
 buffer_size_debug: 100
 batch_size: 150
 total_steps: 150000
-repeats_per_buffer: 5 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
-repeats_per_buffer_scale: -0.005
+repeats_per_buffer: 3
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 learning_rate: 0.0004

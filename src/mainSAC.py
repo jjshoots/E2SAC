@@ -83,9 +83,7 @@ def train(set):
             memory, batch_size=set.batch_size, shuffle=True, drop_last=False
         )
 
-        for repeat_num in range(
-            int(set.repeats_per_buffer + set.repeats_per_buffer_scale * to_log["epoch"])
-        ):
+        for repeat_num in range(set.repeats_per_buffer):
             for batch_num, stuff in enumerate(dataloader):
                 net.train()
 
