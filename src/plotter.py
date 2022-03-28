@@ -83,7 +83,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/3dfhch3p",
         "jjshoots/e2SAC_pybullet/3ourr309",
         "jjshoots/e2SAC_pybullet/29gbbi56",
-        # "MISSING ONE",
+        "jjshoots/e2SAC_pybullet/2x0lcpuj",
     ]
     runs["SAC_HALF_CHEETAH"] = [
         "jjshoots/e2SAC_pybullet/3t3pater",
@@ -92,7 +92,8 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/3jjhmgb3",
         "jjshoots/e2SAC_pybullet/3sw13nvk",
         "jjshoots/e2SAC_pybullet/3671tc3j",
-        # "MISSING TWO",
+        "jjshoots/e2SAC_pybullet/3k7wa339",
+        "jjshoots/e2SAC_pybullet/1gq9vj1w",
     ]
 
     # list of algorithms we have
