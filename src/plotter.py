@@ -38,15 +38,17 @@ rcParams["ps.fonttype"] = 42
 rc("text", usetex=False)
 
 
-def get_log(run_uri, keys):
+def get_wandb_log(run_uri, keys):
     assert isinstance(keys, list), "keys must be a list."
-    api = wandb.Api()
+    api = wandb.Api(timeout=30)
     run = api.run(run_uri)
     history = run.scan_history(keys=keys)
 
     data = {}
     for key in keys:
         array = np.array([row[key] for row in history])
+        array = array.astype(np.float64)
+        array = np.nan_to_num(array, nan=0.0, posinf=0.0, neginf=0.0)
         data[key] = array
 
     return data
@@ -54,14 +56,16 @@ def get_log(run_uri, keys):
 
 if __name__ == "__main__":
     # parameters
-    num_episodes = 501
+    num_steps = 5.0e5
+    num_intervals = 21
+
+    # x_axis values to plot against
+    x_axis = np.linspace(0, num_steps, num_intervals)
 
     # list of algorithms and their corresponding uris
     runs = {}
-    runs["E2SAC"] = [
-    ]
-    runs["SAC"] = [
-        # ANT
+    # runs["E2SAC"] = []
+    runs["SAC_ANT"] = [
         "jjshoots/e2SAC_pybullet/27cjzt50",
         "jjshoots/e2SAC_pybullet/6vgj57fp",
         "jjshoots/e2SAC_pybullet/1l2a1jz3",
@@ -70,6 +74,25 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/2x5hkmbc",
         "jjshoots/e2SAC_pybullet/13r7w035",
         "jjshoots/e2SAC_pybullet/3pmbwojt",
+    ]
+    runs["SAC_HOPPER"] = [
+        "jjshoots/e2SAC_pybullet/o4vokgow",
+        "jjshoots/e2SAC_pybullet/i1sfyc0a",
+        "jjshoots/e2SAC_pybullet/2wvjd3l2",
+        "jjshoots/e2SAC_pybullet/2g5l9qsb",
+        "jjshoots/e2SAC_pybullet/3dfhch3p",
+        "jjshoots/e2SAC_pybullet/3ourr309",
+        "jjshoots/e2SAC_pybullet/29gbbi56",
+        # "MISSING ONE",
+    ]
+    runs["SAC_HALF_CHEETAH"] = [
+        "jjshoots/e2SAC_pybullet/3t3pater",
+        "jjshoots/e2SAC_pybullet/1im0kz8o",
+        "jjshoots/e2SAC_pybullet/3p6rjq7d",
+        "jjshoots/e2SAC_pybullet/3jjhmgb3",
+        "jjshoots/e2SAC_pybullet/3sw13nvk",
+        "jjshoots/e2SAC_pybullet/3671tc3j",
+        # "MISSING TWO",
     ]
 
     # list of algorithms we have
@@ -81,7 +104,8 @@ if __name__ == "__main__":
     for algorithm in runs:
         score = []
         for run_uri in runs[algorithm]:
-            score.append(get_log(run_uri, ["eval_perf"])["eval_perf"][:num_episodes])
+            log = get_wandb_log(run_uri, ["num_transitions", "eval_perf"])
+            score.append(np.interp(x_axis, log["num_transitions"], log["eval_perf"]))
 
         # stack along num_runs axis
         score = np.stack(score, axis=0)
@@ -91,20 +115,16 @@ if __name__ == "__main__":
         # add to overall scores
         scores[algorithm] = score
 
-    episode = np.arange(0, num_episodes, 20)
-    ale_frames_scores_dict = {
-        algorithm: score[:, :, episode] for algorithm, score in scores.items()
-    }
+    # get interquartile mean
     iqm = lambda scores: np.array(
         [metrics.aggregate_iqm(scores[..., frame]) for frame in range(scores.shape[-1])]
     )
-    iqm_scores, iqm_cis = rly.get_interval_estimates(
-        ale_frames_scores_dict, iqm, reps=50000
-    )
+    # compute confidence intervals
+    iqm_scores, iqm_cis = rly.get_interval_estimates(scores, iqm, reps=50000)
 
     # plot sample efficiency curve
     plot_utils.plot_sample_efficiency_curve(
-        episode + 1,
+        x_axis,
         iqm_scores,
         iqm_cis,
         algorithms=algorithms,
