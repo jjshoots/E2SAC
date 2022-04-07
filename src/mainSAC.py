@@ -31,8 +31,8 @@ def train(set):
         to_log["epoch"] += 1
 
         """EVAL RUN"""
-        if memory.len - last_eval_step > set.eval_steps_ratio:
-            last_eval_step = memory.len
+        if memory.count - last_eval_step > set.eval_steps_ratio:
+            last_eval_step += set.eval_steps_ratio
             to_log["eval_perf"] = env.evaluate(set, net)
             to_log["max_eval_perf"] = max(
                 [to_log["max_eval_perf"], to_log["eval_perf"]]
@@ -50,12 +50,12 @@ def train(set):
                 # get the initial state and label
                 obs, _, _, _ = env.get_state()
 
-                if memory.len < set.exploration_steps:
+                if memory.count < set.exploration_steps:
                     action = env.env.action_space.sample()
                 else:
                     output = net.actor(gpuize(obs, set.device).unsqueeze(0))
                     action, _ = net.actor.sample(*output)
-                    action = cpuize(action)[0]
+                    action = cpuize(action).squeeze(0)
 
                 # get the next state and other stuff
                 next_obs, rew, dne, _ = env.step(action)
@@ -144,8 +144,9 @@ def train(set):
 
                 """WANDB"""
                 if set.wandb and repeat_num == 0 and batch_num == 0:
-                    to_log["num_transitions"] = memory.len
+                    to_log["num_transitions"] = memory.count
                     to_log["video"] = wandb.Video("./resource/video_log.gif")
+                    to_log["buffer_size"] = memory.__len__()
                     wandb.log(to_log)
 
 

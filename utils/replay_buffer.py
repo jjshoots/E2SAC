@@ -16,7 +16,7 @@ class ReplayBuffer(Dataset):
         return min(self.mem_size, self.counter)
 
     @property
-    def len(self):
+    def count(self):
         return self.__len__()
 
     def __getitem__(self, idx):
