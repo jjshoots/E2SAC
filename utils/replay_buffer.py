@@ -10,14 +10,10 @@ class ReplayBuffer(Dataset):
     def __init__(self, mem_size):
         self.memory = []
         self.mem_size = int(mem_size)
-        self.counter = 0
+        self.count = 0
 
     def __len__(self):
-        return min(self.mem_size, self.counter)
-
-    @property
-    def count(self):
-        return self.__len__()
+        return min(self.mem_size, self.count)
 
     def __getitem__(self, idx):
         data = []
@@ -47,7 +43,7 @@ class ReplayBuffer(Dataset):
         data = list(map(_ensure_dims, data))
 
         # instantiate the memory if it does not exist
-        if self.counter == 0:
+        if self.count == 0:
             self.memory = []
             for thing in data:
                 if not bulk:
@@ -70,7 +66,7 @@ class ReplayBuffer(Dataset):
         ), "data length not similar to memory buffer length"
 
         # put stuff in memory
-        i = self.counter % self.mem_size
+        i = self.count % self.mem_size
         for memory, thing in zip(self.memory, data):
             if not bulk:
                 memory[i] = thing
@@ -86,8 +82,8 @@ class ReplayBuffer(Dataset):
                 if back < 0:
                     memory[: abs(back)] = thing[back:]
 
-        self.counter += bulk_size
+        self.count += bulk_size
 
     @property
     def is_full(self):
-        return self.counter >= self.mem_size
+        return self.count >= self.mem_size
