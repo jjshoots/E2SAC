@@ -56,7 +56,7 @@ def get_wandb_log(run_uri, keys):
 
 if __name__ == "__main__":
     # parameters
-    num_steps = 5.0e5
+    num_steps = 9.0e5
     num_intervals = 21
 
     # x_axis values to plot against
@@ -75,26 +75,76 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/13r7w035",
         "jjshoots/e2SAC_pybullet/3pmbwojt",
     ]
-    runs["SAC_HOPPER"] = [
-        "jjshoots/e2SAC_pybullet/o4vokgow",
-        "jjshoots/e2SAC_pybullet/i1sfyc0a",
-        "jjshoots/e2SAC_pybullet/2wvjd3l2",
-        "jjshoots/e2SAC_pybullet/2g5l9qsb",
-        "jjshoots/e2SAC_pybullet/3dfhch3p",
-        "jjshoots/e2SAC_pybullet/3ourr309",
-        "jjshoots/e2SAC_pybullet/29gbbi56",
-        "jjshoots/e2SAC_pybullet/2x0lcpuj",
+    # runs["SAC_HOPPER"] = [
+    #     "jjshoots/e2SAC_pybullet/o4vokgow",
+    #     "jjshoots/e2SAC_pybullet/i1sfyc0a",
+    #     "jjshoots/e2SAC_pybullet/2wvjd3l2",
+    #     "jjshoots/e2SAC_pybullet/2g5l9qsb",
+    #     "jjshoots/e2SAC_pybullet/3dfhch3p",
+    #     "jjshoots/e2SAC_pybullet/3ourr309",
+    #     "jjshoots/e2SAC_pybullet/29gbbi56",
+    #     "jjshoots/e2SAC_pybullet/2x0lcpuj",
+    # ]
+    # runs["SAC_HALF_CHEETAH"] = [
+    #     "jjshoots/e2SAC_pybullet/3t3pater",
+    #     "jjshoots/e2SAC_pybullet/1im0kz8o",
+    #     "jjshoots/e2SAC_pybullet/3p6rjq7d",
+    #     "jjshoots/e2SAC_pybullet/3jjhmgb3",
+    #     "jjshoots/e2SAC_pybullet/3sw13nvk",
+    #     "jjshoots/e2SAC_pybullet/3671tc3j",
+    #     "jjshoots/e2SAC_pybullet/3k7wa339",
+    #     "jjshoots/e2SAC_pybullet/1gq9vj1w",
+    # ]
+    # runs["SAC_WALKER_2D"] = [
+    #     "jjshoots/e2SAC_pybullet/2mz2a10g",
+    #     "jjshoots/e2SAC_pybullet/hsl79yjd",
+    #     "jjshoots/e2SAC_pybullet/3rwkyxk5",
+    #     "jjshoots/e2SAC_pybullet/3pbhkx3e",
+    #     "jjshoots/e2SAC_pybullet/3vqvthdp",
+    #     "jjshoots/e2SAC_pybullet/24mthlrl",
+    #     "jjshoots/e2SAC_pybullet/33gw34d7",
+    #     "jjshoots/e2SAC_pybullet/34p7mfyc",
+    # ]
+    runs["E2SAC_ANT"] = [
+        "jjshoots/e2SAC_pybullet/26iy23z8",
+        "jjshoots/e2SAC_pybullet/z30or5e0",
+        "jjshoots/e2SAC_pybullet/2r6j4ti6",
+        "jjshoots/e2SAC_pybullet/1tahjde3",
+        "jjshoots/e2SAC_pybullet/8gef3h2b",
+        "jjshoots/e2SAC_pybullet/2ie3jxhp",
+        "jjshoots/e2SAC_pybullet/1936sb55",
+        "jjshoots/e2SAC_pybullet/3vq6jk5u",
     ]
-    runs["SAC_HALF_CHEETAH"] = [
-        "jjshoots/e2SAC_pybullet/3t3pater",
-        "jjshoots/e2SAC_pybullet/1im0kz8o",
-        "jjshoots/e2SAC_pybullet/3p6rjq7d",
-        "jjshoots/e2SAC_pybullet/3jjhmgb3",
-        "jjshoots/e2SAC_pybullet/3sw13nvk",
-        "jjshoots/e2SAC_pybullet/3671tc3j",
-        "jjshoots/e2SAC_pybullet/3k7wa339",
-        "jjshoots/e2SAC_pybullet/1gq9vj1w",
+    runs["E2SAC_HOPPER"] = [
+        "jjshoots/e2SAC_pybullet/3v68x43e",
+        "jjshoots/e2SAC_pybullet/3dcmg6sb",
+        "jjshoots/e2SAC_pybullet/18c1nnmi",
+        "jjshoots/e2SAC_pybullet/3q62xhiu",
+        "jjshoots/e2SAC_pybullet/3tiax2q9",
+        "jjshoots/e2SAC_pybullet/1g6h6k8p",
+        "jjshoots/e2SAC_pybullet/2ihw442t",
+        "jjshoots/e2SAC_pybullet/brftgjqy",
     ]
+    runs["E2SAC_HALF_CHEETAH"] = [
+        "jjshoots/e2SAC_pybullet/3s7i0gtm",
+        "jjshoots/e2SAC_pybullet/119e98d6",
+        "jjshoots/e2SAC_pybullet/3ncp4r5o",
+        "jjshoots/e2SAC_pybullet/2w5964ry",
+        "jjshoots/e2SAC_pybullet/2fns49hc",
+        "jjshoots/e2SAC_pybullet/1l1lbdzy",
+        "jjshoots/e2SAC_pybullet/27dnblfc",
+        "jjshoots/e2SAC_pybullet/a6i1t5al",
+    ]
+    # runs["E2SAC_WALKER_2D"] = [
+    #     "jjshoots/e2SAC_pybullet/qy3fj41l",
+    #     "jjshoots/e2SAC_pybullet/2r2ocxx3",
+    #     "jjshoots/e2SAC_pybullet/3k7ipmip",
+    #     "jjshoots/e2SAC_pybullet/8vfdgp62",
+    #     "jjshoots/e2SAC_pybullet/3rq3f05i",
+    #     "jjshoots/e2SAC_pybullet/g5dtjuev",
+    #     "jjshoots/e2SAC_pybullet/32g555xp",
+    #     "jjshoots/e2SAC_pybullet/2fioechx",
+    # ]
 
     # list of algorithms we have
     algorithms = [key for key in runs]

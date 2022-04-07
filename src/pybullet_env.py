@@ -96,7 +96,7 @@ class Environment:
     def get_label(self, obs):
         if self.suboptimal_actor is not None:
             action = self.suboptimal_actor(gpuize(obs, self.device))
-            action = cpuize(action)
+            action = cpuize(action)[0]
             return action
         else:
             return self.do_nothing
