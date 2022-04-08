@@ -38,15 +38,17 @@ rcParams["ps.fonttype"] = 42
 rc("text", usetex=False)
 
 
-def get_log(run_uri, keys):
+def get_wandb_log(run_uri, keys):
     assert isinstance(keys, list), "keys must be a list."
-    api = wandb.Api()
+    api = wandb.Api(timeout=30)
     run = api.run(run_uri)
     history = run.scan_history(keys=keys)
 
     data = {}
     for key in keys:
         array = np.array([row[key] for row in history])
+        array = array.astype(np.float64)
+        array = np.nan_to_num(array, nan=0.0, posinf=0.0, neginf=0.0)
         data[key] = array
 
     return data
@@ -54,16 +56,23 @@ def get_log(run_uri, keys):
 
 if __name__ == "__main__":
     # parameters
-    num_episodes = 501
+    num_steps = 5e4
+    num_intervals = 21
+
+    # x_axis values to plot against
+    x_axis = np.linspace(0, num_steps, num_intervals)
 
     # list of algorithms and their corresponding uris
     runs = {}
-    runs["E2SAC"] = [
-        "jjshoots/e2SAC_carracing/2harp7lx",
+    runs["SAC_CARRACING"] = [
+        "jjshoots/e2SAC_carracing/2lhvnwo4",
+        "jjshoots/e2SAC_carracing/30dbuwch",
+        "jjshoots/e2SAC_carracing/gqdxe7ao",
     ]
-    runs["SAC"] = [
-        # ANT
-        # HOPPER
+    runs["E2SAC_CARRACING"] = [
+        "jjshoots/e2SAC_carracing/3g8c9me4",
+        "jjshoots/e2SAC_carracing/1anxcix3",
+        "jjshoots/e2SAC_carracing/3pthiaff",
     ]
 
     # list of algorithms we have
@@ -75,7 +84,8 @@ if __name__ == "__main__":
     for algorithm in runs:
         score = []
         for run_uri in runs[algorithm]:
-            score.append(get_log(run_uri, ["eval_perf"])["eval_perf"][:num_episodes])
+            log = get_wandb_log(run_uri, ["num_transitions", "eval_perf"])
+            score.append(np.interp(x_axis, log["num_transitions"], log["eval_perf"]))
 
         # stack along num_runs axis
         score = np.stack(score, axis=0)
@@ -85,20 +95,16 @@ if __name__ == "__main__":
         # add to overall scores
         scores[algorithm] = score
 
-    episode = np.arange(0, num_episodes, 20)
-    ale_frames_scores_dict = {
-        algorithm: score[:, :, episode] for algorithm, score in scores.items()
-    }
+    # get interquartile mean
     iqm = lambda scores: np.array(
         [metrics.aggregate_iqm(scores[..., frame]) for frame in range(scores.shape[-1])]
     )
-    iqm_scores, iqm_cis = rly.get_interval_estimates(
-        ale_frames_scores_dict, iqm, reps=50000
-    )
+    # compute confidence intervals
+    iqm_scores, iqm_cis = rly.get_interval_estimates(scores, iqm, reps=50000)
 
     # plot sample efficiency curve
     plot_utils.plot_sample_efficiency_curve(
-        episode + 1,
+        x_axis,
         iqm_scores,
         iqm_cis,
         algorithms=algorithms,
