@@ -26,7 +26,7 @@ def train(set):
     to_log["max_eval_perf"] = -np.inf
     last_eval_step = 0
 
-    while memory.count <= set.total_steps:
+    while memory.count <= set.total_steps + set.eval_steps_ratio:
         to_log["epoch"] += 1
 
         """EVAL RUN"""
