@@ -68,11 +68,16 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_carracing/2lhvnwo4",
         "jjshoots/e2SAC_carracing/30dbuwch",
         "jjshoots/e2SAC_carracing/gqdxe7ao",
+        "jjshoots/e2SAC_carracing/muc8orwr",
+        "jjshoots/e2SAC_carracing/3cnk9by9",
     ]
     runs["E2SAC_CARRACING"] = [
         "jjshoots/e2SAC_carracing/3g8c9me4",
         "jjshoots/e2SAC_carracing/1anxcix3",
         "jjshoots/e2SAC_carracing/3pthiaff",
+        "jjshoots/e2SAC_carracing/1nbf7nbm",
+        "jjshoots/e2SAC_carracing/2benjjmc",
+        "jjshoots/e2SAC_carracing/3g2s2nc2",
     ]
 
     # list of algorithms we have
