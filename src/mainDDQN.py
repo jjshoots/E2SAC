@@ -77,9 +77,7 @@ def train(set):
 
                 # train
                 net.zero_grad()
-                loss, log = net.calc_loss(
-                    states, actions, rewards, next_states, dones
-                )
+                loss, log = net.calc_loss(states, actions, rewards, next_states, dones)
                 to_log = {**to_log, **log}
                 loss.backward()
                 optim_set["ddqn"].step()

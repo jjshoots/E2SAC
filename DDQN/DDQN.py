@@ -57,9 +57,7 @@ class DDQN(nn.Module):
         for target, source in zip(self.q_target.parameters(), self.q.parameters()):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_loss(
-        self, states, actions, rewards, next_states, dones, gamma=0.99
-    ):
+    def calc_loss(self, states, actions, rewards, next_states, dones, gamma=0.99):
         """
         states is of shape B x input_shape
         actions is of shape B x num_actions
