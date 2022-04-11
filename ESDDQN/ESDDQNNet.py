@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as func
 
 from utils.neural_blocks import Neural_blocks
 
@@ -27,7 +28,7 @@ class Q_Network(nn.Module):
 
         value, uncertainty = torch.split(output, self.num_actions, dim=-1)
 
-        uncertainty = torch.exp(-uncertainty)
+        uncertainty = func.softplus(uncertainty)
 
         return torch.stack((value, uncertainty), dim=0)
 

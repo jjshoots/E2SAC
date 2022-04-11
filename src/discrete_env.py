@@ -55,6 +55,9 @@ class Environment:
             dones of shape [1]
             labels of shape [num_actions]
         """
+        # remove array from action
+        action = np.squeeze(action)
+
         # step through the env
         self.state, reward, self.done, _ = self.env.step(action)
 
