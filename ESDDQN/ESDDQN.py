@@ -16,16 +16,12 @@ class ESDDQN(nn.Module):
         self,
         num_actions,
         state_size,
-        confidence_lambda=10.0,
-        supervision_lambda=10.0,
         exploration_epsilon=0.05,
     ):
         super().__init__()
 
         self.num_actions = num_actions
         self.state_size = state_size
-        self.confidence_lambda = confidence_lambda
-        self.supervision_lambda = supervision_lambda
         self.exploration_epsilon = exploration_epsilon
         self.num_networks = 1
 
@@ -47,7 +43,7 @@ class ESDDQN(nn.Module):
 
     def sample(self, q, uncertainty):
         if np.random.random_sample() < self.exploration_epsilon:
-            return torch.randint(high=self.num_actions, size=q.shape[:-2]).squeeze()
+            return torch.randint(high=self.num_actions, size=q.shape[:-2]).squeeze(-1)
         else:
             return self.infer(q, uncertainty)
 
@@ -63,9 +59,7 @@ class ESDDQN(nn.Module):
         for target, source in zip(self.q_target.parameters(), self.q.parameters()):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_loss(
-        self, states, actions, rewards, next_states, dones, labels, gamma=0.99
-    ):
+    def calc_loss(self, states, actions, rewards, next_states, dones, gamma=0.99):
         """
         states is of shape B x input_shape
         actions is of shape B x num_actions

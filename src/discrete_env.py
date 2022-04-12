@@ -28,6 +28,11 @@ class Environment:
 
         self.reset()
 
+    def switchup(self):
+        self.env = gym.make(
+            self.env_name, gravity=np.random.random_sample() * 5.0 + 5.0
+        )
+
     def eval(self):
         self.eval_run = True
 
@@ -134,7 +139,7 @@ class Environment:
                 action = cpuize(net.infer(*output))
 
                 # print(action)
-                print(output.squeeze())
+                # print(output.squeeze())
             else:
                 action = lbl
 

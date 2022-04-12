@@ -1,32 +1,26 @@
 # env type
 # env_name: 'CartPole-v1'
-env_name: 'MountainCar-v0'
+# env_name: 'MountainCar-v0'
+env_name: 'LunarLander-v2'
+switchup_epoch: 300
 
 # training params
-buffer_size: 200000
+buffer_size: 50000
 buffer_size_debug: 100
 batch_size: 256
-start_epoch: 0
-epochs: 500
-repeats_per_buffer: 5 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
-repeats_per_buffer_scale: 0.0
+total_steps: 1000000
+repeats_per_buffer: 3
 
 # exploration settings
-exploration_epochs: 0
+exploration_steps: 0
 
-# learning rate and scheduler
-starting_LR: 0.001
-scheduler_steps: 2
-scheduler_gamma: 0.5
-
-# algorithm specifics
-confidence_lambda: 5.0
-supervision_lambda: 5.0
+# learning rate and exploration rate
+learning_rate: 0.01
 exploration_epsilon: 0.05
 
 # eval settings
-eval_num_traj: 20
-eval_epoch_ratio: 20
+eval_num_traj: 10
+eval_steps_ratio: 1000
 
 # helper params
 wandb_project: 'ESDDQN'
