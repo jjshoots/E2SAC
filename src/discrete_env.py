@@ -30,8 +30,8 @@ class Environment:
 
     def switchup(self):
         self.env = gym.make(
-            self.env_name, gravity=np.random.random_sample() * 5.0 + 5.0
-        )
+            self.env_name, gravity=-(np.random.random_sample() * 5.0 + 6.0)
+       )
 
     def eval(self):
         self.eval_run = True
