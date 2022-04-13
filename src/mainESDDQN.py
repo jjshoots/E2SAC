@@ -47,6 +47,7 @@ def train(set):
         net.zero_grad()
 
         with torch.no_grad():
+            cumulative_uncertainty = []
             while not env.is_done:
                 # get the initial state and label
                 obs, _, _, _ = env.get_state()
@@ -57,6 +58,9 @@ def train(set):
                     q, uncertainty = net(gpuize(obs, set.device).unsqueeze(0))
                     action = cpuize(net.sample(q, uncertainty))
 
+                # for logging
+                cumulative_uncertainty.append(cpuize(uncertainty).mean())
+
                 # get the next state and other stuff
                 next_obs, rew, dne, _ = env.step(action)
 
@@ -65,6 +69,7 @@ def train(set):
 
             # for logging
             to_log["total_reward"] = env.cumulative_reward
+            to_log["runtime_uncertainty"] = np.mean(np.stack(cumulative_uncertainty))
 
         """TRAINING RUN"""
         dataloader = torch.utils.data.DataLoader(

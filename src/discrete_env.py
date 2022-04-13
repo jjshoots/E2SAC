@@ -30,8 +30,10 @@ class Environment:
 
     def switchup(self):
         self.env = gym.make(
-            self.env_name, gravity=-(np.random.random_sample() * 12.0)
-       )
+            self.env_name,
+            gravity=-(np.random.random_sample() * 12.0),
+            enable_wind=np.random.randint(2) == 1,
+        )
 
     def eval(self):
         self.eval_run = True
@@ -119,7 +121,6 @@ class Environment:
 
         if net is not None:
             net.eval()
-        self.env = gym.make(self.env_name)
         self.eval()
         self.reset()
 

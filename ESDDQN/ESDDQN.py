@@ -43,7 +43,7 @@ class ESDDQN(nn.Module):
 
     def sample(self, q, uncertainty):
         if np.random.random_sample() < self.exploration_epsilon:
-            return torch.randint(high=self.num_actions, size=q.shape[:-2]).squeeze(-1)
+            return torch.randint(high=self.num_actions, size=q.shape[:-2]).unsqueeze(-1)
         else:
             return self.infer(q, uncertainty)
 
