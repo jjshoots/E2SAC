@@ -56,7 +56,7 @@ def get_wandb_log(run_uri, keys):
 
 if __name__ == "__main__":
     # parameters
-    num_steps = 1e6
+    num_steps = 870000
     num_intervals = 21
 
     # x_axis values to plot against
@@ -64,30 +64,30 @@ if __name__ == "__main__":
 
     # list of algorithms and their corresponding uris
     runs = {}
-    # runs["SAC_ANT"] = [
-    #     "jjshoots/e2SAC_pybullet/27cjzt50",
-    #     "jjshoots/e2SAC_pybullet/6vgj57fp",
-    #     "jjshoots/e2SAC_pybullet/1l2a1jz3",
-    #     "jjshoots/e2SAC_pybullet/110jrok2",
-    #     "jjshoots/e2SAC_pybullet/1xyiilpo",
-    #     "jjshoots/e2SAC_pybullet/2x5hkmbc",
-    #     "jjshoots/e2SAC_pybullet/13r7w035",
-    #     "jjshoots/e2SAC_pybullet/3pmbwojt",
-    #     "jjshoots/e2SAC_pybullet/sj2wj9n9",
-    #     "jjshoots/e2SAC_pybullet/12nev3lk",
-    # ]
-    # runs["E2SAC_ANT"] = [
-    #     "jjshoots/e2SAC_pybullet/26iy23z8",
-    #     "jjshoots/e2SAC_pybullet/z30or5e0",
-    #     "jjshoots/e2SAC_pybullet/2r6j4ti6",
-    #     "jjshoots/e2SAC_pybullet/1tahjde3",
-    #     "jjshoots/e2SAC_pybullet/8gef3h2b",
-    #     "jjshoots/e2SAC_pybullet/2ie3jxhp",
-    #     "jjshoots/e2SAC_pybullet/1936sb55",
-    #     "jjshoots/e2SAC_pybullet/3vq6jk5u",
-    #     "jjshoots/e2SAC_pybullet/28qlpnqd",
-    #     "jjshoots/e2SAC_pybullet/15h8pi1s",
-    # ]
+    runs["SAC_ANT"] = [
+        "jjshoots/e2SAC_pybullet/27cjzt50",
+        "jjshoots/e2SAC_pybullet/6vgj57fp",
+        "jjshoots/e2SAC_pybullet/1l2a1jz3",
+        "jjshoots/e2SAC_pybullet/110jrok2",
+        "jjshoots/e2SAC_pybullet/1xyiilpo",
+        "jjshoots/e2SAC_pybullet/2x5hkmbc",
+        "jjshoots/e2SAC_pybullet/13r7w035",
+        "jjshoots/e2SAC_pybullet/3pmbwojt",
+        "jjshoots/e2SAC_pybullet/sj2wj9n9",
+        "jjshoots/e2SAC_pybullet/12nev3lk",
+    ]
+    runs["E2SAC_ANT"] = [
+        "jjshoots/e2SAC_pybullet/26iy23z8",
+        "jjshoots/e2SAC_pybullet/z30or5e0",
+        "jjshoots/e2SAC_pybullet/2r6j4ti6",
+        "jjshoots/e2SAC_pybullet/1tahjde3",
+        "jjshoots/e2SAC_pybullet/8gef3h2b",
+        "jjshoots/e2SAC_pybullet/2ie3jxhp",
+        "jjshoots/e2SAC_pybullet/1936sb55",
+        "jjshoots/e2SAC_pybullet/3vq6jk5u",
+        "jjshoots/e2SAC_pybullet/28qlpnqd",
+        "jjshoots/e2SAC_pybullet/15h8pi1s",
+    ]
     # runs["SAC_HOPPER"] = [
     #     "jjshoots/e2SAC_pybullet/o4vokgow",
     #     "jjshoots/e2SAC_pybullet/i1sfyc0a",
@@ -108,26 +108,26 @@ if __name__ == "__main__":
     #     "jjshoots/e2SAC_pybullet/2ihw442t",
     #     "jjshoots/e2SAC_pybullet/brftgjqy",
     # ]
-    runs["SAC_HALF_CHEETAH"] = [
-        "jjshoots/e2SAC_pybullet/3t3pater",
-        "jjshoots/e2SAC_pybullet/1im0kz8o",
-        "jjshoots/e2SAC_pybullet/3p6rjq7d",
-        "jjshoots/e2SAC_pybullet/3jjhmgb3",
-        "jjshoots/e2SAC_pybullet/3sw13nvk",
-        "jjshoots/e2SAC_pybullet/3671tc3j",
-        "jjshoots/e2SAC_pybullet/3k7wa339",
-        "jjshoots/e2SAC_pybullet/1gq9vj1w",
-    ]
-    runs["E2SAC_HALF_CHEETAH"] = [
-        "jjshoots/e2SAC_pybullet/3s7i0gtm",
-        "jjshoots/e2SAC_pybullet/119e98d6",
-        "jjshoots/e2SAC_pybullet/3ncp4r5o",
-        "jjshoots/e2SAC_pybullet/2w5964ry",
-        "jjshoots/e2SAC_pybullet/2fns49hc",
-        "jjshoots/e2SAC_pybullet/1l1lbdzy",
-        "jjshoots/e2SAC_pybullet/27dnblfc",
-        "jjshoots/e2SAC_pybullet/a6i1t5al",
-    ]
+    # runs["SAC_HALF_CHEETAH"] = [
+    #     "jjshoots/e2SAC_pybullet/3t3pater",
+    #     "jjshoots/e2SAC_pybullet/1im0kz8o",
+    #     "jjshoots/e2SAC_pybullet/3p6rjq7d",
+    #     "jjshoots/e2SAC_pybullet/3jjhmgb3",
+    #     "jjshoots/e2SAC_pybullet/3sw13nvk",
+    #     "jjshoots/e2SAC_pybullet/3671tc3j",
+    #     "jjshoots/e2SAC_pybullet/3k7wa339",
+    #     "jjshoots/e2SAC_pybullet/1gq9vj1w",
+    # ]
+    # runs["E2SAC_HALF_CHEETAH"] = [
+    #     "jjshoots/e2SAC_pybullet/3s7i0gtm",
+    #     "jjshoots/e2SAC_pybullet/119e98d6",
+    #     "jjshoots/e2SAC_pybullet/3ncp4r5o",
+    #     "jjshoots/e2SAC_pybullet/2w5964ry",
+    #     "jjshoots/e2SAC_pybullet/2fns49hc",
+    #     "jjshoots/e2SAC_pybullet/1l1lbdzy",
+    #     "jjshoots/e2SAC_pybullet/27dnblfc",
+    #     "jjshoots/e2SAC_pybullet/a6i1t5al",
+    # ]
     # runs["SAC_WALKER_2D"] = [
     #     "jjshoots/e2SAC_pybullet/2mz2a10g",
     #     "jjshoots/e2SAC_pybullet/hsl79yjd",
@@ -178,12 +178,14 @@ if __name__ == "__main__":
 
     # plot sample efficiency curve
     plot_utils.plot_sample_efficiency_curve(
-        x_axis,
+        x_axis / 1e6,
         iqm_scores,
         iqm_cis,
         algorithms=algorithms,
-        xlabel=r"Number of episodes",
-        ylabel="Interquartile Mean (IQM)",
+        xlabel=r"Timesteps (1e6)",
+        ylabel="Score Interquartile Mean (IQM)",
+        labelsize='large',
+        ticklabelsize='large',
     )
 
     # form the legend
@@ -197,7 +199,7 @@ if __name__ == "__main__":
         loc="upper center",
         fancybox=True,
         ncol=len(algorithms),
-        fontsize="x-large",
+        fontsize="large",
         bbox_to_anchor=(0.5, 1.1),
     )
 
