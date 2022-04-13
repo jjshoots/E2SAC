@@ -73,6 +73,8 @@ if __name__ == "__main__":
     #     "jjshoots/e2SAC_pybullet/2x5hkmbc",
     #     "jjshoots/e2SAC_pybullet/13r7w035",
     #     "jjshoots/e2SAC_pybullet/3pmbwojt",
+    #     "jjshoots/e2SAC_pybullet/sj2wj9n9",
+    #     "jjshoots/e2SAC_pybullet/12nev3lk",
     # ]
     # runs["E2SAC_ANT"] = [
     #     "jjshoots/e2SAC_pybullet/26iy23z8",
@@ -83,6 +85,8 @@ if __name__ == "__main__":
     #     "jjshoots/e2SAC_pybullet/2ie3jxhp",
     #     "jjshoots/e2SAC_pybullet/1936sb55",
     #     "jjshoots/e2SAC_pybullet/3vq6jk5u",
+    #     "jjshoots/e2SAC_pybullet/28qlpnqd",
+    #     "jjshoots/e2SAC_pybullet/15h8pi1s",
     # ]
     # runs["SAC_HOPPER"] = [
     #     "jjshoots/e2SAC_pybullet/o4vokgow",
