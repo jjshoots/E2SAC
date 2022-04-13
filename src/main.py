@@ -7,8 +7,8 @@ import torch.optim as optim
 from PIL import Image
 
 import wandb
-# from carracing_dr import Environment
-from carracing import Environment
+# from carracing_dr_env import Environment
+from carracing_env import Environment
 from e2SAC.UASAC import UASAC
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize

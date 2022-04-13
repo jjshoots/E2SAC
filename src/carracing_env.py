@@ -16,7 +16,7 @@ class Environment:
         self.image_size = image_size
         self.frame_stack = 4
 
-        self.env = gym.make("CarRacing-v1", verbose=verbose)
+        self.env = gym.make("CarRacing-v1", verbose=verbose, hardcore=False)
         self.state = np.zeros((1, *self.image_size))
         self.num_actions = 2
 
@@ -136,8 +136,8 @@ class Environment:
         midpoint = (rise + fall) / 2.0
         midpoint = (midpoint / 64.0) - 0.5
 
-        steering = midpoint * 2.5
-        accel = 0.1
+        steering = midpoint
+        accel = 0.05
 
         return np.clip(np.array([steering, accel]), -0.99, 0.99)
 
