@@ -7,7 +7,8 @@ else if [ "$hostname" = "availab-dl1" ]
   python3 src/main.py --train --env_name='HopperPyBulletEnv-v0' --wandb --wandb_name='e2SAC_hopper' --notes='hopper'
 else if [ "$hostname" = "availab-dl2" ]
   source venv/bin/activate.fish
-  python3 src/main.py --train --env_name='HopperPyBulletEnv-v0' --wandb --wandb_name='e2SAC_hopper' --notes='hopper'
+  python3 src/mainSAC.py --train --env_name='HopperPyBulletEnv-v0' --wandb --wandb_name='SAC_hopper' --notes='hopper'
+  # python3 src/main.py --train --env_name='HopperPyBulletEnv-v0' --wandb --wandb_name='e2SAC_hopper' --notes='hopper'
 end
 
 

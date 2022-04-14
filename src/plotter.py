@@ -64,50 +64,54 @@ if __name__ == "__main__":
 
     # list of algorithms and their corresponding uris
     runs = {}
-    runs["SAC_ANT"] = [
-        "jjshoots/e2SAC_pybullet/27cjzt50",
-        "jjshoots/e2SAC_pybullet/6vgj57fp",
-        "jjshoots/e2SAC_pybullet/1l2a1jz3",
-        "jjshoots/e2SAC_pybullet/110jrok2",
-        "jjshoots/e2SAC_pybullet/1xyiilpo",
-        "jjshoots/e2SAC_pybullet/2x5hkmbc",
-        "jjshoots/e2SAC_pybullet/13r7w035",
-        "jjshoots/e2SAC_pybullet/3pmbwojt",
-        "jjshoots/e2SAC_pybullet/sj2wj9n9",
-        "jjshoots/e2SAC_pybullet/12nev3lk",
-    ]
-    runs["E2SAC_ANT"] = [
-        "jjshoots/e2SAC_pybullet/26iy23z8",
-        "jjshoots/e2SAC_pybullet/z30or5e0",
-        "jjshoots/e2SAC_pybullet/2r6j4ti6",
-        "jjshoots/e2SAC_pybullet/1tahjde3",
-        "jjshoots/e2SAC_pybullet/8gef3h2b",
-        "jjshoots/e2SAC_pybullet/2ie3jxhp",
-        "jjshoots/e2SAC_pybullet/1936sb55",
-        "jjshoots/e2SAC_pybullet/3vq6jk5u",
-        "jjshoots/e2SAC_pybullet/28qlpnqd",
-        "jjshoots/e2SAC_pybullet/15h8pi1s",
-    ]
-    # runs["SAC_HOPPER"] = [
-    #     "jjshoots/e2SAC_pybullet/o4vokgow",
-    #     "jjshoots/e2SAC_pybullet/i1sfyc0a",
-    #     "jjshoots/e2SAC_pybullet/2wvjd3l2",
-    #     "jjshoots/e2SAC_pybullet/2g5l9qsb",
-    #     "jjshoots/e2SAC_pybullet/3dfhch3p",
-    #     "jjshoots/e2SAC_pybullet/3ourr309",
-    #     "jjshoots/e2SAC_pybullet/29gbbi56",
-    #     "jjshoots/e2SAC_pybullet/2x0lcpuj",
+    # runs["SAC_ANT"] = [
+    #     "jjshoots/e2SAC_pybullet/27cjzt50",
+    #     "jjshoots/e2SAC_pybullet/6vgj57fp",
+    #     "jjshoots/e2SAC_pybullet/1l2a1jz3",
+    #     "jjshoots/e2SAC_pybullet/110jrok2",
+    #     "jjshoots/e2SAC_pybullet/1xyiilpo",
+    #     "jjshoots/e2SAC_pybullet/2x5hkmbc",
+    #     "jjshoots/e2SAC_pybullet/13r7w035",
+    #     "jjshoots/e2SAC_pybullet/3pmbwojt",
+    #     "jjshoots/e2SAC_pybullet/sj2wj9n9",
+    #     "jjshoots/e2SAC_pybullet/12nev3lk",
     # ]
-    # runs["E2SAC_HOPPER"] = [
-    #     "jjshoots/e2SAC_pybullet/3v68x43e",
-    #     "jjshoots/e2SAC_pybullet/3dcmg6sb",
-    #     "jjshoots/e2SAC_pybullet/18c1nnmi",
-    #     "jjshoots/e2SAC_pybullet/3q62xhiu",
-    #     "jjshoots/e2SAC_pybullet/3tiax2q9",
-    #     "jjshoots/e2SAC_pybullet/1g6h6k8p",
-    #     "jjshoots/e2SAC_pybullet/2ihw442t",
-    #     "jjshoots/e2SAC_pybullet/brftgjqy",
+    # runs["E2SAC_ANT"] = [
+    #     "jjshoots/e2SAC_pybullet/26iy23z8",
+    #     "jjshoots/e2SAC_pybullet/z30or5e0",
+    #     "jjshoots/e2SAC_pybullet/2r6j4ti6",
+    #     "jjshoots/e2SAC_pybullet/1tahjde3",
+    #     "jjshoots/e2SAC_pybullet/8gef3h2b",
+    #     "jjshoots/e2SAC_pybullet/2ie3jxhp",
+    #     "jjshoots/e2SAC_pybullet/1936sb55",
+    #     "jjshoots/e2SAC_pybullet/3vq6jk5u",
+    #     "jjshoots/e2SAC_pybullet/28qlpnqd",
+    #     "jjshoots/e2SAC_pybullet/15h8pi1s",
     # ]
+    runs["SAC_HOPPER"] = [
+        "jjshoots/e2SAC_pybullet/o4vokgow",
+        "jjshoots/e2SAC_pybullet/i1sfyc0a",
+        "jjshoots/e2SAC_pybullet/2wvjd3l2",
+        "jjshoots/e2SAC_pybullet/2g5l9qsb",
+        "jjshoots/e2SAC_pybullet/3dfhch3p",
+        "jjshoots/e2SAC_pybullet/3ourr309",
+        "jjshoots/e2SAC_pybullet/29gbbi56",
+        "jjshoots/e2SAC_pybullet/2x0lcpuj",
+        "jjshoots/e2SAC_pybullet/3l6czfp3",
+        "jjshoots/e2SAC_pybullet/2ciy5u3x",
+    ]
+    runs["E2SAC_HOPPER"] = [
+        "jjshoots/e2SAC_pybullet/3v68x43e",
+        "jjshoots/e2SAC_pybullet/3dcmg6sb",
+        "jjshoots/e2SAC_pybullet/18c1nnmi",
+        "jjshoots/e2SAC_pybullet/3q62xhiu",
+        "jjshoots/e2SAC_pybullet/3tiax2q9",
+        "jjshoots/e2SAC_pybullet/1g6h6k8p",
+        "jjshoots/e2SAC_pybullet/2ihw442t",
+        "jjshoots/e2SAC_pybullet/brftgjqy",
+        "jjshoots/e2SAC_pybullet/2ttvam1p",
+        "jjshoots/e2SAC_pybullet/1cfh2ob3",
+    ]
     # runs["SAC_HALF_CHEETAH"] = [
     #     "jjshoots/e2SAC_pybullet/3t3pater",
     #     "jjshoots/e2SAC_pybullet/1im0kz8o",
