@@ -17,4 +17,4 @@ end
 # python3 src/main.py --train --env_name='AntPyBulletEnv-v0' --wandb --wandb_name='e2SAC_ant' --notes='ant'
 # python3 src/main.py --train --env_name='HopperPyBulletEnv-v0' --wandb --wandb_name='e2SAC_hopper' --notes='hopper'
 # python3 src/main.py --train --env_name='Walker2DPyBulletEnv-v0' --wandb --wandb_name='e2SAC_walker2d' --notes='walker2d'
-# python3 src/main.py --train --env_name='HalfCheetahPyBulletEnv-v0' --wandb --wandb_name='e2SAC_half_cheetah' --notes='half_cheetah'
+# python3 src/mainSAC.py --train --env_name='HalfCheetahPyBulletEnv-v0' --wandb --wandb_name='SAC_half_cheetah'

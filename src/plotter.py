@@ -121,6 +121,8 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/3671tc3j",
         "jjshoots/e2SAC_pybullet/3k7wa339",
         "jjshoots/e2SAC_pybullet/1gq9vj1w",
+        "jjshoots/e2SAC_pybullet/1xla4kgx",
+        "jjshoots/e2SAC_pybullet/3siwabhk",
     ]
     runs["E2SAC_HALF_CHEETAH"] = [
         "jjshoots/e2SAC_pybullet/3s7i0gtm",
