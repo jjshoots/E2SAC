@@ -58,7 +58,7 @@ class ReplayBuffer(Dataset):
             mem_size = 0
             for thing in self.memory:
                 mem_size += thing.nbytes
-            print(f"Replay Buffer Size: {mem_size} bytes.")
+            print(f"Replay Buffer Size: {mem_size / 1e9} gigabytes.")
 
         # assert that the number of lists in memory is same as data to push
         assert len(data) == len(
