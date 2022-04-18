@@ -1,8 +1,8 @@
 # training params
-buffer_size: 200000
+buffer_size: 100000
 buffer_size_debug: 128
 batch_size: 128
-total_steps: 200000
+total_steps: 100000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1

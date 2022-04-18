@@ -13,9 +13,9 @@ class Backbone(nn.Module):
     def __init__(self):
         super().__init__()
 
-        channels = [12, 256, 128, 256, 128, 256, 128, 4]
+        channels = [12, 512, 512, 512, 16]
         kernels = [3] * (len(channels) - 1)
-        pooling = [2, 0] * (int(len(channels) / 2) - 1) + [2]
+        pooling = [2] * (int(len(channels) / 2) - 1)
         activation = ["lrelu"] * len(kernels)
         self.net = Neural_blocks.generate_conv_stack(
             channels, kernels, pooling, activation, norm="non"
@@ -36,7 +36,7 @@ class Actor(nn.Module):
 
         self.backbone = Backbone()
 
-        _features_description = [64, num_actions * 2]
+        _features_description = [256, 256, num_actions * 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -63,13 +63,13 @@ class Critic(nn.Module):
 
         self.backbone = Backbone()
 
-        _features_description = [num_actions, 64]
+        _features_description = [num_actions, 256]
         _activation_description = ["identity"] * (len(_features_description) - 1)
         self.action = Neural_blocks.generate_linear_stack(
             _features_description, _activation_description
         )
 
-        _features_description = [64, 256, 256, 2]
+        _features_description = [256, 256, 256, 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
