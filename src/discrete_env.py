@@ -26,13 +26,20 @@ class Environment:
 
         self.eval_run = False
 
+        self.gravity = 1
+        self.wind = 0
+
         self.reset()
 
     def switchup(self):
+        self.gravity = (self.gravity + 5.1) % 12.0
+        self.wind = (self.wind + 5.1) % 20.0
+
         self.env = gym.make(
             self.env_name,
-            gravity=-(np.random.random_sample() * 12.0),
-            enable_wind=np.random.randint(2) == 1,
+            gravity=-self.gravity,
+            enable_wind=True,
+            wind_power=self.wind
         )
 
     def eval(self):
