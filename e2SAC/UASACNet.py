@@ -15,7 +15,7 @@ class Backbone(nn.Module):
 
         channels = [12, 512, 512, 512, 16]
         kernels = [3] * (len(channels) - 1)
-        pooling = [2] * (int(len(channels) / 2) - 1)
+        pooling = [2] * (len(channels) - 1)
         activation = ["lrelu"] * len(kernels)
         self.net = Neural_blocks.generate_conv_stack(
             channels, kernels, pooling, activation, norm="non"
