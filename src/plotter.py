@@ -54,112 +54,17 @@ def get_wandb_log(run_uri, keys):
     return data
 
 
-if __name__ == "__main__":
+def compute_plots(runs):
+    # get the env_name
+    env_name = list(runs.keys())[0]
+    env_name = env_name[env_name.index("_")+1:]
+
     # parameters
     num_steps = 800000
     num_intervals = 21
 
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
-
-    # list of algorithms and their corresponding uris
-    runs = {}
-    # runs["SAC_ANT"] = [
-    #     "jjshoots/e2SAC_pybullet/27cjzt50",
-    #     "jjshoots/e2SAC_pybullet/6vgj57fp",
-    #     "jjshoots/e2SAC_pybullet/1l2a1jz3",
-    #     "jjshoots/e2SAC_pybullet/110jrok2",
-    #     "jjshoots/e2SAC_pybullet/1xyiilpo",
-    #     "jjshoots/e2SAC_pybullet/2x5hkmbc",
-    #     "jjshoots/e2SAC_pybullet/13r7w035",
-    #     "jjshoots/e2SAC_pybullet/3pmbwojt",
-    #     "jjshoots/e2SAC_pybullet/sj2wj9n9",
-    #     "jjshoots/e2SAC_pybullet/12nev3lk",
-    # ]
-    # runs["E2SAC_ANT"] = [
-    #     "jjshoots/e2SAC_pybullet/26iy23z8",
-    #     "jjshoots/e2SAC_pybullet/z30or5e0",
-    #     "jjshoots/e2SAC_pybullet/2r6j4ti6",
-    #     "jjshoots/e2SAC_pybullet/1tahjde3",
-    #     "jjshoots/e2SAC_pybullet/8gef3h2b",
-    #     "jjshoots/e2SAC_pybullet/2ie3jxhp",
-    #     "jjshoots/e2SAC_pybullet/1936sb55",
-    #     "jjshoots/e2SAC_pybullet/3vq6jk5u",
-    #     "jjshoots/e2SAC_pybullet/28qlpnqd",
-    #     "jjshoots/e2SAC_pybullet/15h8pi1s",
-    # ]
-    # runs["SAC_HOPPER"] = [
-    #     "jjshoots/e2SAC_pybullet/o4vokgow",
-    #     "jjshoots/e2SAC_pybullet/i1sfyc0a",
-    #     "jjshoots/e2SAC_pybullet/2wvjd3l2",
-    #     "jjshoots/e2SAC_pybullet/2g5l9qsb",
-    #     "jjshoots/e2SAC_pybullet/3dfhch3p",
-    #     "jjshoots/e2SAC_pybullet/3ourr309",
-    #     "jjshoots/e2SAC_pybullet/29gbbi56",
-    #     "jjshoots/e2SAC_pybullet/2x0lcpuj",
-    #     "jjshoots/e2SAC_pybullet/3l6czfp3",
-    #     "jjshoots/e2SAC_pybullet/2ciy5u3x",
-    # ]
-    # runs["E2SAC_HOPPER"] = [
-    #     "jjshoots/e2SAC_pybullet/3v68x43e",
-    #     "jjshoots/e2SAC_pybullet/3dcmg6sb",
-    #     "jjshoots/e2SAC_pybullet/18c1nnmi",
-    #     "jjshoots/e2SAC_pybullet/3q62xhiu",
-    #     "jjshoots/e2SAC_pybullet/3tiax2q9",
-    #     "jjshoots/e2SAC_pybullet/1g6h6k8p",
-    #     "jjshoots/e2SAC_pybullet/2ihw442t",
-    #     "jjshoots/e2SAC_pybullet/brftgjqy",
-    #     "jjshoots/e2SAC_pybullet/2ttvam1p",
-    #     "jjshoots/e2SAC_pybullet/1cfh2ob3",
-    # ]
-    # runs["SAC_HALF_CHEETAH"] = [
-    #     "jjshoots/e2SAC_pybullet/3t3pater",
-    #     "jjshoots/e2SAC_pybullet/1im0kz8o",
-    #     "jjshoots/e2SAC_pybullet/3p6rjq7d",
-    #     "jjshoots/e2SAC_pybullet/3jjhmgb3",
-    #     "jjshoots/e2SAC_pybullet/3sw13nvk",
-    #     "jjshoots/e2SAC_pybullet/3671tc3j",
-    #     "jjshoots/e2SAC_pybullet/3k7wa339",
-    #     "jjshoots/e2SAC_pybullet/1gq9vj1w",
-    #     "jjshoots/e2SAC_pybullet/1xla4kgx",
-    #     "jjshoots/e2SAC_pybullet/3siwabhk",
-    # ]
-    # runs["E2SAC_HALF_CHEETAH"] = [
-    #     "jjshoots/e2SAC_pybullet/3s7i0gtm",
-    #     "jjshoots/e2SAC_pybullet/119e98d6",
-    #     "jjshoots/e2SAC_pybullet/3ncp4r5o",
-    #     "jjshoots/e2SAC_pybullet/2w5964ry",
-    #     "jjshoots/e2SAC_pybullet/2fns49hc",
-    #     "jjshoots/e2SAC_pybullet/1l1lbdzy",
-    #     "jjshoots/e2SAC_pybullet/27dnblfc",
-    #     "jjshoots/e2SAC_pybullet/a6i1t5al",
-    #     "jjshoots/e2SAC_pybullet/2e92ggz5",
-    #     "jjshoots/e2SAC_pybullet/35kzfwxw",
-    # ]
-    runs["SAC_WALKER_2D"] = [
-        "jjshoots/e2SAC_pybullet/2mz2a10g",
-        "jjshoots/e2SAC_pybullet/hsl79yjd",
-        "jjshoots/e2SAC_pybullet/3rwkyxk5",
-        "jjshoots/e2SAC_pybullet/3pbhkx3e",
-        "jjshoots/e2SAC_pybullet/3vqvthdp",
-        "jjshoots/e2SAC_pybullet/24mthlrl",
-        "jjshoots/e2SAC_pybullet/33gw34d7",
-        "jjshoots/e2SAC_pybullet/34p7mfyc",
-        "jjshoots/e2SAC_pybullet/1tukgzvw",
-        "jjshoots/e2SAC_pybullet/1scupef7",
-    ]
-    runs["E2SAC_WALKER_2D"] = [
-        "jjshoots/e2SAC_pybullet/qy3fj41l",
-        "jjshoots/e2SAC_pybullet/2r2ocxx3",
-        "jjshoots/e2SAC_pybullet/3k7ipmip",
-        "jjshoots/e2SAC_pybullet/8vfdgp62",
-        "jjshoots/e2SAC_pybullet/3rq3f05i",
-        "jjshoots/e2SAC_pybullet/g5dtjuev",
-        "jjshoots/e2SAC_pybullet/32g555xp",
-        "jjshoots/e2SAC_pybullet/2fioechx",
-        "jjshoots/e2SAC_pybullet/1b9n57ov",
-        "jjshoots/e2SAC_pybullet/2ax8d0rd",
-    ]
 
     # list of algorithms we have
     algorithms = [key for key in runs]
@@ -215,4 +120,120 @@ if __name__ == "__main__":
         bbox_to_anchor=(0.5, 1.1),
     )
 
-    plt.show()
+    plt.savefig(f'resource/{env_name}.pdf')
+
+if __name__ == "__main__":
+    # list of algorithms and their corresponding uris
+    runs_list = []
+
+    runs = {}
+    runs["SAC_AntPyBulletEnv-v0"] = [
+        "jjshoots/e2SAC_pybullet/27cjzt50",
+        "jjshoots/e2SAC_pybullet/6vgj57fp",
+        "jjshoots/e2SAC_pybullet/1l2a1jz3",
+        "jjshoots/e2SAC_pybullet/110jrok2",
+        "jjshoots/e2SAC_pybullet/1xyiilpo",
+        "jjshoots/e2SAC_pybullet/2x5hkmbc",
+        "jjshoots/e2SAC_pybullet/13r7w035",
+        "jjshoots/e2SAC_pybullet/3pmbwojt",
+        "jjshoots/e2SAC_pybullet/sj2wj9n9",
+        "jjshoots/e2SAC_pybullet/12nev3lk",
+    ]
+    runs["E2SAC_AntPyBulletEnv-v0"] = [
+        "jjshoots/e2SAC_pybullet/26iy23z8",
+        "jjshoots/e2SAC_pybullet/z30or5e0",
+        "jjshoots/e2SAC_pybullet/2r6j4ti6",
+        "jjshoots/e2SAC_pybullet/1tahjde3",
+        "jjshoots/e2SAC_pybullet/8gef3h2b",
+        "jjshoots/e2SAC_pybullet/2ie3jxhp",
+        "jjshoots/e2SAC_pybullet/1936sb55",
+        "jjshoots/e2SAC_pybullet/3vq6jk5u",
+        "jjshoots/e2SAC_pybullet/28qlpnqd",
+        "jjshoots/e2SAC_pybullet/15h8pi1s",
+    ]
+    runs_list.append(runs)
+
+    runs = {}
+    runs["SAC_HopperPyBulletEnv-v0"] = [
+        "jjshoots/e2SAC_pybullet/o4vokgow",
+        "jjshoots/e2SAC_pybullet/i1sfyc0a",
+        "jjshoots/e2SAC_pybullet/2wvjd3l2",
+        "jjshoots/e2SAC_pybullet/2g5l9qsb",
+        "jjshoots/e2SAC_pybullet/3dfhch3p",
+        "jjshoots/e2SAC_pybullet/3ourr309",
+        "jjshoots/e2SAC_pybullet/29gbbi56",
+        "jjshoots/e2SAC_pybullet/2x0lcpuj",
+        "jjshoots/e2SAC_pybullet/3l6czfp3",
+        "jjshoots/e2SAC_pybullet/2ciy5u3x",
+    ]
+    runs["E2SAC_HopperPyBulletEnv-v0"] = [
+        "jjshoots/e2SAC_pybullet/3v68x43e",
+        "jjshoots/e2SAC_pybullet/3dcmg6sb",
+        "jjshoots/e2SAC_pybullet/18c1nnmi",
+        "jjshoots/e2SAC_pybullet/3q62xhiu",
+        "jjshoots/e2SAC_pybullet/3tiax2q9",
+        "jjshoots/e2SAC_pybullet/1g6h6k8p",
+        "jjshoots/e2SAC_pybullet/2ihw442t",
+        "jjshoots/e2SAC_pybullet/brftgjqy",
+        "jjshoots/e2SAC_pybullet/2ttvam1p",
+        "jjshoots/e2SAC_pybullet/1cfh2ob3",
+    ]
+    runs_list.append(runs)
+
+    runs = {}
+    runs["SAC_HalfCheetahPyBulletEnv-v0"] = [
+        "jjshoots/e2SAC_pybullet/3t3pater",
+        "jjshoots/e2SAC_pybullet/1im0kz8o",
+        "jjshoots/e2SAC_pybullet/3p6rjq7d",
+        "jjshoots/e2SAC_pybullet/3jjhmgb3",
+        "jjshoots/e2SAC_pybullet/3sw13nvk",
+        "jjshoots/e2SAC_pybullet/3671tc3j",
+        "jjshoots/e2SAC_pybullet/3k7wa339",
+        "jjshoots/e2SAC_pybullet/1gq9vj1w",
+        "jjshoots/e2SAC_pybullet/1xla4kgx",
+        "jjshoots/e2SAC_pybullet/3siwabhk",
+    ]
+    runs["E2SAC_HalfCheetahPyBulletEnv-v0"] = [
+        "jjshoots/e2SAC_pybullet/3s7i0gtm",
+        "jjshoots/e2SAC_pybullet/119e98d6",
+        "jjshoots/e2SAC_pybullet/3ncp4r5o",
+        "jjshoots/e2SAC_pybullet/2w5964ry",
+        "jjshoots/e2SAC_pybullet/2fns49hc",
+        "jjshoots/e2SAC_pybullet/1l1lbdzy",
+        "jjshoots/e2SAC_pybullet/27dnblfc",
+        "jjshoots/e2SAC_pybullet/a6i1t5al",
+        "jjshoots/e2SAC_pybullet/2e92ggz5",
+        "jjshoots/e2SAC_pybullet/35kzfwxw",
+    ]
+    runs_list.append(runs)
+
+    runs = {}
+    runs["SAC_Walker2DPyBulletEnv-v0"] = [
+        "jjshoots/e2SAC_pybullet/2mz2a10g",
+        "jjshoots/e2SAC_pybullet/hsl79yjd",
+        "jjshoots/e2SAC_pybullet/3rwkyxk5",
+        "jjshoots/e2SAC_pybullet/3pbhkx3e",
+        "jjshoots/e2SAC_pybullet/3vqvthdp",
+        "jjshoots/e2SAC_pybullet/24mthlrl",
+        "jjshoots/e2SAC_pybullet/33gw34d7",
+        "jjshoots/e2SAC_pybullet/34p7mfyc",
+        "jjshoots/e2SAC_pybullet/1tukgzvw",
+        "jjshoots/e2SAC_pybullet/1scupef7",
+    ]
+    runs["E2SAC_Walker2DPyBulletEnv-v0"] = [
+        "jjshoots/e2SAC_pybullet/qy3fj41l",
+        "jjshoots/e2SAC_pybullet/2r2ocxx3",
+        "jjshoots/e2SAC_pybullet/3k7ipmip",
+        "jjshoots/e2SAC_pybullet/8vfdgp62",
+        "jjshoots/e2SAC_pybullet/3rq3f05i",
+        "jjshoots/e2SAC_pybullet/g5dtjuev",
+        "jjshoots/e2SAC_pybullet/32g555xp",
+        "jjshoots/e2SAC_pybullet/2fioechx",
+        "jjshoots/e2SAC_pybullet/1b9n57ov",
+        "jjshoots/e2SAC_pybullet/2ax8d0rd",
+    ]
+    runs_list.append(runs)
+
+
+    for runs in runs_list:
+        compute_plots(runs)
