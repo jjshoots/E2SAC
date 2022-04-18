@@ -13,9 +13,9 @@ class Backbone(nn.Module):
     def __init__(self):
         super().__init__()
 
-        channels = [12, 128, 128, 128, 4]
+        channels = [12, 256, 128, 256, 128, 256, 128, 4]
         kernels = [3] * (len(channels) - 1)
-        pooling = [2] * (len(channels) - 1)
+        pooling = [2, 0] * (int(len(channels) / 2) - 1) + [2]
         activation = ["lrelu"] * len(kernels)
         self.net = Neural_blocks.generate_conv_stack(
             channels, kernels, pooling, activation, norm="non"
