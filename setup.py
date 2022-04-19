@@ -1,22 +1,6 @@
 from setuptools import setup
 
 setup(
-    name="e2SAC",
-    version="1.0.0",
-    install_requires=[
-        "torch",
-    ],
-)
-
-setup(
-    name="SAC",
-    version="1.0.0",
-    install_requires=[
-        "torch",
-    ],
-)
-
-setup(
     name="DDQN",
     version="1.0.0",
     install_requires=[
