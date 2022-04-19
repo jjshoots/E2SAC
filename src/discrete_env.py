@@ -57,7 +57,7 @@ class Environment:
     def step(self, action, startup=False):
 
         """
-        actions are expected to be of shape [2]
+        actions are expected to be of shape [1]
 
         output:
             observations of shape [observation_shape]
@@ -65,6 +65,8 @@ class Environment:
             dones of shape [1]
             labels of shape [num_actions]
         """
+        action = int(np.squeeze(action))
+
         # step through the env for frame stack num times
         obs = []
         rwd = 0.0
