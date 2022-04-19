@@ -60,7 +60,7 @@ def compute_plots(runs):
     env_name = env_name[env_name.index("_")+1:]
 
     # parameters
-    num_steps = 800000
+    num_steps = 1e6
     num_intervals = 21
 
     # x_axis values to plot against
