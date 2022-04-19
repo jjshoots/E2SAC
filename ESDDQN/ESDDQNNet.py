@@ -10,12 +10,11 @@ class Q_Network(nn.Module):
     Q Network with uncertainty estimates
     """
 
-    def __init__(self, num_actions, state_size):
+    def __init__(self, num_actions):
         super().__init__()
         self.num_actions = num_actions
-        self.state_size = state_size
 
-        _features_description = [state_size, 64, 64, num_actions * 2]
+        _features_description = [256, 64, 64, num_actions * 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
