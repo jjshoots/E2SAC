@@ -15,22 +15,20 @@ class ESDDQN(nn.Module):
     def __init__(
         self,
         num_actions,
-        state_size,
         exploration_epsilon=0.05,
     ):
         super().__init__()
 
         self.num_actions = num_actions
-        self.state_size = state_size
         self.exploration_epsilon = exploration_epsilon
         self.num_networks = 1
 
         # twin delayed Q networks
         self.q = ESDDQNNet.Q_Ensemble(
-            num_actions, state_size, num_networks=self.num_networks
+            num_actions, num_networks=self.num_networks
         )
         self.q_target = ESDDQNNet.Q_Ensemble(
-            num_actions, state_size, num_networks=self.num_networks
+            num_actions, num_networks=self.num_networks
         ).eval()
 
         # copy weights and disable gradients for the target network

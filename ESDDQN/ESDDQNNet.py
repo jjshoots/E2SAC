@@ -5,6 +5,26 @@ import torch.nn.functional as func
 from utils.neural_blocks import Neural_blocks
 
 
+class Backbone(nn.Module):
+    """
+    Backbone for Net
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        channels = [12, 256, 256, 256, 16]
+        kernels = [3] * (len(channels) - 1)
+        pooling = [2] * (len(channels) - 1)
+        activation = ["lrelu"] * len(kernels)
+        self.net = Neural_blocks.generate_conv_stack(
+            channels, kernels, pooling, activation, norm="non"
+        )
+
+    def forward(self, state):
+        return self.net(state).flatten(1, -1)
+
+
 class Q_Network(nn.Module):
     """
     Q Network with uncertainty estimates
@@ -14,7 +34,8 @@ class Q_Network(nn.Module):
         super().__init__()
         self.num_actions = num_actions
 
-        _features_description = [256, 64, 64, num_actions * 2]
+        self.backbone = Backbone()
+        _features_description = [256, 256, 256, num_actions * 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -23,7 +44,8 @@ class Q_Network(nn.Module):
         )
 
     def forward(self, states):
-        output = self.net(states)
+        output = self.backbone(states)
+        output = self.net(output)
 
         value, uncertainty = torch.split(output, self.num_actions, dim=-1)
 
@@ -37,10 +59,10 @@ class Q_Ensemble(nn.Module):
     Q Network Ensembles with uncertainty estimates
     """
 
-    def __init__(self, num_actions, state_size, num_networks=1):
+    def __init__(self, num_actions, num_networks=1):
         super().__init__()
 
-        networks = [Q_Network(num_actions, state_size) for _ in range(num_networks)]
+        networks = [Q_Network(num_actions) for _ in range(num_networks)]
         self.networks = nn.ModuleList(networks)
 
     def forward(self, states):

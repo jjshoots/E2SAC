@@ -144,9 +144,8 @@ def evaluate(set):
 
 
 def setup_env(set):
-    env = Environment(set.env_name)
+    env = Environment()
     set.num_actions = env.num_actions
-    set.state_size = env.state_size
 
     return env
 
@@ -171,7 +170,6 @@ def setup_nets(set):
     # set up networks and optimizers
     net = ESDDQN(
         num_actions=set.num_actions,
-        state_size=set.state_size,
         exploration_epsilon=set.exploration_epsilon,
     ).to(set.device)
     ddqn_optim = optim.AdamW(net.parameters(), lr=set.learning_rate, amsgrad=True)

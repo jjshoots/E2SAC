@@ -182,8 +182,3 @@ class Environment:
                 self.env.render()
 
             cv2.waitKey(int(1000 / 15))
-
-
-if __name__ == "__main__":
-    env = Environment()
-    env.display(set, None)
