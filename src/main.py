@@ -4,6 +4,7 @@ from signal import SIGINT, signal
 import numpy as np
 import torch
 import torch.optim as optim
+from PIL import Image
 
 import wandb
 from ESDDQN.ESDDQN import ESDDQN
@@ -47,6 +48,7 @@ def train(set):
         net.zero_grad()
 
         with torch.no_grad():
+            video_log = []
             cumulative_uncertainty = []
             while not env.is_done:
                 # get the initial state and label
@@ -67,9 +69,21 @@ def train(set):
                 # store stuff in mem
                 memory.push((obs, action, rew, next_obs, dne))
 
+                # log progress
+                frame = np.uint8(obs[:3, ...] * 127.5 + 127.5).transpose(1, 2, 0)
+                video_log.append(Image.fromarray(frame))
+
             # for logging
             to_log["total_reward"] = env.cumulative_reward
             to_log["runtime_uncertainty"] = np.mean(np.stack(cumulative_uncertainty))
+            video_log[0].save(
+                "./resource/video_log.gif",
+                save_all=True,
+                append_images=video_log[1:],
+                optimize=False,
+                duration=20,
+                loop=0,
+            )
 
         """TRAINING RUN"""
         dataloader = torch.utils.data.DataLoader(
@@ -119,6 +133,7 @@ def train(set):
                 """WANDB"""
                 if set.wandb and repeat_num == 0 and batch_num == 0:
                     to_log["num_transitions"] = memory.count
+                    to_log["video"] = wandb.Video("./resource/video_log.gif")
                     to_log["buffer_size"] = memory.__len__()
                     wandb.log(to_log)
 
