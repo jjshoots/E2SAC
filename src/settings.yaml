@@ -12,7 +12,7 @@ exploration_steps: 0
 
 # learning rate and exploration rate
 learning_rate: 0.01
-exploration_epsilon: 0.05
+exploration_epsilon: 0.1
 
 # eval settings
 eval_steps_ratio: 1000
