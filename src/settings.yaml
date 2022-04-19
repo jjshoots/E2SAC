@@ -16,7 +16,7 @@ exploration_epsilon: 0.05
 
 # eval settings
 eval_steps_ratio: 1000
-eval_num_episodes: 10
+eval_num_traj: 10
 
 # helper params
 wandb_project: 'ESDDQN'

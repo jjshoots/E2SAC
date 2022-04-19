@@ -1,3 +1,4 @@
+import time
 import cv2
 import gym
 import numpy as np
@@ -132,14 +133,13 @@ class Environment:
 
         eval_perf = []
 
-        while len(eval_perf) < set.eval_num_episodes:
+        while len(eval_perf) < set.eval_num_traj:
             # get the initial state and action
             obs, _, _, lbl = self.get_state()
 
             if net is not None:
-                output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                action = net.actor.infer(*output)
-                action = cpuize(action)[0]
+                output = net(gpuize(obs, set.device).unsqueeze(0))
+                action = cpuize(net.infer(*output))
             else:
                 action = lbl
 
@@ -173,14 +173,24 @@ class Environment:
                 self.reset()
                 action = 0
 
-            action = lbl
+            if net is not None:
+                output = net.forward(gpuize(obs, set.device).unsqueeze(0))
+                # action = cpuize(net.sample(*output))
+                action = cpuize(net.infer(*output))
+
+                # print(action)
+                # print(output.squeeze())
+            else:
+                action = lbl
 
             if transformed:
                 display = obs[:3, ...]
                 display = np.uint8((display * 127.5 + 127.5))
                 display = np.transpose(display, (1, 2, 0))
                 cv2.imshow("display", display)
+                cv2.waitKey(int(1000 / 15))
             else:
                 self.env.render()
+                time.sleep(0.03)
 
-            cv2.waitKey(int(1000 / 15))
+
