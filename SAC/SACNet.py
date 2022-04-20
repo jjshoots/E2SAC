@@ -63,7 +63,7 @@ class Critic(nn.Module):
 
         self.backbone = Backbone()
 
-        _features_description = [num_actions, 64]
+        _features_description = [num_actions, 256]
         _activation_description = ["identity"] * (len(_features_description) - 1)
         self.action = Neural_blocks.generate_linear_stack(
             _features_description, _activation_description
