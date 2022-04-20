@@ -3,7 +3,7 @@
 switchup_epoch: 300
 buffer_size: 50000
 buffer_size_debug: 100
-batch_size: 128
+batch_size: 160
 total_steps: 100000
 repeats_per_buffer: 3
 
