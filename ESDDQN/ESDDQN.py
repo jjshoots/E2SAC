@@ -81,9 +81,9 @@ class ESDDQN(nn.Module):
             # get the next q and u lists and get the value, then...
             next_q, next_u = self.q_target(next_states)
 
-            # take mean over networks
-            next_q = next_q.mean(dim=-1, keepdim=True)
-            next_u = next_u.mean(dim=-1, keepdim=True)
+            # take min over networks
+            next_q = next_q.min(dim=-1, keepdim=True)[0]
+            next_u = next_u.min(dim=-1, keepdim=True)[0]
 
             # select next actions, and expand over networks dim
             next_a = self.infer(next_q, next_u).unsqueeze(-1)

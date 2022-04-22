@@ -36,7 +36,7 @@ def train(set):
             )
 
         """SWITCH UP ENV"""
-        if to_log["num_transitions"] > set.switchup_num == 0:
+        if memory.count > set.switchup_num == 0:
             env.switchup()
             # memory.refresh()
 

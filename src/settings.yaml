@@ -20,6 +20,7 @@ exploration_epsilon: 0.05
 
 # eval settings
 eval_steps_ratio: 1000
+eval_num_traj: 20
 
 # helper params
 wandb_project: 'ESDDQN'
