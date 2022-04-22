@@ -36,9 +36,9 @@ def train(set):
             )
 
         """SWITCH UP ENV"""
-        if to_log["epoch"] % set.switchup_epoch == 0:
+        if to_log["num_transitions"] > set.switchup_num == 0:
             env.switchup()
-            memory.refresh()
+            # memory.refresh()
 
         """ENVIRONMENT INTERACTION"""
         env.reset()

@@ -2,7 +2,7 @@
 # env_name: 'CartPole-v1'
 # env_name: 'MountainCar-v0'
 env_name: 'LunarLander-v2'
-switchup_epoch: 300
+switchup_num: 50000
 
 # training params
 buffer_size: 50000
