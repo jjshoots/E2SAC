@@ -6,5 +6,5 @@
 /resource
 /.git
 /.vim
-*/*.egg-info
-*/__pycache__
+*.egg-info
+*__pycache__

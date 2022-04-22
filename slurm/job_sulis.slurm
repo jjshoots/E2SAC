@@ -6,20 +6,14 @@
 #SBATCH --gres=gpu:ampere_a100:1
 #SBATCH --partition=gpu
 #SBATCH --time=24:00:00
-#SBATCH --account=su003-iftc1
+#SBATCH --account=su003
+#SBATCH -o ./slurmout/output.%a.out # STDOUT
 
 module purge
+module load SWIG/4.0.2
 module load GCC/10.2.0  CUDA/11.1.1  OpenMPI/4.0.5
 module load PyTorch/1.9.0
 module load torchvision/0.10.0-PyTorch-1.9.0
 
 source ~/.bashrc
-source /venv/bin/activate
-
-NJOBS=`squeue -h --node=$(hostname -s) --user=$SLURM_JOB_USER | wc -l`
-screen="-screen 0 1400x900x24"
-if [[ $NJOBS -gt 1 ]]; then
-  screen="-screen 1 1400x900x24";
-fi
-
-xvfb-run -s "$screen" wandb agent --count=1 jjshoots/UA3SAC_gym/yp3kgbaf
+./run_bash.sh

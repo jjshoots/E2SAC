@@ -65,19 +65,22 @@ if __name__ == "__main__":
     # list of algorithms and their corresponding uris
     runs = {}
     runs["SAC_CARRACING"] = [
-        "jjshoots/e2SAC_carracing/2lhvnwo4",
-        "jjshoots/e2SAC_carracing/30dbuwch",
-        "jjshoots/e2SAC_carracing/gqdxe7ao",
-        "jjshoots/e2SAC_carracing/muc8orwr",
-        "jjshoots/e2SAC_carracing/3cnk9by9",
+        "jjshoots/e2SAC_carracing/wvu01p8s",
+        "jjshoots/e2SAC_carracing/rw1x62h2",
+        "jjshoots/e2SAC_carracing/qw60b6n9",
+        "jjshoots/e2SAC_carracing/b4ty08r7",
+        "jjshoots/e2SAC_carracing/pm9n9p98",
+        "jjshoots/e2SAC_carracing/1v2f1tzz",
     ]
     runs["E2SAC_CARRACING"] = [
-        "jjshoots/e2SAC_carracing/3g8c9me4",
-        "jjshoots/e2SAC_carracing/1anxcix3",
-        "jjshoots/e2SAC_carracing/3pthiaff",
-        "jjshoots/e2SAC_carracing/1nbf7nbm",
-        "jjshoots/e2SAC_carracing/2benjjmc",
-        "jjshoots/e2SAC_carracing/3g2s2nc2",
+        "jjshoots/e2SAC_carracing/31yd7p5d",
+        "jjshoots/e2SAC_carracing/3855k1z2",
+        "jjshoots/e2SAC_carracing/2ahoyqbv",
+        "jjshoots/e2SAC_carracing/hbranf40",
+        "jjshoots/e2SAC_carracing/34r04gu1",
+        "jjshoots/e2SAC_carracing/l8zg223y",
+        "jjshoots/e2SAC_carracing/fr0z773r",
+        "jjshoots/e2SAC_carracing/15pe592m",
     ]
 
     # list of algorithms we have
