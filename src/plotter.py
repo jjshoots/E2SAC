@@ -56,7 +56,7 @@ def get_wandb_log(run_uri, keys):
 
 if __name__ == "__main__":
     # parameters
-    num_steps = 5e4
+    num_steps = 70000
     num_intervals = 21
 
     # x_axis values to plot against
@@ -65,22 +65,38 @@ if __name__ == "__main__":
     # list of algorithms and their corresponding uris
     runs = {}
     runs["SAC_CARRACING"] = [
-        "jjshoots/e2SAC_carracing/wvu01p8s",
-        "jjshoots/e2SAC_carracing/rw1x62h2",
-        "jjshoots/e2SAC_carracing/qw60b6n9",
-        "jjshoots/e2SAC_carracing/b4ty08r7",
-        "jjshoots/e2SAC_carracing/pm9n9p98",
-        "jjshoots/e2SAC_carracing/1v2f1tzz",
+        "jjshoots/e2SAC_carracing/1s67y2pw",
+        "jjshoots/e2SAC_carracing/1tsdhfyb",
+        "jjshoots/e2SAC_carracing/1zclqhsv",
+        "jjshoots/e2SAC_carracing/crr57ik4",
+        "jjshoots/e2SAC_carracing/j2hc8xu6",
+        "jjshoots/e2SAC_carracing/18emr0dv",
+        "jjshoots/e2SAC_carracing/1wuqkevm",
+        "jjshoots/e2SAC_carracing/29ttdvib",
+        "jjshoots/e2SAC_carracing/2fmk9hyk",
+        "jjshoots/e2SAC_carracing/2hh3ouwy",
+        "jjshoots/e2SAC_carracing/32j5589r",
+        "jjshoots/e2SAC_carracing/33zqwfrr",
+        "jjshoots/e2SAC_carracing/36qn6nxt",
+        "jjshoots/e2SAC_carracing/3layv5zm",
     ]
     runs["E2SAC_CARRACING"] = [
-        "jjshoots/e2SAC_carracing/31yd7p5d",
-        "jjshoots/e2SAC_carracing/3855k1z2",
-        "jjshoots/e2SAC_carracing/2ahoyqbv",
-        "jjshoots/e2SAC_carracing/hbranf40",
-        "jjshoots/e2SAC_carracing/34r04gu1",
-        "jjshoots/e2SAC_carracing/l8zg223y",
-        "jjshoots/e2SAC_carracing/fr0z773r",
-        "jjshoots/e2SAC_carracing/15pe592m",
+        "jjshoots/e2SAC_carracing/15ox79xj",
+        "jjshoots/e2SAC_carracing/1zcw8otp",
+        "jjshoots/e2SAC_carracing/2o3ln6sc",
+        "jjshoots/e2SAC_carracing/10ka1fdp",
+        "jjshoots/e2SAC_carracing/3ubd5084",
+        "jjshoots/e2SAC_carracing/y0ku3c13",
+        "jjshoots/e2SAC_carracing/39euchd8",
+        "jjshoots/e2SAC_carracing/3pdurrin",
+        "jjshoots/e2SAC_carracing/396chdhr",
+        "jjshoots/e2SAC_carracing/gh52f025",
+        "jjshoots/e2SAC_carracing/3vhzqg7g",
+        "jjshoots/e2SAC_carracing/384aiwc7",
+        "jjshoots/e2SAC_carracing/3gwqv4sy",
+        "jjshoots/e2SAC_carracing/1yfoik4h",
+        "jjshoots/e2SAC_carracing/32rhqm2g",
+        "jjshoots/e2SAC_carracing/upu5fgds",
     ]
 
     # list of algorithms we have
