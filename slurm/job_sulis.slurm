@@ -7,11 +7,10 @@
 #SBATCH --partition=gpu
 #SBATCH --time=24:00:00
 #SBATCH --account=su003
-#SBATCH -o ./slurmout/output.%a.out # STDOUT
 
 module purge
-module load SWIG/4.0.2
 module load GCC/10.2.0  CUDA/11.1.1  OpenMPI/4.0.5
+module load SWIG/4.0.2
 module load PyTorch/1.9.0
 module load torchvision/0.10.0-PyTorch-1.9.0
 
