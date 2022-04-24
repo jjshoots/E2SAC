@@ -56,7 +56,7 @@ def get_wandb_log(run_uri, keys):
 
 if __name__ == "__main__":
     # parameters
-    num_steps = 70000
+    num_steps = 100000
     num_intervals = 21
 
     # x_axis values to plot against
