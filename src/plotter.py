@@ -80,7 +80,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_carracing/36qn6nxt",
         "jjshoots/e2SAC_carracing/3layv5zm",
     ]
-    runs["E2SAC_CARRACING"] = [
+    runs["E2SAC_CARRACING_20"] = [
         "jjshoots/e2SAC_carracing/15ox79xj",
         "jjshoots/e2SAC_carracing/1zcw8otp",
         "jjshoots/e2SAC_carracing/2o3ln6sc",
@@ -97,6 +97,31 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_carracing/1yfoik4h",
         "jjshoots/e2SAC_carracing/32rhqm2g",
         "jjshoots/e2SAC_carracing/upu5fgds",
+    ]
+    runs["E2SAC_CARRACING_8"] = [
+        "jjshoots/e2SAC_carracing/2smcyzzs",
+        "jjshoots/e2SAC_carracing/1mn3fmw9",
+        "jjshoots/e2SAC_carracing/2sn5b8b5",
+        "jjshoots/e2SAC_carracing/16t2whq1",
+        "jjshoots/e2SAC_carracing/26yr8o25",
+        "jjshoots/e2SAC_carracing/3puj87ig",
+        "jjshoots/e2SAC_carracing/1cvkql33",
+        "jjshoots/e2SAC_carracing/270g98tg",
+        "jjshoots/e2SAC_carracing/fr1k6g8a",
+    ]
+    runs["E2SAC_CARRACING_2"] = [
+        "jjshoots/e2SAC_carracing/1u6qf5r4",
+        "jjshoots/e2SAC_carracing/1ss3yrfd",
+        "jjshoots/e2SAC_carracing/393700q4",
+        "jjshoots/e2SAC_carracing/1ibxhnm2",
+        "jjshoots/e2SAC_carracing/1kmxayj6",
+        "jjshoots/e2SAC_carracing/2jm10wyp",
+        "jjshoots/e2SAC_carracing/1xxp2n00",
+        "jjshoots/e2SAC_carracing/1y2dpmxy",
+        "jjshoots/e2SAC_carracing/2m25e2h6",
+        "jjshoots/e2SAC_carracing/33fepo9b",
+        "jjshoots/e2SAC_carracing/3a4mpnlp",
+        "jjshoots/e2SAC_carracing/3mb5x3wx",
     ]
 
     # list of algorithms we have
