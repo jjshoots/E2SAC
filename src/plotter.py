@@ -176,4 +176,6 @@ if __name__ == "__main__":
         bbox_to_anchor=(0.5, 1.1),
     )
 
+    plt.title('Suboptimal Policy Eval = 270')
+    plt.savefig('resource/carracing.pdf')
     plt.show()
