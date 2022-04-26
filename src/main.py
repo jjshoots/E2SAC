@@ -65,7 +65,9 @@ def train(set):
                     action = cpuize(net.sample(q, uncertainty))
 
                 # for logging
-                cumulative_uncertainty.append(cpuize(uncertainty).mean())
+                cumulative_uncertainty.append(
+                    cpuize(uncertainty.squeeze()[action.squeeze()])
+                )
 
                 # get the next state and other stuff
                 next_obs, rew, dne, _ = env.step(action)

@@ -32,9 +32,7 @@ class Environment:
         self.reset()
 
     def switchup(self):
-        self.env = gym.make(
-            "CarRacing-v1", verbose=False, continuous=False, perky=True
-        )
+        self.env = gym.make("CarRacing-v1", verbose=False, continuous=False, perky=True)
 
     def eval(self):
         self.eval_run = True

@@ -1,10 +1,10 @@
 
 # training params
-switchup_step: 30000
+switchup_step: 60000
 buffer_size: 30000
 buffer_size_debug: 100
 batch_size: 300
-total_steps: 120000
+total_steps: 500000
 repeats_per_buffer: 5
 max_grad_norm: 0.5
 target_network_frequency: 1000
@@ -13,7 +13,7 @@ target_network_frequency: 1000
 exploration_steps: 0
 
 # learning rate and exploration rate
-learning_rate: 0.01
+learning_rate: 0.001
 exploration_epsilon: 0.1
 
 # eval settings
