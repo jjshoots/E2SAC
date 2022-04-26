@@ -1,3 +1,4 @@
+import torch.nn as nn
 import os
 from signal import SIGINT, signal
 
@@ -24,6 +25,7 @@ def train(set):
     to_log["eval_perf"] = -np.inf
     to_log["max_eval_perf"] = -np.inf
     last_eval_step = 0
+    last_switchup_step = 0
 
     while memory.count <= set.total_steps + set.eval_steps_ratio:
         to_log["epoch"] += 1
@@ -37,8 +39,9 @@ def train(set):
             )
 
         """SWITCH UP ENV"""
-        if to_log["epoch"] % set.switchup_epoch == 0:
-            # env.switchup()
+        if memory.count - last_switchup_step > set.switchup_step:
+            last_switchup_step += set.switchup_step
+            env.switchup()
             # memory.refresh()
             pass
 
@@ -106,6 +109,7 @@ def train(set):
                 loss, log = net.calc_loss(states, actions, rewards, next_states, dones)
                 to_log = {**to_log, **log}
                 loss.backward()
+                nn.utils.clip_grad_norm_(list(net.parameters()), set.max_grad_norm)
                 optim_set["ddqn"].step()
                 net.update_q_target()
 
@@ -187,6 +191,7 @@ def setup_nets(set):
     net = ESDDQN(
         num_actions=set.num_actions,
         exploration_epsilon=set.exploration_epsilon,
+        target_network_frequency=set.target_network_frequency,
     ).to(set.device)
     ddqn_optim = optim.AdamW(net.parameters(), lr=set.learning_rate, amsgrad=True)
 

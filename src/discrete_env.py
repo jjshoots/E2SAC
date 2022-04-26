@@ -17,7 +17,7 @@ class Environment:
         self.image_size = image_size
         self.frame_stack = 4
 
-        self.env = gym.make("CarRacing-v1", verbose=False, continuous=False)
+        self.env = gym.make("CarRacing-v1", verbose=False, continuous=False, perky=True)
         self.state = np.zeros((1, *self.image_size))
         self.num_actions = self.env.action_space.n
 
@@ -30,6 +30,11 @@ class Environment:
         self.eval_run = False
 
         self.reset()
+
+    def switchup(self):
+        self.env = gym.make(
+            "CarRacing-v1", verbose=False, continuous=False, perky=True
+        )
 
     def eval(self):
         self.eval_run = True
@@ -192,5 +197,3 @@ class Environment:
             else:
                 self.env.render()
                 time.sleep(0.03)
-
-

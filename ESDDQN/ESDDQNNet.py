@@ -13,7 +13,7 @@ class Backbone(nn.Module):
     def __init__(self):
         super().__init__()
 
-        channels = [12, 256, 256, 256, 16]
+        channels = [12, 32, 64, 128, 16]
         kernels = [3] * (len(channels) - 1)
         pooling = [2] * (len(channels) - 1)
         activation = ["lrelu"] * len(kernels)
@@ -35,7 +35,7 @@ class Q_Network(nn.Module):
         self.num_actions = num_actions
 
         self.backbone = Backbone()
-        _features_description = [256, 256, 256, num_actions * 2]
+        _features_description = [256, 256, num_actions * 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]

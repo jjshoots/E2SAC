@@ -16,22 +16,23 @@ class ESDDQN(nn.Module):
         self,
         num_actions,
         exploration_epsilon=0.05,
+        target_network_frequency=1000,
     ):
         super().__init__()
 
         self.num_actions = num_actions
         self.exploration_epsilon = exploration_epsilon
-        self.num_networks = 2
+        self.target_network_frequency = target_network_frequency
+        self.num_networks = 1
 
         # twin delayed Q networks
-        self.q = ESDDQNNet.Q_Ensemble(
-            num_actions, num_networks=self.num_networks
-        )
+        self.q = ESDDQNNet.Q_Ensemble(num_actions, num_networks=self.num_networks)
         self.q_target = ESDDQNNet.Q_Ensemble(
             num_actions, num_networks=self.num_networks
         ).eval()
 
         # copy weights and disable gradients for the target network
+        self.gradient_steps = 0
         self.q_target.load_state_dict(self.q.state_dict())
         for param in self.q_target.parameters():
             param.requires_grad = False
@@ -52,10 +53,10 @@ class ESDDQN(nn.Module):
         # get max over all actions
         return torch.argmax(q, dim=-1, keepdim=True)
 
-    def update_q_target(self, tau=0.005):
-        # polyak averaging update for target q network
-        for target, source in zip(self.q_target.parameters(), self.q.parameters()):
-            target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
+    def update_q_target(self):
+        if self.gradient_steps % self.target_network_frequency == 0:
+            self.q_target.load_state_dict(self.q.state_dict())
+        self.gradient_steps += 1
 
     def calc_loss(self, states, actions, rewards, next_states, dones, gamma=0.99):
         """
