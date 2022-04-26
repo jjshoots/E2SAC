@@ -54,11 +54,7 @@ def get_wandb_log(run_uri, keys):
     return data
 
 
-def compute_plots(runs):
-    # get the env_name
-    env_name = list(runs.keys())[0]
-    env_name = env_name[env_name.index("_")+1:]
-
+def compute_plots(runs, env_name):
     # parameters
     num_steps = 1e6
     num_intervals = 21
@@ -100,7 +96,7 @@ def compute_plots(runs):
         iqm_cis,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e6)",
-        ylabel="Score Interquartile Mean (IQM)",
+        ylabel="Evaluation Interquartile Mean (IQM)",
         labelsize='large',
         ticklabelsize='large',
     )
@@ -124,10 +120,12 @@ def compute_plots(runs):
 
 if __name__ == "__main__":
     # list of algorithms and their corresponding uris
-    runs_list = []
+    run_list = []
+    env_list = []
 
+    # Ant
     runs = {}
-    runs["SAC_AntPyBulletEnv-v0"] = [
+    runs["SAC"] = [
         "jjshoots/e2SAC_pybullet/27cjzt50",
         "jjshoots/e2SAC_pybullet/6vgj57fp",
         "jjshoots/e2SAC_pybullet/1l2a1jz3",
@@ -139,7 +137,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/sj2wj9n9",
         "jjshoots/e2SAC_pybullet/12nev3lk",
     ]
-    runs["E2SAC_AntPyBulletEnv-v0"] = [
+    runs["E2SAC"] = [
         "jjshoots/e2SAC_pybullet/26iy23z8",
         "jjshoots/e2SAC_pybullet/z30or5e0",
         "jjshoots/e2SAC_pybullet/2r6j4ti6",
@@ -151,10 +149,12 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/28qlpnqd",
         "jjshoots/e2SAC_pybullet/15h8pi1s",
     ]
-    runs_list.append(runs)
+    run_list.append(runs)
+    env_list.append("AntPyBulletEnv-v0")
 
+    # Hopper
     runs = {}
-    runs["SAC_HopperPyBulletEnv-v0"] = [
+    runs["SAC"] = [
         "jjshoots/e2SAC_pybullet/o4vokgow",
         "jjshoots/e2SAC_pybullet/i1sfyc0a",
         "jjshoots/e2SAC_pybullet/2wvjd3l2",
@@ -166,7 +166,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/3l6czfp3",
         "jjshoots/e2SAC_pybullet/2ciy5u3x",
     ]
-    runs["E2SAC_HopperPyBulletEnv-v0"] = [
+    runs["E2SAC"] = [
         "jjshoots/e2SAC_pybullet/3v68x43e",
         "jjshoots/e2SAC_pybullet/3dcmg6sb",
         "jjshoots/e2SAC_pybullet/18c1nnmi",
@@ -178,10 +178,12 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/2ttvam1p",
         "jjshoots/e2SAC_pybullet/1cfh2ob3",
     ]
-    runs_list.append(runs)
+    run_list.append(runs)
+    env_list.append("HopperPyBulletEnv-v0")
 
+    # HalfCheetah
     runs = {}
-    runs["SAC_HalfCheetahPyBulletEnv-v0"] = [
+    runs["SAC"] = [
         "jjshoots/e2SAC_pybullet/3t3pater",
         "jjshoots/e2SAC_pybullet/1im0kz8o",
         "jjshoots/e2SAC_pybullet/3p6rjq7d",
@@ -193,7 +195,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/1xla4kgx",
         "jjshoots/e2SAC_pybullet/3siwabhk",
     ]
-    runs["E2SAC_HalfCheetahPyBulletEnv-v0"] = [
+    runs["E2SAC"] = [
         "jjshoots/e2SAC_pybullet/3s7i0gtm",
         "jjshoots/e2SAC_pybullet/119e98d6",
         "jjshoots/e2SAC_pybullet/3ncp4r5o",
@@ -205,10 +207,12 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/2e92ggz5",
         "jjshoots/e2SAC_pybullet/35kzfwxw",
     ]
-    runs_list.append(runs)
+    run_list.append(runs)
+    env_list.append("HalfCheetahPyBulletEnv-v0")
 
+    # Walker2D
     runs = {}
-    runs["SAC_Walker2DPyBulletEnv-v0"] = [
+    runs["SAC"] = [
         "jjshoots/e2SAC_pybullet/2mz2a10g",
         "jjshoots/e2SAC_pybullet/hsl79yjd",
         "jjshoots/e2SAC_pybullet/3rwkyxk5",
@@ -220,7 +224,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/1tukgzvw",
         "jjshoots/e2SAC_pybullet/1scupef7",
     ]
-    runs["E2SAC_Walker2DPyBulletEnv-v0"] = [
+    runs["E2SAC"] = [
         "jjshoots/e2SAC_pybullet/qy3fj41l",
         "jjshoots/e2SAC_pybullet/2r2ocxx3",
         "jjshoots/e2SAC_pybullet/3k7ipmip",
@@ -232,8 +236,9 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/1b9n57ov",
         "jjshoots/e2SAC_pybullet/2ax8d0rd",
     ]
-    runs_list.append(runs)
+    run_list.append(runs)
+    env_list.append("Walker2DPyBulletEnv-v0")
 
 
-    for runs in runs_list:
-        compute_plots(runs)
+    for runs, env_name in zip(run_list, env_list):
+        compute_plots(runs, env_name)
