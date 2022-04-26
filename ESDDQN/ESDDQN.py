@@ -54,9 +54,9 @@ class ESDDQN(nn.Module):
         return torch.argmax(q, dim=-1, keepdim=True)
 
     def update_q_target(self):
+        self.gradient_steps += 1
         if self.gradient_steps % self.target_network_frequency == 0:
             self.q_target.load_state_dict(self.q.state_dict())
-        self.gradient_steps += 1
 
     def calc_loss(self, states, actions, rewards, next_states, dones, gamma=0.99):
         """
