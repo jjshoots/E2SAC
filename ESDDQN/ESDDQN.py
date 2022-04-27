@@ -23,7 +23,7 @@ class ESDDQN(nn.Module):
         self.num_actions = num_actions
         self.exploration_epsilon = exploration_epsilon
         self.target_network_frequency = target_network_frequency
-        self.num_networks = 2
+        self.num_networks = 1
 
         # twin delayed Q networks
         self.q = ESDDQNNet.Q_Ensemble(num_actions, num_networks=self.num_networks)
