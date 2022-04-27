@@ -23,7 +23,7 @@ class ESDDQN(nn.Module):
         self.num_actions = num_actions
         self.exploration_epsilon = exploration_epsilon
         self.target_network_frequency = target_network_frequency
-        self.num_networks = 1
+        self.num_networks = 2
 
         # twin delayed Q networks
         self.q = ESDDQNNet.Q_Ensemble(num_actions, num_networks=self.num_networks)
@@ -58,7 +58,7 @@ class ESDDQN(nn.Module):
         if self.gradient_steps % self.target_network_frequency == 0:
             self.q_target.load_state_dict(self.q.state_dict())
 
-    def calc_loss(self, states, actions, rewards, next_states, dones, gamma=0.99):
+    def calc_loss(self, states, actions, rewards, next_states, dones, gamma=0.98):
         """
         states is of shape B x input_shape
         actions is of shape B x num_actions
