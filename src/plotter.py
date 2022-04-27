@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     # list of algorithms and their corresponding uris
     runs = {}
-    runs["SAC_CARRACING"] = [
+    runs["SAC"] = [
         "jjshoots/e2SAC_carracing/1s67y2pw",
         "jjshoots/e2SAC_carracing/1tsdhfyb",
         "jjshoots/e2SAC_carracing/1zclqhsv",
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_carracing/36qn6nxt",
         "jjshoots/e2SAC_carracing/3layv5zm",
     ]
-    runs["E2SAC_CARRACING_20"] = [
+    runs["E2SAC, CS=20"] = [
         "jjshoots/e2SAC_carracing/15ox79xj",
         "jjshoots/e2SAC_carracing/1zcw8otp",
         "jjshoots/e2SAC_carracing/2o3ln6sc",
@@ -98,7 +98,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_carracing/32rhqm2g",
         "jjshoots/e2SAC_carracing/upu5fgds",
     ]
-    runs["E2SAC_CARRACING_8"] = [
+    runs["E2SAC, CS=8"] = [
         "jjshoots/e2SAC_carracing/2smcyzzs",
         "jjshoots/e2SAC_carracing/1mn3fmw9",
         "jjshoots/e2SAC_carracing/2sn5b8b5",
@@ -109,7 +109,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_carracing/270g98tg",
         "jjshoots/e2SAC_carracing/fr1k6g8a",
     ]
-    runs["E2SAC_CARRACING_2"] = [
+    runs["E2SAC, CS=2"] = [
         "jjshoots/e2SAC_carracing/1u6qf5r4",
         "jjshoots/e2SAC_carracing/1ss3yrfd",
         "jjshoots/e2SAC_carracing/393700q4",
@@ -153,12 +153,14 @@ if __name__ == "__main__":
 
     # plot sample efficiency curve
     plot_utils.plot_sample_efficiency_curve(
-        x_axis,
+        x_axis / 1e4,
         iqm_scores,
         iqm_cis,
         algorithms=algorithms,
-        xlabel=r"Number of episodes",
-        ylabel="Interquartile Mean (IQM)",
+        xlabel=r"Timesteps (1e4)",
+        ylabel="Evaluation Interquartile Mean (IQM)",
+        labelsize='xx-large',
+        ticklabelsize='xx-large',
     )
 
     # form the legend
@@ -172,10 +174,10 @@ if __name__ == "__main__":
         loc="upper center",
         fancybox=True,
         ncol=len(algorithms),
-        fontsize="x-large",
+        fontsize="xx-large",
         bbox_to_anchor=(0.5, 1.1),
     )
 
-    plt.title('Suboptimal Policy Eval = 270')
-    plt.savefig('resource/carracing.pdf')
+    # plt.title('Suboptimal Policy Eval = 270')
+    # plt.savefig('resource/carracing.pdf')
     plt.show()
