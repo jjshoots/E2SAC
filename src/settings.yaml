@@ -1,6 +1,6 @@
 
 # training params
-switchup_step: 60000
+switchup_step: 250000
 buffer_size: 30000
 buffer_size_debug: 100
 batch_size: 300
