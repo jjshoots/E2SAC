@@ -70,7 +70,7 @@ class Environment:
         action = np.squeeze(action)
 
         # step through the env
-        self.state, reward, self.done, _ = self.env.step(action)
+        self.state, reward, self.done, info = self.env.step(action)
 
         # accumulate rewards
         self.cumulative_reward += reward
@@ -78,7 +78,12 @@ class Environment:
         # get label
         label = self.get_label(self.state)
 
-        return self.state, reward, self.done, label
+        # only return done when we fail the env, not time limit
+        done = self.done
+        if 'TimeLimit.truncated' in info:
+            done = False
+
+        return self.state, reward, done, label
 
     @property
     def is_done(self):
