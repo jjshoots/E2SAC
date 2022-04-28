@@ -163,6 +163,9 @@ if __name__ == "__main__":
         ticklabelsize='xx-large',
     )
 
+    plt.axhline(y=270, color=sns.color_palette("colorblind")[4], linestyle="-")
+    algorithms.append("Suboptimal")
+
     # form the legend
     color_dict = dict(zip(algorithms, sns.color_palette("colorblind")))
     fake_patches = [
