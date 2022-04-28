@@ -99,15 +99,15 @@ class ESDDQN(nn.Module):
         current_u = u_output.gather(dim=-2, index=actions)
 
         # compute bellman error
-        bellman_error = abs(current_q - target_q)
+        bellman_error = (current_q - target_q) ** 2
 
         """Q LOSS CALCULATION"""
         # compare predictions with targets to form loss
-        q_loss = (bellman_error ** 2).mean()
+        q_loss = bellman_error.mean()
 
         """U LOSS CALCULATION"""
         # U_target = bellman_error + dones * gamma * next_u
-        target_u = bellman_error.detach() + gamma * next_u * dones
+        target_u = (bellman_error.detach() + (gamma * next_u * dones) ** 2).sqrt()
 
         # compute uncertainty loss
         u_loss = ((current_u - target_u) ** 2).mean()

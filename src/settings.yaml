@@ -7,7 +7,7 @@ batch_size: 300
 total_steps: 500000
 repeats_per_buffer: 5
 max_grad_norm: 0.5
-target_network_frequency: 3000
+target_network_frequency: 1000
 
 # exploration settings
 exploration_steps: 0
