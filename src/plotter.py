@@ -16,7 +16,7 @@ from matplotlib import rc
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-sns.set_style("white", {'axes.grid' : False})
+sns.set_style("white", {"axes.grid": False})
 
 # See warnings only once
 import warnings
@@ -97,13 +97,13 @@ def compute_plots(runs, env_name, baseline):
         algorithms=algorithms,
         xlabel=r"Timesteps (1e6)",
         ylabel="Evaluation Interquartile Mean (IQM)",
-        labelsize='large',
-        ticklabelsize='large',
+        labelsize="large",
+        ticklabelsize="large",
     )
 
     # plot suboptimal policy line
-    plt.axhline(y = baseline, color = 'r', linestyle = '-')
-    algorithms.append('Suboptimal')
+    plt.axhline(y=baseline, color=sns.color_palette("colorblind")[2], linestyle="-")
+    algorithms.append("Suboptimal")
 
     # form the legend
     color_dict = dict(zip(algorithms, sns.color_palette("colorblind")))
@@ -120,7 +120,8 @@ def compute_plots(runs, env_name, baseline):
         bbox_to_anchor=(0.5, 1.1),
     )
 
-    plt.savefig(f'resource/{env_name}.pdf')
+    plt.savefig(f"resource/{env_name}.pdf")
+
 
 if __name__ == "__main__":
     # list of algorithms and their corresponding uris
