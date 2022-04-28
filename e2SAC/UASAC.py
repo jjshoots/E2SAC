@@ -176,17 +176,17 @@ class UASAC(nn.Module):
             target_q = target_q.mean(dim=0)
 
             # calculate bellman error and take expectation over all networks
-            bellman_error = (current_q - target_q).abs()
+            bellman_error = (current_q - target_q) ** 2
             bellman_error = bellman_error.mean(dim=-1, keepdim=True)
 
             # calculate next_u and take expectation over all next actions
             next_u = next_u.mean(dim=0)
 
-            # U_target = max(bellman_error) + dones * (gamma * mean(next_U))
-            target_u = bellman_error + (gamma * next_u) * dones
+            # U_target = sqrt(bellman_error + next_u^2)
+            target_u = (bellman_error + (gamma * next_u * dones) ** 2).sqrt()
 
         # compare predictions with targets to form loss
-        q_loss = ((current_q - target_q) ** 2).mean()
+        q_loss = bellman_error.mean()
         u_loss = ((current_u - target_u) ** 2).mean()
 
         # critic loss is q loss plus uncertainty loss, scale losses to have the same mag
