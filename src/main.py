@@ -37,8 +37,8 @@ def train(set):
 
         # """SWITCH UP ENV"""
         # if memory.count > set.switchup_num == 0:
-            # env.switchup()
-            # memory.refresh()
+        # env.switchup()
+        # memory.refresh()
 
         """ENVIRONMENT INTERACTION"""
         env.reset()

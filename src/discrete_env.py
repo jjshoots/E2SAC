@@ -32,11 +32,7 @@ class Environment:
 
     def switchup(self):
         if not self.has_switched:
-            self.env = gym.make(
-                self.env_name,
-                enable_wind=True,
-                wind_power=10.0
-            )
+            self.env = gym.make(self.env_name, enable_wind=True, wind_power=10.0)
             self.has_switched = True
 
     def eval(self):
@@ -80,7 +76,7 @@ class Environment:
 
         # only return done when we fail the env, not time limit
         done = self.done
-        if 'TimeLimit.truncated' in info:
+        if "TimeLimit.truncated" in info:
             done = False
 
         return self.state, reward, done, label
