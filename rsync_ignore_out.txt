@@ -7,5 +7,6 @@
 /.git
 /.vim
 */*.egg-info
+*.egg-info
 */__pycache__
 */archive
