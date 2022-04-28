@@ -16,7 +16,7 @@ from matplotlib import rc
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-sns.set_style("white")
+sns.set_style("white", {'axes.grid' : False})
 
 # See warnings only once
 import warnings
@@ -54,7 +54,7 @@ def get_wandb_log(run_uri, keys):
     return data
 
 
-def compute_plots(runs, env_name):
+def compute_plots(runs, env_name, baseline):
     # parameters
     num_steps = 1e6
     num_intervals = 21
@@ -101,12 +101,16 @@ def compute_plots(runs, env_name):
         ticklabelsize='large',
     )
 
+    # plot suboptimal policy line
+    plt.axhline(y = baseline, color = 'r', linestyle = '-')
+    algorithms.append('Suboptimal')
+
     # form the legend
     color_dict = dict(zip(algorithms, sns.color_palette("colorblind")))
     fake_patches = [
         patches.Patch(color=color_dict[alg], alpha=0.75) for alg in algorithms
     ]
-    legend = plt.legend(
+    plt.legend(
         fake_patches,
         algorithms,
         loc="upper center",
@@ -122,6 +126,7 @@ if __name__ == "__main__":
     # list of algorithms and their corresponding uris
     run_list = []
     env_list = []
+    baselines = []
 
     # Ant
     runs = {}
@@ -151,6 +156,7 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     env_list.append("AntPyBulletEnv-v0")
+    baselines.append(1720.0)
 
     # Hopper
     runs = {}
@@ -180,6 +186,7 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     env_list.append("HopperPyBulletEnv-v0")
+    baselines.append(1677.0)
 
     # HalfCheetah
     runs = {}
@@ -209,6 +216,7 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     env_list.append("HalfCheetahPyBulletEnv-v0")
+    baselines.append(447.0)
 
     # Walker2D
     runs = {}
@@ -238,7 +246,7 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     env_list.append("Walker2DPyBulletEnv-v0")
+    baselines.append(788.0)
 
-
-    for runs, env_name in zip(run_list, env_list):
-        compute_plots(runs, env_name)
+    for runs, env_name, baseline in zip(run_list, env_list, baselines):
+        compute_plots(runs, env_name, baseline)
