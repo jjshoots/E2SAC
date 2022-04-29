@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 sns.set_style("white")
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
 
 # See warnings only once
 import warnings
@@ -38,15 +40,17 @@ rcParams["ps.fonttype"] = 42
 rc("text", usetex=False)
 
 
-def get_log(run_uri, keys):
+def get_wandb_log(run_uri, keys):
     assert isinstance(keys, list), "keys must be a list."
-    api = wandb.Api()
+    api = wandb.Api(timeout=30)
     run = api.run(run_uri)
     history = run.scan_history(keys=keys)
 
     data = {}
     for key in keys:
         array = np.array([row[key] for row in history])
+        array = array.astype(np.float64)
+        array = np.nan_to_num(array, nan=0.0, posinf=0.0, neginf=0.0)
         data[key] = array
 
     return data
@@ -54,13 +58,17 @@ def get_log(run_uri, keys):
 
 if __name__ == "__main__":
     # parameters
-    num_episodes = 501
+    num_steps = 500000
+    num_intervals = 200
+
+    # x_axis values to plot against
+    x_axis = np.linspace(0, num_steps, num_intervals)
 
     # list of algorithms and their corresponding uris
     runs = {}
     runs["Runtime Uncertainty"] = [
         "jjshoots/carracing_discrete/85wv07fe",
-        "jjshoots/carracing_discrete/11d3jqat",
+        # "jjshoots/carracing_discrete/11d3jqat",
         "jjshoots/carracing_discrete/1jla2e50",
         "jjshoots/carracing_discrete/2otv5zh6",
     ]
@@ -74,11 +82,8 @@ if __name__ == "__main__":
     for algorithm in runs:
         score = []
         for run_uri in runs[algorithm]:
-            score.append(
-                get_log(run_uri, ["runtime_uncertainty"])["runtime_uncertainty"][
-                    :num_episodes
-                ]
-            )
+            log = get_wandb_log(run_uri, ["num_transitions", "runtime_uncertainty"])
+            score.append(np.interp(x_axis, log["num_transitions"], log["runtime_uncertainty"]))
 
         # stack along num_runs axis
         score = np.stack(score, axis=0)
@@ -88,26 +93,27 @@ if __name__ == "__main__":
         # add to overall scores
         scores[algorithm] = score
 
-    episode = np.arange(0, num_episodes, 20)
-    ale_frames_scores_dict = {
-        algorithm: score[:, :, episode] for algorithm, score in scores.items()
-    }
+    # get interquartile mean
     iqm = lambda scores: np.array(
         [metrics.aggregate_iqm(scores[..., frame]) for frame in range(scores.shape[-1])]
     )
-    iqm_scores, iqm_cis = rly.get_interval_estimates(
-        ale_frames_scores_dict, iqm, reps=50000
-    )
+    # compute confidence intervals
+    iqm_scores, iqm_cis = rly.get_interval_estimates(scores, iqm, reps=50000)
 
     # plot sample efficiency curve
     plot_utils.plot_sample_efficiency_curve(
-        episode + 1,
+        x_axis / 1e5,
         iqm_scores,
         iqm_cis,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e5)",
-        ylabel="Runtime Uncertainty",
+        ylabel="Mean Episodic Epistemic Uncertainty",
+        labelsize='xx-large',
+        ticklabelsize='xx-large',
     )
+
+    plt.axvline(x=250000/1e5, color=sns.color_palette("colorblind")[1], linestyle="-")
+    algorithms.append("Domain Change")
 
     # form the legend
     color_dict = dict(zip(algorithms, sns.color_palette("colorblind")))
@@ -117,11 +123,13 @@ if __name__ == "__main__":
     legend = plt.legend(
         fake_patches,
         algorithms,
-        loc="upper center",
+        loc="lower right",
         fancybox=True,
         ncol=len(algorithms),
-        fontsize="x-large",
-        bbox_to_anchor=(0.5, 1.1),
+        fontsize="xx-large",
+        # bbox_to_anchor=(0.5, 1.1),
     )
 
+    plt.title('Runtime Uncertainty CarRacing-v1', fontsize="xx-large")
+    # plt.savefig('resource/RuntimeUncertaintyCarRacing.pdf')
     plt.show()
