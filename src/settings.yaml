@@ -2,13 +2,13 @@
 # env_name: 'CartPole-v1'
 # env_name: 'MountainCar-v0'
 env_name: 'LunarLander-v2'
-switchup_num: 100000
+switchup_num: 200000
 
 # training params
-buffer_size: 100000
+buffer_size: 200000
 buffer_size_debug: 100
 batch_size: 256
-total_steps: 200000
+total_steps: 400000
 repeats_per_buffer: 3
 max_grad_norm: 0.5
 target_network_frequency: 1000
