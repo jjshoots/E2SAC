@@ -58,24 +58,11 @@ if __name__ == "__main__":
 
     # list of algorithms and their corresponding uris
     runs = {}
-    runs["E2SAC"] = [
-        "jjshoots/e2SAC_carracing/2harp7lx",
-    ]
-    runs["SAC"] = [
-        # ANT
-        "jjshoots/e2SAC_pybullet/13h1m9xi",
-        "jjshoots/e2SAC_pybullet/3b5j9b7m",
-        "jjshoots/e2SAC_pybullet/2peczyr9",
-        "jjshoots/e2SAC_pybullet/1c6y8gu6",
-        "jjshoots/e2SAC_pybullet/91w6nx7m",
-        "jjshoots/e2SAC_pybullet/19ohj3hi",
-        "jjshoots/e2SAC_pybullet/2nptl9ih",
-        "jjshoots/e2SAC_pybullet/3uptzvr4",
-        # HOPPER
-        "jjshoots/e2SAC_pybullet/28o1jyka",
-        "jjshoots/e2SAC_pybullet/208rjk0x",
-        "jjshoots/e2SAC_pybullet/2yno2ni6",
-        "jjshoots/e2SAC_pybullet/jrtr337s",
+    runs["Runtime Uncertainty"] = [
+        "jjshoots/carracing_discrete/85wv07fe",
+        "jjshoots/carracing_discrete/11d3jqat",
+        "jjshoots/carracing_discrete/1jla2e50",
+        "jjshoots/carracing_discrete/2otv5zh6",
     ]
 
     # list of algorithms we have
@@ -87,7 +74,11 @@ if __name__ == "__main__":
     for algorithm in runs:
         score = []
         for run_uri in runs[algorithm]:
-            score.append(get_log(run_uri, ["eval_perf"])["eval_perf"][:num_episodes])
+            score.append(
+                get_log(run_uri, ["runtime_uncertainty"])["runtime_uncertainty"][
+                    :num_episodes
+                ]
+            )
 
         # stack along num_runs axis
         score = np.stack(score, axis=0)
@@ -114,8 +105,8 @@ if __name__ == "__main__":
         iqm_scores,
         iqm_cis,
         algorithms=algorithms,
-        xlabel=r"Number of episodes",
-        ylabel="Interquartile Mean (IQM)",
+        xlabel=r"Timesteps (1e5)",
+        ylabel="Runtime Uncertainty",
     )
 
     # form the legend
