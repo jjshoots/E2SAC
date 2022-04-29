@@ -15,7 +15,7 @@ repeats_per_buffer: 3
 exploration_steps: 0
 
 # learning rate and exploration rate
-learning_rate: 0.01
+learning_rate: 0.001
 exploration_epsilon: 0.05
 
 # eval settings

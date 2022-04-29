@@ -119,8 +119,6 @@ class ESDDQN(nn.Module):
         log = dict()
         log["target_q"] = target_q.mean().detach()
         log["target_u"] = target_u.mean().detach()
-        log["current_u"] = current_u.mean().detach()
-        log["next_u"] = next_u.mean().detach()
         log["q_loss"] = q_loss.mean().detach()
         log["u_loss"] = u_loss.mean().detach()
         log["uncertainty"] = current_u.mean().detach()
