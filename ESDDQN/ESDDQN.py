@@ -17,12 +17,14 @@ class ESDDQN(nn.Module):
         num_actions,
         state_size,
         exploration_epsilon=0.05,
+        target_network_frequency=1000,
     ):
         super().__init__()
 
         self.num_actions = num_actions
         self.state_size = state_size
         self.exploration_epsilon = exploration_epsilon
+        self.target_network_frequency = target_network_frequency
         self.num_networks = 1
 
         # twin delayed Q networks
@@ -34,6 +36,7 @@ class ESDDQN(nn.Module):
         ).eval()
 
         # copy weights and disable gradients for the target network
+        self.gradient_steps = 0
         self.q_target.load_state_dict(self.q.state_dict())
         for param in self.q_target.parameters():
             param.requires_grad = False
@@ -54,10 +57,10 @@ class ESDDQN(nn.Module):
         # get max over all actions
         return torch.argmax(q, dim=-1, keepdim=True)
 
-    def update_q_target(self, tau=0.005):
-        # polyak averaging update for target q network
-        for target, source in zip(self.q_target.parameters(), self.q.parameters()):
-            target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
+    def update_q_target(self):
+        self.gradient_steps += 1
+        if self.gradient_steps % self.target_network_frequency == 0:
+            self.q_target.load_state_dict(self.q.state_dict())
 
     def calc_loss(self, states, actions, rewards, next_states, dones, gamma=0.99):
         """
@@ -81,7 +84,7 @@ class ESDDQN(nn.Module):
             # get the next q and u lists and get the value, then...
             next_q, next_u = self.q_target(next_states)
 
-            # take min over networks
+            # take min over networks to prevent overestimation bias
             next_q = next_q.min(dim=-1, keepdim=True)[0]
             next_u = next_u.min(dim=-1, keepdim=True)[0]
 
@@ -108,7 +111,7 @@ class ESDDQN(nn.Module):
 
         """U LOSS CALCULATION"""
         # U_target = bellman_error + dones * gamma * next_u
-        target_u = (bellman_error.detach() + ((gamma * next_u * dones) ** 2)).sqrt()
+        target_u = (bellman_error.detach() + (gamma * next_u * dones) ** 2).sqrt()
 
         # compute uncertainty loss
         u_loss = ((current_u - target_u) ** 2).mean()

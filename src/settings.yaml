@@ -10,6 +10,8 @@ buffer_size_debug: 100
 batch_size: 256
 total_steps: 200000
 repeats_per_buffer: 3
+max_grad_norm: 0.5
+target_network_frequency: 1000
 
 # exploration settings
 exploration_steps: 0

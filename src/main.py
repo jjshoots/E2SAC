@@ -3,11 +3,12 @@ from signal import SIGINT, signal
 
 import numpy as np
 import torch
+import torch.nn as nn
 import torch.optim as optim
 
 import wandb
-from ESDDQN.ESDDQN import ESDDQN
 from discrete_env import Environment
+from ESDDQN.ESDDQN import ESDDQN
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize
 from utils.replay_buffer import ReplayBuffer
@@ -91,6 +92,7 @@ def train(set):
                 loss, log = net.calc_loss(states, actions, rewards, next_states, dones)
                 to_log = {**to_log, **log}
                 loss.backward()
+                nn.utils.clip_grad_norm_(list(net.parameters()), set.max_grad_norm)
                 optim_set["ddqn"].step()
                 net.update_q_target()
 
@@ -173,6 +175,7 @@ def setup_nets(set):
         num_actions=set.num_actions,
         state_size=set.state_size,
         exploration_epsilon=set.exploration_epsilon,
+        target_network_frequency=set.target_network_frequency,
     ).to(set.device)
     ddqn_optim = optim.AdamW(net.parameters(), lr=set.learning_rate, amsgrad=True)
 

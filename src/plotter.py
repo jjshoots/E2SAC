@@ -1,20 +1,16 @@
 # rliable google
+import matplotlib.patches as patches
+# plotting styles
+import matplotlib.pyplot as plt
+# normal imports
+import numpy as np
+import seaborn as sns
+from matplotlib import rc, rcParams
 from rliable import library as rly
-from rliable import metrics
-from rliable import plot_utils
+from rliable import metrics, plot_utils
 
 # to import stuff from wandb
 import wandb
-
-# normal imports
-import numpy as np
-import matplotlib.patches as patches
-from matplotlib import rcParams
-from matplotlib import rc
-
-# plotting styles
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 sns.set_style("white")
 
