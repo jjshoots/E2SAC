@@ -108,9 +108,7 @@ class ESDDQN(nn.Module):
 
         """U LOSS CALCULATION"""
         # U_target = bellman_error + dones * gamma * next_u
-        target_u = (
-            bellman_error.detach() + ((gamma * next_u * dones) ** 2)
-        ).sqrt()
+        target_u = (bellman_error.detach() + ((gamma * next_u * dones) ** 2)).sqrt()
 
         # compute uncertainty loss
         u_loss = ((current_u - target_u) ** 2).mean()

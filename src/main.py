@@ -35,10 +35,10 @@ def train(set):
                 [to_log["max_eval_perf"], to_log["eval_perf"]]
             )
 
-        # """SWITCH UP ENV"""
-        # if memory.count > set.switchup_num == 0:
-        # env.switchup()
-        # memory.refresh()
+        """SWITCH UP ENV"""
+        if memory.count > set.switchup_num == 0:
+            env.switchup()
+            # memory.refresh()
 
         """ENVIRONMENT INTERACTION"""
         env.reset()
