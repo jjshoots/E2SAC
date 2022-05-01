@@ -67,10 +67,18 @@ if __name__ == "__main__":
     # list of algorithms and their corresponding uris
     runs = {}
     runs["Runtime Uncertainty"] = [
+        "jjshoots/carracing_discrete/16ghiz19",
+        "jjshoots/carracing_discrete/1t1i6i4z",
+        "jjshoots/carracing_discrete/ifbtm01s",
+        "jjshoots/carracing_discrete/2e01yqe5",
+        "jjshoots/carracing_discrete/q4mciaiy",
+        # "jjshoots/carracing_discrete/evvbcntl",
+        "jjshoots/carracing_discrete/2ad054yx",
         "jjshoots/carracing_discrete/85wv07fe",
         # "jjshoots/carracing_discrete/11d3jqat",
         "jjshoots/carracing_discrete/1jla2e50",
         "jjshoots/carracing_discrete/2otv5zh6",
+        "jjshoots/carracing_discrete/11d3jqat",
     ]
 
     # list of algorithms we have
@@ -129,6 +137,9 @@ if __name__ == "__main__":
         fontsize="xx-large",
         # bbox_to_anchor=(0.5, 1.1),
     )
+
+    # bound limites
+    plt.ylim(top=25)
 
     plt.title('Runtime Uncertainty CarRacing-v1', fontsize="xx-large")
     # plt.savefig('resource/RuntimeUncertaintyCarRacing.pdf')
