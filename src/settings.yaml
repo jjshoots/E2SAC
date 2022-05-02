@@ -21,7 +21,7 @@ exploration_steps: 0
 
 # algorithm specifics
 supervision_lambda: 10.
-# confidence_lambda: null
+confidence_lambda: 200
 use_entropy: true
 target_entropy: null
 n_var_samples: 32
@@ -31,7 +31,7 @@ eval_num_episodes: 50
 eval_steps_ratio: 50000
 
 # helper params
-wandb_project: 'e2SAC_pybullet'
+wandb_project: 'pybullet_proper'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''

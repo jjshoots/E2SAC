@@ -117,15 +117,6 @@ def arg_parser():
         help="Environment name from pybullet gym.",
     )
 
-    parser.add_argument(
-        "--confidence_lambda",
-        type=float,
-        nargs="?",
-        const=False,
-        default=1.0,
-        help="Confidence Lambda.",
-    )
-
     return parser.parse_args()
 
 
