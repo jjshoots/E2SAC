@@ -5,7 +5,7 @@ env_name: 'LunarLander-v2'
 switchup_num: 500000
 
 # training params
-buffer_size: 200000
+buffer_size: 500000
 buffer_size_debug: 100
 batch_size: 256
 total_steps: 1000000
