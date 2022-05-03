@@ -109,6 +109,15 @@ def arg_parser():
         help="Network weights number.",
     )
 
+    parser.add_argument(
+        "--confidence_lambda",
+        type=float,
+        nargs="?",
+        const=False,
+        default=200.0,
+        help="Confidence lambda.",
+    )
+
     return parser.parse_args()
 
 

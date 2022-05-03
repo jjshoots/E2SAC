@@ -12,8 +12,8 @@ learning_rate: 0.0004
 exploration_steps: 0
 
 # algorithm specifics
-supervision_lambda: 10.
-confidence_lambda: 8.
+supervision_lambda: 5.
+# confidence_lambda: 200.
 use_entropy: true
 target_entropy: null
 n_var_samples: 32
