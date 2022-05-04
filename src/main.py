@@ -37,7 +37,7 @@ def train(set):
             )
 
         """SWITCH UP ENV"""
-        if memory.count > set.switchup_num == 0:
+        if memory.count > set.switchup_num:
             env.switchup()
             # memory.refresh()
 
