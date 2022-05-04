@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 sns.set_style("white")
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
 
 # See warnings only once
 import warnings
