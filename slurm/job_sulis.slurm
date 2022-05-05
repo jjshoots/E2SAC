@@ -5,8 +5,8 @@
 #SBATCH --mem-per-cpu=3850
 #SBATCH --gres=gpu:ampere_a100:1
 #SBATCH --partition=gpu
-#SBATCH --time=24:00:00
-#SBATCH --account=su003
+#SBATCH --time=48:00:00
+#SBATCH --account=su003-iftc1
 
 module purge
 module load GCC/10.2.0  CUDA/11.1.1  OpenMPI/4.0.5
