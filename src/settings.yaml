@@ -10,11 +10,11 @@ buffer_size: 1000000
 buffer_size_debug: 100
 batch_size: 256
 total_steps: 1000000
-repeats_per_buffer: 3 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
+repeats_per_buffer: 1 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
 repeats_per_buffer_scale: 0.0
 critic_update_multiplier: 1
 actor_update_multiplier: 1
-learning_rate: 0.0004
+learning_rate: 0.001
 
 # exploration settings
 exploration_steps: 0
