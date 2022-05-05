@@ -15,7 +15,6 @@ class Environment:
         super().__init__()
 
         self.env_name = env_name
-        # self.env = gym.make(env_name)
         self.env = gym.make(self.env_name)
         self.state = np.zeros_like(self.env.reset())
         self.state_size = self.state.shape[0]
@@ -31,10 +30,10 @@ class Environment:
 
         self.reset()
 
-    def switchup(self):
-        if not self.has_switched:
-            self.env = gym.make(self.env_name, enable_wind=True, wind_power=10.0)
-            self.has_switched = True
+    # def switchup(self):
+    #     if not self.has_switched:
+    #         self.env = gym.make(self.env_name, enable_wind=True, wind_power=10.0)
+    #         self.has_switched = True
 
     def eval(self):
         self.eval_run = True
