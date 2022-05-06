@@ -14,7 +14,7 @@ repeats_per_buffer: 1 # repeats = repeats_per_buffer + repeats_per_buffer_scale 
 repeats_per_buffer_scale: 0.0
 critic_update_multiplier: 1
 actor_update_multiplier: 1
-learning_rate: 0.001
+learning_rate: 0.0004
 
 # exploration settings
 exploration_steps: 0

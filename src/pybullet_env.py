@@ -17,6 +17,9 @@ class Environment:
     def __init__(self, env_name):
         super().__init__()
 
+        big = True
+        size = "" if not big else "_big"
+
         self.env_name = env_name
         self.env = gym.make(env_name)
         self.state = np.zeros_like(self.env.reset())
@@ -33,10 +36,10 @@ class Environment:
         self.device = get_device()
         try:
             self.suboptimal_actor = Suboptimal_Actor(
-                num_actions=self.num_actions, state_size=self.state_size
+                num_actions=self.num_actions, state_size=self.state_size, big=big
             ).to(self.device)
             self.suboptimal_actor.load_state_dict(
-                torch.load(f"./suboptimal_policies/{env_name}.pth")
+                torch.load(f"./suboptimal_policies/{env_name}{size}.pth")
             )
         except:
             print("--------------------------------------------------")
@@ -135,7 +138,7 @@ class Environment:
         if net is not None:
             net.eval()
         self.env = gym.make(self.env_name)
-        self.env.render(mode='human')
+        self.env.render(mode="human")
         self.eval()
         self.reset()
 
