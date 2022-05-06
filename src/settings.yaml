@@ -4,11 +4,11 @@ env_name: 'CartPole-v1'
 # env_name: 'LunarLander-v2'
 
 # training params
-buffer_size: 200000
+buffer_size: 300000
 buffer_size_debug: 100
 batch_size: 256
 total_steps: 1000000
-repeats_per_buffer: 3
+repeats_per_buffer: 1
 max_grad_norm: 0.5
 target_network_frequency: 1000
 
@@ -16,7 +16,7 @@ target_network_frequency: 1000
 exploration_steps: 0
 
 # learning rate and exploration rate
-learning_rate: 0.001
+learning_rate: 0.0003
 exploration_epsilon: 0.05
 
 # eval settings
