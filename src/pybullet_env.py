@@ -1,12 +1,13 @@
 import time
+import warnings
 
-import torch
 import gym
 import numpy as np
 import pybulletgym
+import torch
 
-from utils.helpers import cpuize, gpuize, get_device
 from suboptimal_policy import Suboptimal_Actor
+from utils.helpers import cpuize, get_device, gpuize
 
 
 class Environment:
@@ -42,9 +43,9 @@ class Environment:
                 torch.load(f"./suboptimal_policies/{env_name}{size}.pth")
             )
         except:
-            print("--------------------------------------------------")
-            print(f"No subotpimal actor found for env {env_name}")
-            print("--------------------------------------------------")
+            warnings.warn("--------------------------------------------------")
+            warnings.warn(f"No subotpimal actor found for env {env_name}")
+            warnings.warn("--------------------------------------------------")
             self.suboptimal_actor = None
 
         self.reset()
