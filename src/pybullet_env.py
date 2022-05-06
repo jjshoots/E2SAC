@@ -135,7 +135,7 @@ class Environment:
         if net is not None:
             net.eval()
         self.env = gym.make(self.env_name)
-        self.env.render()
+        self.env.render(mode='human')
         self.eval()
         self.reset()
 
