@@ -1,7 +1,9 @@
 # rliable google
 import matplotlib.patches as patches
+
 # plotting styles
 import matplotlib.pyplot as plt
+
 # normal imports
 import numpy as np
 import seaborn as sns
@@ -146,7 +148,7 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     env_list.append("AntPyBulletEnv-v0")
-    baselines.append(1720.0)
+    baselines.append(2355.0)
 
     # Hopper
     runs = {}
@@ -167,7 +169,7 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     env_list.append("HopperPyBulletEnv-v0")
-    baselines.append(1677.0)
+    baselines.append(2500.0)
 
     # HalfCheetah
     runs = {}
@@ -188,7 +190,7 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     env_list.append("HalfCheetahPyBulletEnv-v0")
-    baselines.append(447.0)
+    baselines.append(1646.0)
 
     # Walker2D
     runs = {}
@@ -209,7 +211,7 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     env_list.append("Walker2DPyBulletEnv-v0")
-    baselines.append(788.0)
+    baselines.append(1733.0)
 
     for runs, env_name, baseline in zip(run_list, env_list, baselines):
         compute_plots(runs, env_name, baseline)

@@ -27,4 +27,5 @@ class Suboptimal_Actor(nn.Module):
     def forward(self, states):
         output = self.net(states).reshape(-1, 2, self.num_actions).permute(1, 0, 2)
 
-        return torch.tanh(output[0])
+        return output[0] * 2.0, output[1] * 10.0
+

@@ -36,12 +36,12 @@ class Environment:
         # load suboptimal policy
         self.device = get_device()
         try:
+            path = f"./suboptimal_policies/{env_name}{size}.pth"
             self.suboptimal_actor = Suboptimal_Actor(
                 num_actions=self.num_actions, state_size=self.state_size, big=big
             ).to(self.device)
-            self.suboptimal_actor.load_state_dict(
-                torch.load(f"./suboptimal_policies/{env_name}{size}.pth")
-            )
+            self.suboptimal_actor.load_state_dict(torch.load(path))
+            print(f"Loaded {path}")
         except:
             warnings.warn("--------------------------------------------------")
             warnings.warn(f"No subotpimal actor found for env {env_name}")
@@ -100,6 +100,7 @@ class Environment:
     def get_label(self, obs):
         if self.suboptimal_actor is not None:
             action = self.suboptimal_actor(gpuize(obs, self.device))
+            action = torch.tanh(action[0])
             action = cpuize(action)[0]
             return action
         else:
