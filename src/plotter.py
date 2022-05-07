@@ -54,7 +54,7 @@ def get_wandb_log(run_uri, keys):
     return data
 
 
-def compute_plots(runs, env_name, baseline):
+def compute_plots(runs, env_name, baselines):
     # parameters
     num_steps = 1e6
     num_intervals = 21
@@ -101,9 +101,10 @@ def compute_plots(runs, env_name, baseline):
         ticklabelsize="large",
     )
 
-    # plot suboptimal policy line
-    plt.axhline(y=baseline, color=sns.color_palette("colorblind")[2], linestyle="-")
-    algorithms.append("Suboptimal")
+    # plot suboptimal policy lines
+    for i, baseline in enumerate(baselines):
+        plt.axhline(y=baselines[baseline], color=sns.color_palette("colorblind")[2+i], linestyle="-")
+        algorithms.append(baseline)
 
     # form the legend
     color_dict = dict(zip(algorithms, sns.color_palette("colorblind")))
@@ -127,12 +128,12 @@ if __name__ == "__main__":
     # list of algorithms and their corresponding uris
     run_list = []
     env_list = []
-    baselines = []
+    baseline_list = []
 
     # Ant
     runs = {}
     runs["SAC"] = [
-        "jjshoots/e2SAC_pybullet/27cjzt50",
+        # "jjshoots/e2SAC_pybullet/27cjzt50",
         "jjshoots/e2SAC_pybullet/6vgj57fp",
         "jjshoots/e2SAC_pybullet/1l2a1jz3",
         "jjshoots/e2SAC_pybullet/110jrok2",
@@ -143,8 +144,9 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/sj2wj9n9",
         "jjshoots/e2SAC_pybullet/12nev3lk",
     ]
-    runs["E2SAC"] = [
-        # "jjshoots/pybullet_proper/ngk7rmx1",
+    runs["CGES_1"] = [
+        # "jjshoots/pybullet_proper/20yxnnax",
+        "jjshoots/pybullet_proper/ngk7rmx1",
         "jjshoots/pybullet_proper/2z08ng6b",
         "jjshoots/pybullet_proper/30v3ld90",
         "jjshoots/pybullet_proper/1w6dc3wd",
@@ -162,9 +164,16 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/28qlpnqd",
         # "jjshoots/e2SAC_pybullet/15h8pi1s",
     ]
+    runs["CGES_2"] = [
+        # "jjshoots/pybullet_proper/tn3ubq2t",
+        "jjshoots/pybullet_proper/u2jmu5sx",
+    ]
     run_list.append(runs)
+    baselines = {}
+    baselines['suboptimal_1'] = 1720.0
+    baselines['suboptimal_2'] = 2355.0
+    baseline_list.append(baselines)
     env_list.append("AntPyBulletEnv-v0")
-    baselines.append(1720.0)
 
     # Hopper
     runs = {}
@@ -180,8 +189,9 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/3l6czfp3",
         "jjshoots/e2SAC_pybullet/2ciy5u3x",
     ]
-    runs["E2SAC"] = [
-        # "jjshoots/pybullet_proper/ladktazj",
+    runs["CGES_1"] = [
+        # "jjshoots/pybullet_proper/6h88uw0w",
+        "jjshoots/pybullet_proper/ladktazj",
         "jjshoots/pybullet_proper/2y36fnp5",
         "jjshoots/pybullet_proper/2w2z9umd",
         "jjshoots/pybullet_proper/396k5lw4",
@@ -199,9 +209,16 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/2ttvam1p",
         # "jjshoots/e2SAC_pybullet/1cfh2ob3",
     ]
+    runs["CGES_2"] = [
+        # "jjshoots/pybullet_proper/1cwj8sav",
+        "jjshoots/pybullet_proper/2phhovh3",
+    ]
     run_list.append(runs)
+    baselines = {}
+    baselines['suboptimal_1'] = 1677.0
+    baselines['suboptimal_2'] = 2500.0
+    baseline_list.append(baselines)
     env_list.append("HopperPyBulletEnv-v0")
-    baselines.append(1677.0)
 
     # HalfCheetah
     runs = {}
@@ -217,10 +234,10 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/1xla4kgx",
         "jjshoots/e2SAC_pybullet/3siwabhk",
     ]
-    runs["E2SAC"] = [
-        # "jjshoots/pybullet_proper/3lqx12f5",
+    runs["CGES_1"] = [
+        # "jjshoots/pybullet_proper/1tq7rwb2",
+        "jjshoots/pybullet_proper/3lqx12f5",
         "jjshoots/pybullet_proper/qtkjn0vz",
-        "jjshoots/pybullet_proper/28gb4clu",
         "jjshoots/pybullet_proper/1r1h9r90",
         "jjshoots/pybullet_proper/31udjhbm",
         "jjshoots/pybullet_proper/32llu182",
@@ -236,9 +253,16 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/2e92ggz5",
         # "jjshoots/e2SAC_pybullet/35kzfwxw",
     ]
+    runs["CGES_2"] = [
+        # "jjshoots/pybullet_proper/227pvile",
+        "jjshoots/pybullet_proper/1osdpzz4",
+    ]
     run_list.append(runs)
+    baselines = {}
+    baselines['suboptimal_1'] = 447.0
+    baselines['suboptimal_2'] = 1640.0
+    baseline_list.append(baselines)
     env_list.append("HalfCheetahPyBulletEnv-v0")
-    baselines.append(447.0)
 
     # Walker2D
     runs = {}
@@ -254,8 +278,9 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/1tukgzvw",
         "jjshoots/e2SAC_pybullet/1scupef7",
     ]
-    runs["E2SAC"] = [
-        # "jjshoots/pybullet_proper/3u3l5qhc",
+    runs["CGES_1"] = [
+        # "jjshoots/pybullet_proper/16l4njhw",
+        "jjshoots/pybullet_proper/3u3l5qhc",
         "jjshoots/pybullet_proper/2p2wfpk6",
         "jjshoots/pybullet_proper/mpojmj1k",
         "jjshoots/pybullet_proper/z5n9vb5g",
@@ -273,9 +298,16 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/1b9n57ov",
         # "jjshoots/e2SAC_pybullet/2ax8d0rd",
     ]
+    runs["CGES_2"] = [
+        # "jjshoots/pybullet_proper/2gdynrc6",
+        "jjshoots/pybullet_proper/1eo23yrb",
+    ]
     run_list.append(runs)
+    baselines = {}
+    baselines['suboptimal_1'] = 788.0
+    baselines['suboptimal_2'] = 1733.0
+    baseline_list.append(baselines)
     env_list.append("Walker2DPyBulletEnv-v0")
-    baselines.append(788.0)
 
-    for runs, env_name, baseline in zip(run_list, env_list, baselines):
-        compute_plots(runs, env_name, baseline)
+    for runs, env_name, baselines in zip(run_list, env_list, baseline_list):
+        compute_plots(runs, env_name, baselines)
