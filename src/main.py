@@ -139,7 +139,7 @@ def evaluate(set):
     env = setup_env(set)
 
     net = None
-    if False:
+    if True:
         net, _, _, _ = setup_nets(set)
 
     print(env.evaluate(set, net))

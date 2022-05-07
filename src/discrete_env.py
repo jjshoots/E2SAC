@@ -89,10 +89,7 @@ class Environment:
         return self.done
 
     def get_label(self, obs):
-        if obs[1] > 0:
-            return 2
-        else:
-            return 0
+        return self.do_nothing
 
     def evaluate(self, set, net=None):
         if net is not None:
