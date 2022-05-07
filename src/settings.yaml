@@ -4,9 +4,9 @@ env_name: 'CartPole-v1'
 # env_name: 'LunarLander-v2'
 
 # training params
-buffer_size: 100000
+buffer_size: 300000
 buffer_size_debug: 100
-batch_size: 512
+batch_size: 2048
 total_steps: 1000000
 repeats_per_buffer: 1
 max_grad_norm: 0.5
