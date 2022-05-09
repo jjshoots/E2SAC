@@ -118,7 +118,7 @@ def compute_plots(runs, env_name, baselines):
         fancybox=True,
         # ncol=len(algorithms),
         fontsize="large",
-        bbox_to_anchor=(0.5, 1.1),
+        # bbox_to_anchor=(0.5, 1.1),
     )
 
     plt.savefig(f"resource/{env_name}.pdf")
