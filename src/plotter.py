@@ -103,7 +103,7 @@ def compute_plots(runs, env_name, baselines):
 
     # plot suboptimal policy lines
     for i, baseline in enumerate(baselines):
-        plt.axhline(y=baselines[baseline], color=sns.color_palette("colorblind")[2+i], linestyle="-")
+        plt.axhline(y=baselines[baseline], color=sns.color_palette("colorblind")[3+i], linestyle="-")
         algorithms.append(baseline)
 
     # form the legend
