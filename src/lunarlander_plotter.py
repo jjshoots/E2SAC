@@ -65,10 +65,10 @@ if __name__ == "__main__":
     x_axis = np.linspace(0, num_steps, num_intervals)
 
     # list of algorithms and their corresponding uris
-    run = "jjshoots/ESDDQN/2mlelzjg"
-    span_region = [200000, 275000]
-    # run = "jjshoots/ESDDQN/1qtbr3np"
-    # span_region = [150000, 275000]
+    # run = "jjshoots/ESDDQN/2mlelzjg"
+    # span_region = [200000, 275000]
+    run = "jjshoots/ESDDQN/1qtbr3np"
+    span_region = [150000, 275000]
 
     log = get_wandb_log(run, ["num_transitions", "runtime_uncertainty", "eval_perf"])
     eval_score = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     # twin plots
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
-    ax1.set_xlabel("Timestep (1e5)")
+    ax2.set_xlabel("Timestep (1e5)")
 
     # plot the eval score
     legend_labels["Evaluation Score"] = palette[i + 0]
@@ -91,9 +91,9 @@ if __name__ == "__main__":
     ax1.tick_params(axis="y", labelcolor=palette[i + 0])
 
     # plot the uncertainty
-    legend_labels["Mean Episodic Epistemic Uncertainty"] = palette[i + 1]
+    legend_labels["Episodic Mean Epistemic Uncertainty"] = palette[i + 1]
     ax2.set_ylabel(
-        "Mean Episodic Epistemic Uncertainty", color=palette[i + 1], fontsize=20
+        "Episodic Mean Epistemic Uncertainty", color=palette[i + 1], fontsize=20
     )
     ax2.plot(x_axis, uncertainty, color=palette[i + 1])
     ax2.tick_params(axis="y", labelcolor=palette[i + 1])
@@ -116,5 +116,5 @@ if __name__ == "__main__":
         # bbox_to_anchor=(0.5, 1.1),
     )
 
-    plt.title("Runtime Uncertainty LunarLander", fontsize="xx-large")
+    # plt.title("Runtime Uncertainty LunarLander", fontsize="xx-large")
     plt.show()
