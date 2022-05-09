@@ -176,8 +176,8 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines['suboptimal_1'] = 1720.0
-    baselines['suboptimal_2'] = 2355.0
+    baselines['Oracle_1'] = 1720.0
+    baselines['Oracle_2'] = 2355.0
     baseline_list.append(baselines)
     env_list.append("AntPyBulletEnv-v0")
 
@@ -227,8 +227,8 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines['suboptimal_1'] = 1677.0
-    baselines['suboptimal_2'] = 2500.0
+    baselines['Oracle_1'] = 1677.0
+    baselines['Oracle_2'] = 2500.0
     baseline_list.append(baselines)
     env_list.append("HopperPyBulletEnv-v0")
 
@@ -277,8 +277,8 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines['suboptimal_1'] = 447.0
-    baselines['suboptimal_2'] = 1640.0
+    baselines['Oracle_1'] = 447.0
+    baselines['Oracle_2'] = 1640.0
     baseline_list.append(baselines)
     env_list.append("HalfCheetahPyBulletEnv-v0")
 
@@ -328,8 +328,8 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines['suboptimal_1'] = 788.0
-    baselines['suboptimal_2'] = 1733.0
+    baselines['Oracle_1'] = 788.0
+    baselines['Oracle_2'] = 1733.0
     baseline_list.append(baselines)
     env_list.append("Walker2DPyBulletEnv-v0")
 
