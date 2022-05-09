@@ -190,7 +190,7 @@ if __name__ == "__main__":
     )
 
     plt.axhline(y=270, color=sns.color_palette("colorblind")[4], linestyle="-")
-    algorithms.append("Suboptimal")
+    algorithms.append("Oracle")
 
     # form the legend
     color_dict = dict(zip(algorithms, sns.color_palette("colorblind")))
