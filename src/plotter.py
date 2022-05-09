@@ -114,9 +114,9 @@ def compute_plots(runs, env_name, baselines):
     plt.legend(
         fake_patches,
         algorithms,
-        loc="upper center",
+        loc="lower right",
         fancybox=True,
-        ncol=len(algorithms),
+        # ncol=len(algorithms),
         fontsize="large",
         bbox_to_anchor=(0.5, 1.1),
     )
