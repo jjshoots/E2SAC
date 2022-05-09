@@ -196,7 +196,6 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/2ciy5u3x",
     ]
     runs["CGES_1"] = [
-        # "jjshoots/pybullet_proper/3n6guebt",
         "jjshoots/pybullet_proper/3ruha6kc",
         "jjshoots/pybullet_proper/2ko2c2aj",
         "jjshoots/pybullet_proper/6h88uw0w",
