@@ -1,14 +1,14 @@
 # env type
-env_name: 'CartPole-v1'
+# env_name: 'CartPole-v1'
 # env_name: 'MountainCar-v0'
-# env_name: 'LunarLander-v2'
+env_name: 'LunarLander-v2'
 
 # training params
 buffer_size: 300000
 buffer_size_debug: 100
-batch_size: 2048
-total_steps: 1000000
-repeats_per_buffer: 1
+batch_size: 10000
+total_steps: 500000
+repeats_per_buffer: 2
 max_grad_norm: 0.5
 target_network_frequency: 3000
 
@@ -16,7 +16,7 @@ target_network_frequency: 3000
 exploration_steps: 0
 
 # learning rate and exploration rate
-learning_rate: 0.0002
+learning_rate: 0.0005
 exploration_epsilon: 0.05
 
 # eval settings
@@ -24,7 +24,7 @@ eval_steps_ratio: 10000
 eval_num_traj: 50
 
 # helper params
-wandb_project: 'ESDDQN'
+wandb_project: 'lunarlander-turbulance'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''
