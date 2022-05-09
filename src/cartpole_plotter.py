@@ -65,14 +65,49 @@ if __name__ == "__main__":
     x_axis = np.linspace(0, num_steps, num_intervals)
 
     # list of algorithms and their corresponding uris
-    # run = "jjshoots/ESDDQN/211mucgg"
-    # run = "jjshoots/ESDDQN/2ximq079"
-    run = "jjshoots/ESDDQN/3uthjuly"
-    # run = "jjshoots/ESDDQN/c2dcts1w"
+    runs = []
+    runs.append("jjshoots/ESDDQN/211mucgg")
+    runs.append("jjshoots/ESDDQN/2ximq079")
+    runs.append("jjshoots/ESDDQN/3uthjuly")
+    runs.append("jjshoots/ESDDQN/c2dcts1w")
 
-    log = get_wandb_log(run, ["num_transitions", "runtime_uncertainty", "eval_perf"])
-    eval_score = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
-    uncertainty = np.interp(x_axis, log["num_transitions"], log["runtime_uncertainty"])
+    uncertainties = []
+    eval_scores = []
+    for run_uri in runs:
+        log = get_wandb_log(run_uri, ["num_transitions", "eval_perf"])
+        eval_scores.append(
+            np.interp(x_axis, log["num_transitions"], log["eval_perf"])
+        )
+
+        log = get_wandb_log(run_uri, ["num_transitions", "runtime_uncertainty"])
+        uncertainties.append(
+            np.interp(x_axis, log["num_transitions"], log["runtime_uncertainty"])
+        )
+
+    # stack along num_runs axis
+    eval_temp = np.stack(eval_scores, axis=0)
+    uncer_temp = np.stack(uncertainties, axis=0)
+    # expand along num_games axis
+    eval_temp = np.expand_dims(eval_scores, axis=1)
+    uncer_temp = np.expand_dims(uncertainties, axis=1)
+
+    eval_scores = {}
+    eval_scores['cartpole'] = eval_temp
+    uncertainties = {}
+    uncertainties['cartpole'] = uncer_temp
+
+    # get interquartile mean
+    iqm = lambda eval_scores: np.array(
+        [metrics.aggregate_iqm(eval_scores[..., frame]) for frame in range(eval_scores.shape[-1])]
+    )
+    eval_iqm, eval_cis = rly.get_interval_estimates(eval_scores, iqm, reps=50000)
+
+
+    # get interquartile mean
+    iqm = lambda uncertainties: np.array(
+        [metrics.aggregate_iqm(uncertainties[..., frame]) for frame in range(uncertainties.shape[-1])]
+    )
+    uncer_iqm, uncer_cis = rly.get_interval_estimates(uncertainties, iqm, reps=50000)
 
     # instantiate colorwheel
     palette = sns.color_palette("colorblind")
@@ -82,35 +117,54 @@ if __name__ == "__main__":
     # twin plots
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
-    ax1.set_xlabel("Timestep (1e5)")
+    ax1.set_xlabel("Timestep (1e6)")
 
-    # plot the eval score
-    legend_labels["Evaluation Score"] = palette[i + 0]
-    ax1.set_ylabel("Evaluation Score", color=palette[i + 0], fontsize=20)
-    ax1.plot(x_axis, eval_score, color=palette[i + 0])
-    ax1.tick_params(axis="y", labelcolor=palette[i + 0])
-
-    # plot the uncertainty
-    legend_labels["Mean Episodic Epistemic Uncertainty"] = palette[i + 1]
-    ax2.set_ylabel(
-        "Mean Episodic Epistemic Uncertainty", color=palette[i + 1], fontsize=20
+    # plot sample efficiency curve
+    plot_utils.plot_sample_efficiency_curve(
+        x_axis / 1e6,
+        eval_iqm,
+        eval_cis,
+        algorithms=None,
+        xlabel=r"Timesteps (1e6)",
+        ylabel="Evaluation Interquartile Mean (IQM)",
+        labelsize="large",
+        ticklabelsize="large",
+        ax=ax1,
+        custom_color=sns.color_palette("colorblind")[0:]
     )
-    ax2.plot(x_axis, uncertainty, color=palette[i + 1])
-    ax2.tick_params(axis="y", labelcolor=palette[i + 1])
+    ax1.tick_params(axis="y", labelcolor=palette[0])
+    ax1.set_ylabel("Evaluation Interquartile Mean (IQM)", color=palette[0], fontsize=20)
+
+    # plot sample efficiency curve
+    plot_utils.plot_sample_efficiency_curve(
+        x_axis / 1e6,
+        uncer_iqm,
+        uncer_cis,
+        algorithms=None,
+        xlabel=r"Timesteps (1e6)",
+        ylabel="Episodic Mean Epistemic Uncertainty",
+        labelsize="large",
+        ticklabelsize="large",
+        ax=ax2,
+        custom_color=sns.color_palette("colorblind")[1:]
+    )
+    ax2.tick_params(axis="y", labelcolor=palette[1])
+    ax2.set_ylabel("Episodic Mean Epistemic Uncertainty", color=palette[1], fontsize=20)
+    ax2.set_ylim(top=2.0)
 
     # legend
-    fake_patches = [
-        patches.Patch(color=legend_labels[label], alpha=0.75) for label in legend_labels
-    ]
-    legend = plt.legend(
-        fake_patches,
-        legend_labels,
-        loc="lower right",
-        fancybox=True,
-        # ncol=len(legend_labels),
-        fontsize="xx-large",
-        # bbox_to_anchor=(0.5, 1.1),
-    )
+    # fake_patches = [
+    #     patches.Patch(color=legend_labels[label], alpha=0.75) for label in legend_labels
+    # ]
+    # legend = plt.legend(
+    #     fake_patches,
+    #     legend_labels,
+    #     loc="lower right",
+    #     fancybox=True,
+    #     # ncol=len(legend_labels),
+    #     fontsize="xx-large",
+    #     # bbox_to_anchor=(0.5, 1.1),
+    # )
 
-    plt.title("Runtime Uncertainty LunarLander", fontsize="xx-large")
+    # plt.title("Runtime Uncertainty LunarLander", fontsize="xx-large")
     plt.show()
