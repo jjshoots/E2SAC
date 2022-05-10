@@ -118,6 +118,7 @@ if __name__ == "__main__":
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     ax1.set_xlabel("Timestep (1e6)")
+    ax1.tick_params(axis="x", labelsize=15)
 
     # plot sample efficiency curve
     plot_utils.plot_sample_efficiency_curve(
@@ -127,12 +128,12 @@ if __name__ == "__main__":
         algorithms=None,
         xlabel=r"Timesteps (1e6)",
         ylabel="Evaluation Interquartile Mean (IQM)",
-        labelsize="xx-large",
-        ticklabelsize="xx-large",
+        labelsize=24,
+        ticklabelsize=24,
         ax=ax1,
         custom_color=sns.color_palette("colorblind")[0:]
     )
-    ax1.tick_params(axis="y", labelcolor=palette[0])
+    ax1.tick_params(axis="y", labelcolor=palette[0], labelsize=15)
     ax1.set_ylabel("Evaluation Interquartile Mean (IQM)", color=palette[0], fontsize=20)
 
     # plot sample efficiency curve
@@ -148,7 +149,7 @@ if __name__ == "__main__":
         ax=ax2,
         custom_color=sns.color_palette("colorblind")[1:]
     )
-    ax2.tick_params(axis="y", labelcolor=palette[1])
+    ax2.tick_params(axis="y", labelcolor=palette[1], labelsize=15)
     ax2.set_ylabel("Episodic Mean Epistemic Uncertainty", color=palette[1], fontsize=20)
     ax2.set_ylim(top=2.0)
 

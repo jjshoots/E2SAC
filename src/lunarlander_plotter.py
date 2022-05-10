@@ -65,10 +65,10 @@ if __name__ == "__main__":
     x_axis = np.linspace(0, num_steps, num_intervals)
 
     # list of algorithms and their corresponding uris
-    run = "jjshoots/ESDDQN/2mlelzjg"
-    span_region = [200000, 275000]
-    # run = "jjshoots/ESDDQN/1qtbr3np"
-    # span_region = [150000, 275000]
+    # run = "jjshoots/ESDDQN/2mlelzjg"
+    # span_region = [200000, 275000]
+    run = "jjshoots/ESDDQN/1qtbr3np"
+    span_region = [150000, 275000]
 
     log = get_wandb_log(run, ["num_transitions", "runtime_uncertainty", "eval_perf"])
     eval_score = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
@@ -82,13 +82,14 @@ if __name__ == "__main__":
     # twin plots
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
-    ax1.set_xlabel("Timesteps (1e5)", fontsize="xx-large")
+    ax1.set_xlabel("Timesteps (1e5)", fontsize=24)
+    ax1.tick_params(axis="x", labelsize=15)
 
     # plot the eval score
     legend_labels["Evaluation Score"] = palette[i + 0]
     ax1.set_ylabel("Evaluation Score", color=palette[i + 0], fontsize=20)
     ax1.plot(x_axis / 1e5, eval_score, color=palette[i + 0])
-    ax1.tick_params(axis="y", labelcolor=palette[i + 0])
+    ax1.tick_params(axis="y", labelcolor=palette[i + 0], labelsize=15)
 
     # plot the uncertainty
     legend_labels["Episodic Mean Epistemic Uncertainty"] = palette[i + 1]
@@ -96,7 +97,7 @@ if __name__ == "__main__":
         "Episodic Mean Epistemic Uncertainty", color=palette[i + 1], fontsize=20
     )
     ax2.plot(x_axis / 1e5, uncertainty, color=palette[i + 1])
-    ax2.tick_params(axis="y", labelcolor=palette[i + 1])
+    ax2.tick_params(axis="y", labelcolor=palette[i + 1], labelsize=15)
 
     # fill in the area where the agent discovers things
     legend_labels["Learns Landing"] = palette[i + 2]
