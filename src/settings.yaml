@@ -6,7 +6,7 @@ env_name: 'LunarLander-v2'
 # training params
 buffer_size: 300000
 buffer_size_debug: 100
-batch_size: 1048
+batch_size: 256
 total_steps: 500000
 repeats_per_buffer: 2
 max_grad_norm: 0.5
