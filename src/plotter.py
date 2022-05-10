@@ -141,6 +141,6 @@ if __name__ == "__main__":
     # bound limites
     plt.ylim(top=25)
 
-    plt.title('Runtime Uncertainty CarRacing-v1', fontsize="xx-large")
+    # plt.title('Runtime Uncertainty CarRacing-v1', fontsize="xx-large")
     # plt.savefig('resource/RuntimeUncertaintyCarRacing.pdf')
     plt.show()
