@@ -185,8 +185,8 @@ if __name__ == "__main__":
         algorithms=algorithms,
         xlabel=r"Timesteps (1e4)",
         ylabel="Evaluation Interquartile Mean (IQM)",
-        labelsize='xx-large',
-        ticklabelsize='xx-large',
+        labelsize=24,
+        ticklabelsize=24,
     )
 
     plt.axhline(y=270, color=sns.color_palette("colorblind")[4], linestyle="-")
@@ -202,11 +202,14 @@ if __name__ == "__main__":
         algorithms,
         loc="upper center",
         fancybox=True,
-        ncol=len(algorithms),
-        fontsize="xx-large",
-        bbox_to_anchor=(0.5, 1.1),
+        # ncol=len(algorithms),
+        ncol=2,
+        fontsize=24,
+        # handleheight=1.8,
+        bbox_to_anchor=(0.5, 1.4),
     )
 
     # plt.title('Suboptimal Policy Eval = 270')
     # plt.savefig('resource/carracing.pdf')
+    plt.subplots_adjust(top=0.7, left=0.2, bottom=0.1)
     plt.show()
