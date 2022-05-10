@@ -127,8 +127,8 @@ if __name__ == "__main__":
         algorithms=None,
         xlabel=r"Timesteps (1e6)",
         ylabel="Evaluation Interquartile Mean (IQM)",
-        labelsize="large",
-        ticklabelsize="large",
+        labelsize="xx-large",
+        ticklabelsize="xx-large",
         ax=ax1,
         custom_color=sns.color_palette("colorblind")[0:]
     )
