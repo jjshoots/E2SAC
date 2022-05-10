@@ -115,9 +115,9 @@ if __name__ == "__main__":
         iqm_cis,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e5)",
-        ylabel="Mean Episodic Epistemic Uncertainty",
-        labelsize='xx-large',
-        ticklabelsize='xx-large',
+        ylabel="Episodic Mean Epistemic Uncertainty",
+        labelsize=24,
+        ticklabelsize=24,
     )
 
     plt.axvline(x=250000/1e5, color=sns.color_palette("colorblind")[1], linestyle="-")
