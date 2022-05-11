@@ -15,7 +15,7 @@ class Environment:
         super().__init__()
 
         self.env_name = env_name
-        self.env = gym.make(self.env_name, enable_wind=True)
+        self.env = gym.make(self.env_name, enable_wind=False)
         self.state = np.zeros_like(self.env.reset())
         self.state_size = self.state.shape[0]
         self.num_actions = self.env.action_space.n

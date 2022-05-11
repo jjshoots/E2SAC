@@ -10,13 +10,13 @@ batch_size: 256
 total_steps: 500000
 repeats_per_buffer: 2
 max_grad_norm: 0.5
-target_network_frequency: 3000
+target_network_frequency: 1000
 
 # exploration settings
 exploration_steps: 0
 
 # learning rate and exploration rate
-learning_rate: 0.0005
+learning_rate: 0.001
 exploration_epsilon: 0.05
 
 # eval settings
