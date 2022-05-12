@@ -23,7 +23,7 @@ eval_num_episodes: 50
 eval_steps_ratio: 5000
 
 # helper params
-wandb_project: 'e2SAC_carracing'
+wandb_project: 'carracing_SAC_sweep'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''

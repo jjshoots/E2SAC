@@ -1,15 +1,36 @@
-program: main.py
+program: mainSAC.py
 method: bayes
 metric:
   name: max_eval_perf
   goal: maximize
 parameters:
-  reg_lambda:
-    min: +0.001
-    max: +0.100
+  buffer_size:
+    min: 10000
+    max: 100000
+  learning_rate:
+    min: 0.01
+    max: 0.0001
+  learning_rate:
+    min: 0.01
+    max: 0.0001
+  critic_update_multiplier:
+    value:
+      - 1
+      - 2
+      - 3
+  repeats_per_buffer:
+    value:
+      - 1
+      - 2
+      - 3
+  batch_size:
+    value:
+      - 32
+      - 64
+      - 128
 command:
   - python3
-  - src/main.py
+  - src/mainSAC.py
   - "--train"
   - "--wandb"
-  - "--name=e2sac_sweep"
+  - "--name=a100"
