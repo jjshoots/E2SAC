@@ -2,13 +2,16 @@ source venv/bin/activate
 
 declare -a pids=()
 
-python3 src/main.py --train --wandb --wandb_name="e2SAC_dr_$1" --confidence_lambda=$1 &
+wandb agent jjshoots/carracing_sac_sweep/s78umd9w
 pids+=($!)
-python3 src/main.py --train --wandb --wandb_name="e2SAC_dr_$1" --confidence_lambda=$1 &
+sleep 10
+wandb agent jjshoots/carracing_sac_sweep/s78umd9w
 pids+=($!)
-python3 src/main.py --train --wandb --wandb_name="e2SAC_dr_$1" --confidence_lambda=$1 &
+sleep 10
+wandb agent jjshoots/carracing_sac_sweep/s78umd9w
 pids+=($!)
-python3 src/main.py --train --wandb --wandb_name="e2SAC_dr_$1" --confidence_lambda=$1 &
+sleep 10
+wandb agent jjshoots/carracing_sac_sweep/s78umd9w
 pids+=($!)
 
 for pid in ${pids[*]}; do
