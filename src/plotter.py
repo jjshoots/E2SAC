@@ -50,7 +50,7 @@ def get_wandb_log(run_uri, keys):
     for key in keys:
         array = np.array([row[key] for row in history])
         array = array.astype(np.float64)
-        array = np.nan_to_num(array, nan=0.0, posinf=0.0, neginf=0.0)
+        array = np.nan_to_num(array, nan=-100.0, posinf=-100.0, neginf=-100.0)
         data[key] = array
 
     return data
