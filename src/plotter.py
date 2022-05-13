@@ -168,6 +168,9 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/15h8pi1s",
     ]
     runs["CGES_2"] = [
+        "jjshoots/pybullet_proper/twiy7oxs",
+        "jjshoots/pybullet_proper/34vxuxlm",
+        "jjshoots/pybullet_proper/3d08tjt0",
         "jjshoots/pybullet_proper/89b6d9xt",
         "jjshoots/pybullet_proper/1aexce2z",
         "jjshoots/pybullet_proper/2yccizor",
@@ -220,6 +223,9 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/1cfh2ob3",
     ]
     runs["CGES_2"] = [
+        "jjshoots/pybullet_proper/11rcgun1",
+        "jjshoots/pybullet_proper/1u80mtnd",
+        "jjshoots/pybullet_proper/1niisv0w",
         "jjshoots/pybullet_proper/kuxshzg0",
         "jjshoots/pybullet_proper/3n6guebt",
         "jjshoots/pybullet_proper/30qr6wr5",
@@ -274,6 +280,9 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/35kzfwxw",
     ]
     runs["CGES_2"] = [
+        "jjshoots/pybullet_proper/2di7pva6",
+        "jjshoots/pybullet_proper/1bzcji2j",
+        "jjshoots/pybullet_proper/1l62xg29",
         "jjshoots/pybullet_proper/p0lmd4xq",
         "jjshoots/pybullet_proper/2d51z0e4",
         "jjshoots/pybullet_proper/1ra0s53a",
@@ -327,6 +336,9 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/2ax8d0rd",
     ]
     runs["CGES_2"] = [
+        "jjshoots/pybullet_proper/odnzikh0",
+        "jjshoots/pybullet_proper/19835kd8",
+        "jjshoots/pybullet_proper/2bbwhvlz",
         "jjshoots/pybullet_proper/23fied0h",
         "jjshoots/pybullet_proper/1wqvc3e7",
         "jjshoots/pybullet_proper/2j78d803",
