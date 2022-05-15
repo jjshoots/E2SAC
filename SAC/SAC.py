@@ -83,11 +83,13 @@ class SAC(nn.Module):
         num_actions,
         entropy_tuning=True,
         target_entropy=None,
+        discount_factor=0.99,
     ):
         super().__init__()
 
         self.num_actions = num_actions
         self.use_entropy = entropy_tuning
+        self.gamma = discount_factor
 
         # actor head
         self.actor = GaussianActor(num_actions)
@@ -126,7 +128,7 @@ class SAC(nn.Module):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
     def calc_critic_loss(
-        self, states, actions, rewards, next_states, dones, gamma=0.99
+        self, states, actions, rewards, next_states, dones
     ):
         """
         states is of shape B x input_shape
@@ -154,7 +156,7 @@ class SAC(nn.Module):
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
                 rewards
-                + (-self.log_alpha.exp().detach() * log_probs + gamma * next_q) * dones
+                + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q) * dones
             )
 
         # critic loss is mean squared TD errors

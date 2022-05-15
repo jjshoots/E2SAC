@@ -9,25 +9,19 @@ parameters:
     max: 100000
   learning_rate:
     min: 0.0001
-    max: 0.01
+    max: 0.003
   critic_update_multiplier:
-    value:
-      - 1
-      - 2
-      - 3
+    values: [1, 2, 3]
   repeats_per_buffer:
-    value:
-      - 1
-      - 2
-      - 3
+    values: [1, 2, 3]
   batch_size:
-    value:
-      - 32
-      - 64
-      - 128
+    values: [32, 64, 128]
+  discount_factor:
+    min: 0.90
+    max: 0.99
 command:
   - python3
   - src/mainSAC.py
   - "--train"
   - "--wandb"
-  - "--name=a100"
+  - "--wandb_name=a100"

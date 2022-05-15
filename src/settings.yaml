@@ -7,6 +7,7 @@ repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 learning_rate: 0.0004
+discount_factor: 0.99
 
 # exploration settings
 exploration_steps: 0
