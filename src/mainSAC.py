@@ -154,7 +154,7 @@ def display(set):
     env = setup_env(set)
 
     net = None
-    if False:
+    if True:
         net, _, _, _ = setup_nets(set)
 
     env.display(set, net)
@@ -207,7 +207,7 @@ def setup_nets(set):
     critic_optim = optim.AdamW(
         net.critic.parameters(), lr=set.learning_rate, amsgrad=True
     )
-    alpha_optim = optim.AdamW([net.log_alpha], lr=set.learning_rate, amsgrad=True)
+    alpha_optim = optim.AdamW([net.log_alpha], lr=0.01, amsgrad=True)
 
     optim_set = dict()
     optim_set["actor"] = actor_optim

@@ -9,3 +9,4 @@
 *.egg-info
 */*.egg-info
 *__pycache__
+slurm-*
