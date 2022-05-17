@@ -96,7 +96,7 @@ def compute_plots(runs, env_name, baselines):
         iqm_cis,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e6)",
-        ylabel="Evaluation Interquartile Mean (IQM)",
+        ylabel="Episodic Total Reward (IQM)",
         labelsize="large",
         ticklabelsize="large",
     )
@@ -148,7 +148,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/sj2wj9n9",
         "jjshoots/e2SAC_pybullet/12nev3lk",
     ]
-    runs["CGES_1"] = [
+    runs["CCGE1"] = [
         "jjshoots/pybullet_proper/1aexce2z",
         "jjshoots/pybullet_proper/1y6jhrec",
         "jjshoots/pybullet_proper/3k4nolub",
@@ -171,7 +171,7 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/28qlpnqd",
         # "jjshoots/e2SAC_pybullet/15h8pi1s",
     ]
-    runs["CGES_2"] = [
+    runs["CCGE2"] = [
         "jjshoots/pybullet_proper/twiy7oxs",
         "jjshoots/pybullet_proper/34vxuxlm",
         "jjshoots/pybullet_proper/3d08tjt0",
@@ -185,8 +185,8 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle_1"] = 1720.0
-    baselines["Oracle_2"] = 2355.0
+    baselines["Oracle1"] = 1720.0
+    baselines["Oracle2"] = 2355.0
     baseline_list.append(baselines)
     env_list.append("AntPyBulletEnv-v0")
 
@@ -204,7 +204,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/3l6czfp3",
         "jjshoots/e2SAC_pybullet/2ciy5u3x",
     ]
-    runs["CGES_1"] = [
+    runs["CCGE1"] = [
         "jjshoots/pybullet_proper/3ruha6kc",
         "jjshoots/pybullet_proper/2ko2c2aj",
         "jjshoots/pybullet_proper/6h88uw0w",
@@ -226,7 +226,7 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/2ttvam1p",
         # "jjshoots/e2SAC_pybullet/1cfh2ob3",
     ]
-    runs["CGES_2"] = [
+    runs["CCGE2"] = [
         "jjshoots/pybullet_proper/11rcgun1",
         "jjshoots/pybullet_proper/1u80mtnd",
         "jjshoots/pybullet_proper/1niisv0w",
@@ -240,8 +240,8 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle_1"] = 1677.0
-    baselines["Oracle_2"] = 2500.0
+    baselines["Oracle1"] = 1677.0
+    baselines["Oracle2"] = 2500.0
     baseline_list.append(baselines)
     env_list.append("HopperPyBulletEnv-v0")
 
@@ -259,7 +259,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/1xla4kgx",
         "jjshoots/e2SAC_pybullet/3siwabhk",
     ]
-    runs["CGES_1"] = [
+    runs["CCGE1"] = [
         "jjshoots/pybullet_proper/pg1h5nds",
         "jjshoots/pybullet_proper/3jufwzxx",
         "jjshoots/pybullet_proper/2d51z0e4",
@@ -283,7 +283,7 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/2e92ggz5",
         # "jjshoots/e2SAC_pybullet/35kzfwxw",
     ]
-    runs["CGES_2"] = [
+    runs["CCGE2"] = [
         "jjshoots/pybullet_proper/2di7pva6",
         "jjshoots/pybullet_proper/1bzcji2j",
         "jjshoots/pybullet_proper/1l62xg29",
@@ -297,8 +297,8 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle_1"] = 447.0
-    baselines["Oracle_2"] = 1640.0
+    baselines["Oracle1"] = 447.0
+    baselines["Oracle2"] = 1640.0
     baseline_list.append(baselines)
     env_list.append("HalfCheetahPyBulletEnv-v0")
 
@@ -316,7 +316,7 @@ if __name__ == "__main__":
         "jjshoots/e2SAC_pybullet/1tukgzvw",
         "jjshoots/e2SAC_pybullet/1scupef7",
     ]
-    runs["CGES_1"] = [
+    runs["CCGE1"] = [
         "jjshoots/pybullet_proper/1wqvc3e7",
         "jjshoots/pybullet_proper/ohtwl01k",
         "jjshoots/pybullet_proper/11fr7qgh",
@@ -339,7 +339,7 @@ if __name__ == "__main__":
         # "jjshoots/e2SAC_pybullet/1b9n57ov",
         # "jjshoots/e2SAC_pybullet/2ax8d0rd",
     ]
-    runs["CGES_2"] = [
+    runs["CCGE2"] = [
         "jjshoots/pybullet_proper/odnzikh0",
         "jjshoots/pybullet_proper/19835kd8",
         "jjshoots/pybullet_proper/2bbwhvlz",
@@ -353,8 +353,8 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle_1"] = 788.0
-    baselines["Oracle_2"] = 1733.0
+    baselines["Oracle1"] = 788.0
+    baselines["Oracle2"] = 1733.0
     baseline_list.append(baselines)
     env_list.append("Walker2DPyBulletEnv-v0")
 
