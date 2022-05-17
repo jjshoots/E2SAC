@@ -18,7 +18,7 @@ class Environment:
     def __init__(self, env_name):
         super().__init__()
 
-        big = True
+        big = False
         size = "" if not big else "_big"
 
         self.env_name = env_name

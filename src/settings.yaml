@@ -6,32 +6,31 @@ env_name: ''
 # env_name: 'HalfCheetahPyBulletEnv-v0'
 
 # training params
-buffer_size: 1000000
+buffer_size: 300000
 buffer_size_debug: 100
 batch_size: 256
 total_steps: 1000000
-repeats_per_buffer: 1 # repeats = repeats_per_buffer + repeats_per_buffer_scale * epoch
-repeats_per_buffer_scale: 0.0
+repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
-learning_rate: 0.001
+learning_rate: 0.00073
 
 # exploration settings
 exploration_steps: 0
 
 # algorithm specifics
-supervision_lambda: 5.
-confidence_lambda: 200
+supervision_lambda: 2.0
+confidence_lambda: 100.0
 use_entropy: true
 target_entropy: null
 n_var_samples: 32
 
 # eval settings
-eval_num_episodes: 50
-eval_steps_ratio: 50000
+eval_num_episodes: 10
+eval_steps_ratio: 20000
 
 # helper params
-wandb_project: 'pybullet_proper'
+wandb_project: 'pybullet_proper2'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''

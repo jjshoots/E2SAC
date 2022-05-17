@@ -15,8 +15,8 @@ class Actor(nn.Module):
         self.num_actions = num_actions
         self.state_size = state_size
 
-        _features_description = [state_size, 128, 128, num_actions * 2]
-        _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
+        _features_description = [state_size, 400, 300, num_actions * 2]
+        _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
         self.net = Neural_blocks.generate_linear_stack(
@@ -39,8 +39,8 @@ class Critic(nn.Module):
         self.num_actions = num_actions
         self.state_size = state_size
 
-        _features_description = [num_actions + state_size, 256, 256, 1]
-        _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
+        _features_description = [num_actions + state_size, 400, 300, 1]
+        _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
         self.net = Neural_blocks.generate_linear_stack(

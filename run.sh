@@ -3,12 +3,24 @@ if [ "$hostname" = "arctic-linx" ]
   # ssh availab-dl1 'tmux send-keys -t 0 "./run.sh" ENTER'
   ssh availab-dl2 'tmux send-keys -t 0 "./run.sh" ENTER'
 else if [ "$hostname" = "availab-dl1" ]
+  # ant hopper
+  bash ./run_bash.sh
+  bash ./run_bash.sh
+  bash ./run_bash.sh
+  bash ./run_bash.sh
+  bash ./run_bash.sh
   bash ./run_bash.sh
   bash ./run_bash.sh
   bash ./run_bash.sh
   bash ./run_bash.sh
   bash ./run_bash.sh
 else if [ "$hostname" = "availab-dl2" ]
+  # walker cheetah
+  bash ./run_bash.sh
+  bash ./run_bash.sh
+  bash ./run_bash.sh
+  bash ./run_bash.sh
+  bash ./run_bash.sh
   bash ./run_bash.sh
   bash ./run_bash.sh
   bash ./run_bash.sh

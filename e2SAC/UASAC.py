@@ -132,7 +132,7 @@ class UASAC(nn.Module):
         else:
             self.log_alpha = nn.Parameter(torch.tensor(0.0, requires_grad=True))
 
-    def update_q_target(self, tau=0.005):
+    def update_q_target(self, tau=0.02):
         # polyak averaging update for target q network
         for target, source in zip(
             self.critic_target.parameters(), self.critic.parameters()
@@ -140,7 +140,7 @@ class UASAC(nn.Module):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
     def calc_critic_loss(
-        self, states, actions, rewards, next_states, dones, gamma=0.99
+        self, states, actions, rewards, next_states, dones, gamma=0.98
     ):
         """
         states is of shape B x input_shape

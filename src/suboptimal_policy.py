@@ -28,4 +28,3 @@ class Suboptimal_Actor(nn.Module):
         output = self.net(states).reshape(-1, 2, self.num_actions).permute(1, 0, 2)
 
         return output[0] * 2.0, output[1] * 10.0
-
