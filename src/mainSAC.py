@@ -184,6 +184,7 @@ def setup_nets(set):
         state_size=set.state_size,
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
+        discount_factor=set.discount_factor,
     ).to(set.device)
 
     actor_optim = optim.AdamW(

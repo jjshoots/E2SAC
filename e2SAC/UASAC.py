@@ -90,6 +90,7 @@ class UASAC(nn.Module):
         state_size,
         entropy_tuning=True,
         target_entropy=None,
+        discount_factor=0.99,
         confidence_lambda=10.0,
         supervision_lambda=10.0,
         n_var_samples=32,
@@ -99,6 +100,7 @@ class UASAC(nn.Module):
         self.num_actions = num_actions
         self.state_size = state_size
         self.use_entropy = entropy_tuning
+        self.gamma = discount_factor
         self.confidence_lambda = confidence_lambda
         self.supervision_lambda = supervision_lambda
         self.n_var_samples = n_var_samples
@@ -140,7 +142,7 @@ class UASAC(nn.Module):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
     def calc_critic_loss(
-        self, states, actions, rewards, next_states, dones, gamma=0.98
+        self, states, actions, rewards, next_states, dones
     ):
         """
         states is of shape B x input_shape
@@ -171,7 +173,7 @@ class UASAC(nn.Module):
             # Q_target = reward + dones * (gamma * next_q + entropy_bonus)
             target_q = (
                 rewards
-                + (-self.log_alpha.exp().detach() * log_probs + gamma * next_q) * dones
+                + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q) * dones
             )
             target_q = target_q.mean(dim=0)
 
@@ -186,7 +188,7 @@ class UASAC(nn.Module):
         q_loss = bellman_error.mean()
 
         # U_target = sqrt(bellman_error + next_u^2)
-        target_u = (bellman_error.detach() + (gamma * next_u * dones) ** 2).sqrt()
+        target_u = (bellman_error.detach() + (self.gamma * next_u * dones) ** 2).sqrt()
         u_loss = ((current_u - target_u) ** 2).mean()
 
         # critic loss is q loss plus uncertainty loss, scale losses to have the same mag
