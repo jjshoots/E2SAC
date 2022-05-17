@@ -8,7 +8,7 @@
 ## number of CPUs
 #SBATCH --ntasks-per-node=4
 ## amount of RAM in MB
-#SBATCH --mem=64000
+#SBATCH --mem=16000
 ## add in GPUs
 #SBATCH --gres=gpu:K80:1
 
@@ -21,14 +21,5 @@ echo ${HOSTS} | sed 's/ /n/g'>${WORKDIR}/slurm/hostsfile.txt
 NPROCS=$(( $SLURM_JOB_NUM_NODES * $SLURM_NTASKS_PER_NODE ))
 
 source ~/.bashrc
-
-NJOBS=`squeue -h --node=$(hostname -s) --user=$SLURM_JOB_USER | wc -l`
-screen="-screen 0 1400x900x24"
-if [[ $NJOBS -gt 1 ]]; then
-  screen="-screen 1 1400x900x24";
-fi
-
-module load python/last
-conda activate robocar
-
-xvfb-run -s "$screen" wandb agent --count=1 jjshoots/UA3SAC_gym/yp3kgbaf
+source venv/bin/activate
+wandb agent jjshoots/carracing_sac_sweep/bp3bcsm9 --count 1

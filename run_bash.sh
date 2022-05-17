@@ -2,23 +2,23 @@ source venv/bin/activate
 
 declare -a pids=()
 
-# wandb agent jjshoots/carracing_sac_sweep/qc18k6lz --count 1 &
-python3 src/main.py --train --wandb --wandb_name='e2SAC' &
+wandb agent jjshoots/carracing_sac_sweep/bp3bcsm9 --count 1 &
+# python3 src/main.py --train --wandb --wandb_name='e2SAC' &
 # python3 src/mainSAC.py --train --wandb --wandb_name='SAC' &
 pids+=($!)
 sleep 10
-# wandb agent jjshoots/carracing_sac_sweep/qc18k6lz --count 1 &
-python3 src/main.py --train --wandb --wandb_name='e2SAC' &
+wandb agent jjshoots/carracing_sac_sweep/bp3bcsm9 --count 1 &
+# python3 src/main.py --train --wandb --wandb_name='e2SAC' &
 # python3 src/mainSAC.py --train --wandb --wandb_name='SAC' &
 pids+=($!)
 sleep 10
-# wandb agent jjshoots/carracing_sac_sweep/qc18k6lz --count 1 &
-python3 src/main.py --train --wandb --wandb_name='e2SAC' &
+wandb agent jjshoots/carracing_sac_sweep/bp3bcsm9 --count 1 &
+# python3 src/main.py --train --wandb --wandb_name='e2SAC' &
 # python3 src/mainSAC.py --train --wandb --wandb_name='SAC' &
 pids+=($!)
 sleep 10
-# wandb agent jjshoots/carracing_sac_sweep/qc18k6lz --count 1 &
-python3 src/main.py --train --wandb --wandb_name='e2SAC' &
+wandb agent jjshoots/carracing_sac_sweep/bp3bcsm9 --count 1 &
+# python3 src/main.py --train --wandb --wandb_name='e2SAC' &
 # python3 src/mainSAC.py --train --wandb --wandb_name='SAC' &
 pids+=($!)
 
