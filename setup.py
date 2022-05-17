@@ -4,6 +4,7 @@ setup(
     name="e2SAC",
     version="1.0.0",
     install_requires=[
+        "numpy",
         "wandb",
         "torch",
         "matplotlib",

@@ -96,7 +96,7 @@ def compute_plots(runs, env_name, baselines):
         iqm_cis,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e6)",
-        ylabel="Episodic Total Reward (IQM)",
+        ylabel="IQM Episodic Total Reward",
         labelsize="large",
         ticklabelsize="large",
     )
