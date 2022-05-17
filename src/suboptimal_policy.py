@@ -14,9 +14,9 @@ class Suboptimal_Actor(nn.Module):
         self.num_actions = num_actions
         self.state_size = state_size
 
-        hidden_size = 64 if not big else 256
+        hidden_size = [100, 100] if not big else [400, 300]
 
-        _features_description = [state_size, hidden_size, hidden_size, num_actions * 2]
+        _features_description = [state_size, hidden_size[0], hidden_size[0], num_actions * 2]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -27,4 +27,4 @@ class Suboptimal_Actor(nn.Module):
     def forward(self, states):
         output = self.net(states).reshape(-1, 2, self.num_actions).permute(1, 0, 2)
 
-        return output[0] * 2.0, output[1] * 10.0
+        return output[0], output[1]
