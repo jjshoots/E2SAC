@@ -141,9 +141,7 @@ class UASAC(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_critic_loss(
-        self, states, actions, rewards, next_states, dones
-    ):
+    def calc_critic_loss(self, states, actions, rewards, next_states, dones):
         """
         states is of shape B x input_shape
         actions is of shape B x num_actions
@@ -173,7 +171,8 @@ class UASAC(nn.Module):
             # Q_target = reward + dones * (gamma * next_q + entropy_bonus)
             target_q = (
                 rewards
-                + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q) * dones
+                + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
+                * dones
             )
             target_q = target_q.mean(dim=0)
 

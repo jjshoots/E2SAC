@@ -21,7 +21,7 @@ exploration_steps: 0
 
 # algorithm specifics
 supervision_lambda: 1.0
-confidence_lambda: 100.0
+confidence_lambda: 200.0
 use_entropy: true
 target_entropy: null
 n_var_samples: 16
