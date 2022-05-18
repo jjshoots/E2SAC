@@ -20,7 +20,7 @@ class Q_Ensemble(nn.Module):
         networks = [SACNet.Critic(num_actions, state_size) for _ in range(num_networks)]
         self.networks = nn.ModuleList(networks)
 
-    def forward(self, states, actions):
+    def forward(self, states):
         """
         states is of shape B x input_shape
         actions is of shape B x num_actions
@@ -28,7 +28,7 @@ class Q_Ensemble(nn.Module):
         """
         output = []
         for network in self.networks:
-            output.append(network(states, actions))
+            output.append(network(states))
 
         output = torch.cat(output, dim=-1)
 
@@ -45,32 +45,29 @@ class GaussianActor(nn.Module):
         self.net = SACNet.Actor(num_actions, state_size)
 
     def forward(self, states):
-        output = self.net(states)
-        return output[0], output[1]
+        return self.net(states)
 
     @staticmethod
-    def sample(mu, sigma):
+    def sample(logits):
         """
         output:
             actions is of shape B x num_actions
             entropies is of shape B x 1
         """
         # lower bound sigma and bias it
-        normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
+        cat = dist.Categorical(logits)
 
         # sample from dist
-        mu_samples = normals.rsample()
-        actions = torch.tanh(mu_samples)
+        actions = cat.rsample()
 
         # calculate log_probs
-        log_probs = normals.log_prob(mu_samples) - torch.log(1 - actions.pow(2) + 1e-6)
-        log_probs = log_probs.sum(dim=-1, keepdim=True)
+        entropy = -func.softmax(logits, dim=-1).mean(dim=-1, keepdim=True)
 
-        return actions, log_probs
+        return actions, entropy
 
     @staticmethod
-    def infer(mu, sigma):
-        return torch.tanh(mu)
+    def infer(logits):
+        return torch.argmax(logits, dim=-1, keepdim=True)
 
 
 class SAC(nn.Module):
@@ -139,7 +136,7 @@ class SAC(nn.Module):
         dones = 1.0 - dones
 
         # current Q, output is num_networks x B x 1
-        current_q = self.critic(states, actions)
+        current_q = self.critic(states)
 
         # target Q
         with torch.no_grad():
@@ -148,7 +145,7 @@ class SAC(nn.Module):
             next_actions, log_probs = self.actor.sample(*output)
 
             # get the next q lists then...
-            next_q = self.critic_target(next_states, next_actions)
+            next_q = self.critic_target(next_states)
 
             # ...take the min at the cat dimension
             next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
@@ -182,7 +179,7 @@ class SAC(nn.Module):
         actions, entropies = self.actor.sample(*output)
 
         # expectations of Q with clipped double Q
-        q = self.critic(states, actions)
+        q = self.critic(states)
         q, _ = torch.min(q, dim=-1, keepdim=True)
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done

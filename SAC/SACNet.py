@@ -15,7 +15,7 @@ class Actor(nn.Module):
         self.num_actions = num_actions
         self.state_size = state_size
 
-        _features_description = [state_size, 400, 300, num_actions * 2]
+        _features_description = [state_size, 400, 300, num_actions]
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -24,9 +24,7 @@ class Actor(nn.Module):
         )
 
     def forward(self, states):
-        output = self.net(states).reshape(-1, 2, self.num_actions).permute(1, 0, 2)
-
-        return output
+        return self.net(states)
 
 
 class Critic(nn.Module):
@@ -39,7 +37,7 @@ class Critic(nn.Module):
         self.num_actions = num_actions
         self.state_size = state_size
 
-        _features_description = [num_actions + state_size, 400, 300, 1]
+        _features_description = [state_size, 400, 300, num_actions]
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -47,11 +45,9 @@ class Critic(nn.Module):
             _features_description, _activation_description
         )
 
-    def forward(self, states, actions):
-        if len(actions.shape) != len(states.shape):
-            states = torch.stack([states] * actions.shape[0], dim=0)
-
-        output = torch.cat((states, actions), dim=-1)
-        output = self.net(output)
+    def forward(self, states):
+        print(states.shape)
+        exit()
+        output = self.net(states)
 
         return output

@@ -143,17 +143,20 @@ def parse_set():
     )
     # when formatting net_version, assert that only either args or settings
     # file have a value, not both
-    if settings["net_version"] == "" and args.net_version == "":
-        settings["net_version"] = str(np.random.randint(999999))
-    elif settings["net_version"] != "" and args.net_version == "":
-        settings["net_version"] = settings["net_version"]
-    elif settings["net_version"] == "" and args.net_version != "":
-        settings["net_version"] = args.net_version
+    if not args.debug:
+        if settings["net_version"] == "" and args.net_version == "":
+            settings["net_version"] = str(np.random.randint(999999))
+        elif settings["net_version"] != "" and args.net_version == "":
+            settings["net_version"] = settings["net_version"]
+        elif settings["net_version"] == "" and args.net_version != "":
+            settings["net_version"] = args.net_version
+        else:
+            raise AssertionError(
+                "net_version cannot be set in both settings.yaml and in args."
+            )
+        args.net_version = settings["net_version"]
     else:
-        raise AssertionError(
-            "net_version cannot be set in both settings.yaml and in args."
-        )
-    args.net_version = settings["net_version"]
+        args.net_version = '_debug'
 
     # when formatting env_name, assert that only either args or settings
     # file have a value, not both
