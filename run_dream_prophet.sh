@@ -32,6 +32,7 @@ for i in {0..3}; do
     pids+=($!)
     CUDA_VISIBLE_DEVICES=1 python3 src/mainSAC.py --train --wandb --wandb_name='SAC_cheetah' --env_name=HalfCheetahPyBulletEnv-v0 &
     pids+=($!)
+
     for pid in ${pids[*]}; do
         wait $pid
     done
