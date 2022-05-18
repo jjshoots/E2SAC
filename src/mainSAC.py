@@ -137,7 +137,7 @@ def display(set):
     env = setup_env(set)
 
     net = None
-    if True:
+    if False:
         net, _, _, _ = setup_nets(set)
 
     env.display(set, net)
@@ -217,8 +217,8 @@ def setup_nets(set):
         optim_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
         print(f"Lowest Running Loss for Net: {net_helper.lowest_running_loss}")
 
-    # torch.save(net.actor.net.state_dict(), f"./{set.env_name}.pth")
-    # exit()
+    torch.save(net.actor.net.state_dict(), f"./{set.env_name}.pth")
+    exit()
 
     return net, net_helper, optim_set, optim_helper
 
