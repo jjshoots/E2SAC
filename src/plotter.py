@@ -137,15 +137,15 @@ if __name__ == "__main__":
     # Ant
     runs = {}
     runs["SAC"] = [
+        "jjshoots/pybullet_proper2/5u53xvbr",
+        "jjshoots/pybullet_proper2/my12ylhy",
+        "jjshoots/pybullet_proper2/qs8fjteo",
         "jjshoots/pybullet_proper2/2nos2ruq",
         "jjshoots/pybullet_proper2/2n7flvkr",
-        "jjshoots/pybullet_proper2/27oe2u28",
         "jjshoots/pybullet_proper2/3f5d6i2z",
         "jjshoots/pybullet_proper2/3j02w4uw",
-        "jjshoots/pybullet_proper2/3okg1e02",
         "jjshoots/pybullet_proper2/1lwslgqt",
         "jjshoots/pybullet_proper2/c7giyxke",
-        "jjshoots/pybullet_proper2/13vi61us",
         "jjshoots/pybullet_proper2/1t9xa0xq",
         "jjshoots/pybullet_proper2/1l4vcb9e",
         "jjshoots/pybullet_proper2/odteaj0s",
@@ -164,16 +164,17 @@ if __name__ == "__main__":
     # Hopper
     runs = {}
     runs["SAC"] = [
+        "jjshoots/pybullet_proper2/3agi889l",
+        "jjshoots/pybullet_proper2/1cerdbg1",
+        "jjshoots/pybullet_proper2/vwkcs9e8",
+        "jjshoots/pybullet_proper2/1mxw7c76",
         "jjshoots/pybullet_proper2/27q7wd3j",
-        "jjshoots/pybullet_proper2/2maaga9r",
-        "jjshoots/pybullet_proper2/1ws805ex",
         "jjshoots/pybullet_proper2/gyvok2m6",
         "jjshoots/pybullet_proper2/12xo59aa",
         "jjshoots/pybullet_proper2/2jq2bia7",
         "jjshoots/pybullet_proper2/2tzvly3r",
         "jjshoots/pybullet_proper2/xozzppob",
         "jjshoots/pybullet_proper2/3sw9iv69",
-        "jjshoots/pybullet_proper2/1jsh4r3f",
         "jjshoots/pybullet_proper2/3nek6wsm",
     ]
     # runs["CCGE1"] = [
@@ -190,9 +191,10 @@ if __name__ == "__main__":
     # HalfCheetah
     runs = {}
     runs["SAC"] = [
+        "jjshoots/pybullet_proper2/29djrz60",
+        "jjshoots/pybullet_proper2/yuhrc1m6",
+        "jjshoots/pybullet_proper2/2s15roye",
         "jjshoots/pybullet_proper2/22tcgqrk",
-        "jjshoots/pybullet_proper2/2jrhovq2",
-        "jjshoots/pybullet_proper2/1jwmt4cn",
         "jjshoots/pybullet_proper2/3ma8hltf",
         "jjshoots/pybullet_proper2/2lzlligf",
         "jjshoots/pybullet_proper2/sc3pvis4",
@@ -200,7 +202,6 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/2bj2myc8",
         "jjshoots/pybullet_proper2/27uegbvt",
         "jjshoots/pybullet_proper2/2u1vsnr5",
-        "jjshoots/pybullet_proper2/29zj2l7u",
         "jjshoots/pybullet_proper2/cel76d0i",
     ]
     # runs["CCGE1"] = [
@@ -217,15 +218,15 @@ if __name__ == "__main__":
     # Walker2D
     runs = {}
     runs["SAC"] = [
+        "jjshoots/pybullet_proper2/iv83lvpe",
+        "jjshoots/pybullet_proper2/1nugaeda",
+        "jjshoots/pybullet_proper2/1l99vuyl",
         "jjshoots/pybullet_proper2/lgab8igk",
-        "jjshoots/pybullet_proper2/1ehjkn6i",
         "jjshoots/pybullet_proper2/xwziupc5",
-        "jjshoots/pybullet_proper2/mr9dm5ot",
         "jjshoots/pybullet_proper2/3d59105o",
         "jjshoots/pybullet_proper2/13p6apja",
         "jjshoots/pybullet_proper2/3bb8whna",
         "jjshoots/pybullet_proper2/1gsqjuow",
-        "jjshoots/pybullet_proper2/1y7zmi88",
         "jjshoots/pybullet_proper2/1vyczwt2",
         "jjshoots/pybullet_proper2/1nd3v4dh",
         "jjshoots/pybullet_proper2/2000jz2c",
