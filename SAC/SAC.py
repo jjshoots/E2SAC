@@ -28,7 +28,7 @@ class Q_Ensemble(nn.Module):
         """
         output = []
         for network in self.networks:
-            output.append(network(states))
+            output.append(network(states).unsqueeze(-1))
 
         output = torch.cat(output, dim=-1)
 
@@ -48,26 +48,17 @@ class GaussianActor(nn.Module):
         return self.net(states)
 
     @staticmethod
-    def sample(logits):
+    def sample(action_probs):
         """
         output:
-            actions is of shape B x num_actions
-            entropies is of shape B x 1
+            actions is of shape B x 1
         """
-        # lower bound sigma and bias it
-        cat = dist.Categorical(logits)
-
-        # sample from dist
-        actions = cat.rsample()
-
-        # calculate log_probs
-        entropy = -func.softmax(logits, dim=-1).mean(dim=-1, keepdim=True)
-
-        return actions, entropy
+        cat = dist.Categorical(action_probs)
+        return cat.sample()
 
     @staticmethod
-    def infer(logits):
-        return torch.argmax(logits, dim=-1, keepdim=True)
+    def infer(action_probs):
+        return torch.argmax(action_probs, dim=-1, keepdim=True)
 
 
 class SAC(nn.Module):
@@ -82,6 +73,7 @@ class SAC(nn.Module):
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.98,
+        num_networks=2,
     ):
         super().__init__()
 
@@ -89,13 +81,14 @@ class SAC(nn.Module):
         self.state_size = state_size
         self.use_entropy = entropy_tuning
         self.gamma = discount_factor
+        self.num_networks = 2
 
         # actor head
         self.actor = GaussianActor(num_actions, state_size)
 
         # twin delayed Q networks
-        self.critic = Q_Ensemble(num_actions, state_size)
-        self.critic_target = Q_Ensemble(num_actions, state_size).eval()
+        self.critic = Q_Ensemble(num_actions, state_size, num_networks)
+        self.critic_target = Q_Ensemble(num_actions, state_size, num_networks).eval()
 
         # copy weights and disable gradients for the target network
         self.critic_target.load_state_dict(self.critic.state_dict())
@@ -106,14 +99,9 @@ class SAC(nn.Module):
         self.entropy_tuning = entropy_tuning
         if entropy_tuning:
             if target_entropy is None:
-                self.target_entropy = -float(num_actions)
+                import math
+                self.target_entropy = -math.log(1 / float(num_actions)) / 4.0
             else:
-                if target_entropy > 0.0:
-                    warnings.warn(
-                        f"Target entropy is recommended to be negative,\
-                                  currently it is {target_entropy},\
-                                  I hope you know what you're doing..."
-                    )
                 self.target_entropy = target_entropy
             self.log_alpha = nn.Parameter(torch.tensor(0.0, requires_grad=True))
         else:
@@ -126,46 +114,66 @@ class SAC(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_critic_loss(self, states, actions, rewards, next_states, dones):
+    def calc_critic_alpha_loss(self, states, actions, rewards, next_states, dones):
         """
         states is of shape B x input_shape
-        actions is of shape B x num_actions
+        actions is of shape B x 1
         rewards is of shape B x 1
         dones is of shape B x 1
         """
         dones = 1.0 - dones
+        actions = actions.to(dtype=torch.int64)
 
-        # current Q, output is num_networks x B x 1
+        # current Q, output is B x num_actions x num_networks
         current_q = self.critic(states)
+
+        # gather the relevant Q values only
+        actions = actions.unsqueeze(-1).repeat(1, 1, self.num_networks)
+        current_q = current_q.gather(dim=-2, index=actions).squeeze(-2)
 
         # target Q
         with torch.no_grad():
             # sample the next actions based on the current policy
-            output = self.actor(next_states)
-            next_actions, log_probs = self.actor.sample(*output)
+            action_probs = self.actor(next_states)
+            # actions = action_probs.argmax(dim=-1, keepdim=True)
+            # actions = actions.unsqueeze(-1).repeat(1, 1, self.num_networks)
 
-            # get the next q lists then...
+            # entropy bonus
+            entropy = -(action_probs * torch.log(action_probs)).mean(dim=-1, keepdim=True)
+
+            # get the next q lists
             next_q = self.critic_target(next_states)
 
-            # ...take the min at the cat dimension
-            next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
+            # expected next_q
+            next_q = (action_probs.unsqueeze(-1) * next_q).mean(dim=-2)
+            # next_q = next_q.gather(dim=-2, index=actions).squeeze(-2)
+            next_q, _ = next_q.min(dim=-1, keepdim=True)
 
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
                 rewards
-                + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
+                + (self.log_alpha.exp().detach() * entropy + self.gamma * next_q)
                 * dones
             )
 
         # critic loss is mean squared TD errors
-        q_loss = ((current_q - target_q) ** 2).mean()
+        critic_loss = ((current_q - target_q) ** 2).mean()
 
-        # critic loss is q error
-        critic_loss = q_loss
+        # compute loss for alpha as well
+        if self.use_entropy:
+            entropy_loss = (
+                self.log_alpha * (entropy - self.target_entropy).detach()
+            ).mean()
+            loss = critic_loss + entropy_loss
+        else:
+            loss = critic_loss
 
+        # logging
         log = dict()
+        log["log_alpha"] = self.log_alpha.item()
+        log["mean_entropy"] = entropy.mean().detach()
 
-        return critic_loss, log
+        return loss, log
 
     def calc_actor_loss(self, states, dones):
         """
@@ -175,42 +183,25 @@ class SAC(nn.Module):
         dones = 1.0 - dones
 
         # We re-sample actions to calculate expectations of Q.
-        output = self.actor(states)
-        actions, entropies = self.actor.sample(*output)
+        action_probs = self.actor(states)
 
         # expectations of Q with clipped double Q
-        q = self.critic(states)
-        q, _ = torch.min(q, dim=-1, keepdim=True)
+        q = self.critic(states).detach()
+
+        # maximization objective, expectations over actions, min over networks
+        objective = action_probs.unsqueeze(-1) * q
+        objective = objective.mean(-2)
+        objective, _ = objective.min(-1, keepdim=True)
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         if self.use_entropy:
-            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * dones)
+            entropy = -(action_probs * torch.log(action_probs)).mean(dim=-1, keepdim=True)
+            rnf_loss = -((objective + self.log_alpha.exp().detach() * entropy) * dones)
         else:
-            rnf_loss = -(q * dones)
+            rnf_loss = -(objective * dones)
 
         actor_loss = rnf_loss.mean()
 
         log = dict()
 
         return actor_loss, log
-
-    def calc_alpha_loss(self, states):
-        """
-        states is of shape B x input_shape
-        """
-        if not self.entropy_tuning:
-            return torch.zeros(1)
-
-        output = self.actor(states)
-        _, log_probs = self.actor.sample(*output)
-
-        # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.
-        entropy_loss = -(
-            self.log_alpha * (self.target_entropy + log_probs).detach()
-        ).mean()
-
-        log = dict()
-        log["log_alpha"] = self.log_alpha.item()
-        log["mean_entropy"] = -log_probs.mean().detach()
-
-        return entropy_loss, log

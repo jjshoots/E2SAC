@@ -6,7 +6,7 @@ import torch
 import torch.optim as optim
 
 import wandb
-from pybullet_env import Environment
+from discrete_env import Environment
 from SAC.SAC import SAC
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize
@@ -49,8 +49,8 @@ def train(set):
                 if memory.count < set.exploration_steps:
                     action = env.env.action_space.sample()
                 else:
-                    output = net.actor(gpuize(obs, set.device).unsqueeze(0))
-                    action, _ = net.actor.sample(*output)
+                    action_probs = net.actor(gpuize(obs, set.device).unsqueeze(0))
+                    action = net.actor.sample(action_probs)
                     action = cpuize(action).squeeze(0)
 
                 # get the next state and other stuff
@@ -80,13 +80,17 @@ def train(set):
                 # train critic
                 for _ in range(set.critic_update_multiplier):
                     net.zero_grad()
-                    q_loss, log = net.calc_critic_loss(
+                    q_loss, log = net.calc_critic_alpha_loss(
                         states, actions, rewards, next_states, dones
                     )
                     to_log = {**to_log, **log}
                     q_loss.backward()
                     optim_set["critic"].step()
                     net.update_q_target()
+
+                    # train entropy regularizer
+                    if net.use_entropy:
+                        optim_set["alpha"].step()
 
                 # train actor
                 for _ in range(set.actor_update_multiplier):
@@ -95,14 +99,6 @@ def train(set):
                     to_log = {**to_log, **log}
                     rnf_loss.backward()
                     optim_set["actor"].step()
-
-                    # train entropy regularizer
-                    if net.use_entropy:
-                        net.zero_grad()
-                        ent_loss, log = net.calc_alpha_loss(states)
-                        to_log = {**to_log, **log}
-                        ent_loss.backward()
-                        optim_set["alpha"].step()
 
                 """WEIGHTS SAVING"""
                 net_weights = net_helper.training_checkpoint(
@@ -137,7 +133,7 @@ def display(set):
     env = setup_env(set)
 
     net = None
-    if False:
+    if True:
         net, _, _, _ = setup_nets(set)
 
     env.display(set, net)
@@ -224,6 +220,7 @@ def setup_nets(set):
 
 
 if __name__ == "__main__":
+    torch.autograd.set_detect_anomaly(True)
     signal(SIGINT, shutdown_handler)
     set = parse_set()
     check_venv()

@@ -24,7 +24,7 @@ class Actor(nn.Module):
         )
 
     def forward(self, states):
-        return self.net(states)
+        return F.softmax(self.net(states), dim=-1)
 
 
 class Critic(nn.Module):
@@ -46,8 +46,4 @@ class Critic(nn.Module):
         )
 
     def forward(self, states):
-        print(states.shape)
-        exit()
-        output = self.net(states)
-
-        return output
+        return self.net(states)

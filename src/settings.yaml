@@ -4,6 +4,7 @@ env_name: ''
 # env_name: 'HopperPyBulletEnv-v0'
 # env_name: 'HumanoidPyBulletEnv-v0'
 # env_name: 'HalfCheetahPyBulletEnv-v0'
+# env_name: 'LunarLander-v2'
 
 # training params
 buffer_size: 300000
@@ -14,7 +15,7 @@ repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 discount_factor: 0.98
-learning_rate: 0.0004
+learning_rate: 0.0003
 
 # exploration settings
 exploration_steps: 0
@@ -27,11 +28,11 @@ target_entropy: null
 n_var_samples: 16
 
 # eval settings
-eval_num_episodes: 10
-eval_steps_ratio: 20000
+eval_num_episodes: 3
+eval_steps_ratio: 1000
 
 # helper params
-wandb_project: 'pybullet_proper2'
+wandb_project: 'discrete_SAC_test'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''

@@ -156,7 +156,7 @@ def parse_set():
             )
         args.net_version = settings["net_version"]
     else:
-        args.net_version = '_debug'
+        args.net_version = "_debug"
 
     # when formatting env_name, assert that only either args or settings
     # file have a value, not both
@@ -178,8 +178,8 @@ def parse_set():
     settings = dict({**settings, **vars(args)})
 
     # check if we maybe need to reboot
-    if settings['device'] == 'cpu':
-        print('No GPU found, probably need to restart, exiting.')
+    if settings["device"] == "cpu":
+        print("No GPU found, probably need to restart, exiting.")
         exit()
 
     # set depending on whether wandb is enabled
