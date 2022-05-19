@@ -47,6 +47,8 @@ class Critic(nn.Module):
             _features_description, _activation_description
         )
 
+        self.register_buffer("uncertainty_bias", torch.rand(1) * 100.0, persistent=True)
+
     def forward(self, states, actions):
         if len(actions.shape) != len(states.shape):
             states = torch.stack([states] * actions.shape[0], dim=0)
@@ -56,6 +58,7 @@ class Critic(nn.Module):
 
         value, uncertainty = torch.split(output, 1, dim=-1)
 
-        uncertainty = F.softplus(uncertainty)
+        uncertainty = F.softplus(uncertainty) + self.uncertainty_bias
+        print(uncertainty)
 
         return torch.stack((value, uncertainty), dim=0)

@@ -175,8 +175,8 @@ def parse_set():
     settings = dict({**settings, **vars(args)})
 
     # check if we maybe need to reboot
-    if settings['device'] == 'cpu':
-        print('No GPU found, probably need to restart, exiting.')
+    if settings["device"] == "cpu":
+        print("No GPU found, probably need to restart, exiting.")
         exit()
 
     # set depending on whether wandb is enabled
