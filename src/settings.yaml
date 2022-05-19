@@ -7,15 +7,15 @@ env_name: ''
 # env_name: 'LunarLander-v2'
 
 # training params
-buffer_size: 300000
+buffer_size: 20000
 buffer_size_debug: 100
 batch_size: 256
-total_steps: 1000000
+total_steps: 500000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
-discount_factor: 0.98
-learning_rate: 0.0003
+discount_factor: 0.99
+learning_rate: 0.0001
 
 # exploration settings
 exploration_steps: 0

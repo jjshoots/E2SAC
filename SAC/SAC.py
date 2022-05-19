@@ -100,7 +100,7 @@ class SAC(nn.Module):
         if entropy_tuning:
             if target_entropy is None:
                 import math
-                self.target_entropy = -math.log(1 / float(num_actions)) / 4.0
+                self.target_entropy = -math.log(1 / float(num_actions)) / 8.0
             else:
                 self.target_entropy = target_entropy
             self.log_alpha = nn.Parameter(torch.tensor(0.0, requires_grad=True))

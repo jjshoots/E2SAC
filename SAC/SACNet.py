@@ -15,7 +15,7 @@ class Actor(nn.Module):
         self.num_actions = num_actions
         self.state_size = state_size
 
-        _features_description = [state_size, 400, 300, num_actions]
+        _features_description = [state_size, 128, 128, num_actions]
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -37,7 +37,7 @@ class Critic(nn.Module):
         self.num_actions = num_actions
         self.state_size = state_size
 
-        _features_description = [state_size, 400, 300, num_actions]
+        _features_description = [state_size, 128, 128, num_actions]
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
