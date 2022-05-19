@@ -40,7 +40,7 @@ rc("text", usetex=False)
 
 def get_wandb_log(run_uri, keys):
     assert isinstance(keys, list), "keys must be a list."
-    api = wandb.Api(timeout=30)
+    api = wandb.Api(timeout=180)
     run = api.run(run_uri)
     history = run.scan_history(keys=keys)
 
@@ -150,8 +150,18 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/1l4vcb9e",
         "jjshoots/pybullet_proper2/odteaj0s",
     ]
-    # runs["CCGE1"] = [
-    # ]
+    runs["CCGE1"] = [
+        "jjshoots/pybullet_proper2/47vas0et",
+        "jjshoots/pybullet_proper2/2ud5d7io",
+        "jjshoots/pybullet_proper2/1hgvkjsz",
+        "jjshoots/pybullet_proper2/19x23xod",
+        "jjshoots/pybullet_proper2/1u90gdof",
+        "jjshoots/pybullet_proper2/3jr4fw5t",
+        "jjshoots/pybullet_proper2/1y6ylnmh",
+        "jjshoots/pybullet_proper2/1gmnwa4g",
+        "jjshoots/pybullet_proper2/24c90bcd",
+        "jjshoots/pybullet_proper2/243z7v5o",
+    ]
     # runs["CCGE2"] = [
     # ]
     run_list.append(runs)
@@ -177,8 +187,18 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/3sw9iv69",
         "jjshoots/pybullet_proper2/3nek6wsm",
     ]
-    # runs["CCGE1"] = [
-    # ]
+    runs["CCGE1"] = [
+        "jjshoots/pybullet_proper2/31m1ydp4",
+        "jjshoots/pybullet_proper2/bt5tcn2u",
+        "jjshoots/pybullet_proper2/1l5of0xc",
+        "jjshoots/pybullet_proper2/771eb2ye",
+        "jjshoots/pybullet_proper2/266spyl2",
+        "jjshoots/pybullet_proper2/1xcwyouz",
+        "jjshoots/pybullet_proper2/2iz9ynna",
+        "jjshoots/pybullet_proper2/2k95xw45",
+        "jjshoots/pybullet_proper2/2asykiz1",
+        "jjshoots/pybullet_proper2/lvahv041",
+    ]
     # runs["CCGE2"] = [
     # ]
     run_list.append(runs)
@@ -204,8 +224,18 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/2u1vsnr5",
         "jjshoots/pybullet_proper2/cel76d0i",
     ]
-    # runs["CCGE1"] = [
-    # ]
+    runs["CCGE1"] = [
+        "jjshoots/pybullet_proper2/141jvkir",
+        "jjshoots/pybullet_proper2/35iqj6jq",
+        "jjshoots/pybullet_proper2/1yewmolf",
+        "jjshoots/pybullet_proper2/2g5pewnq",
+        "jjshoots/pybullet_proper2/1urylorh",
+        "jjshoots/pybullet_proper2/onk3hzdp",
+        "jjshoots/pybullet_proper2/3e102eof",
+        "jjshoots/pybullet_proper2/369n9lgm",
+        "jjshoots/pybullet_proper2/s34cof1j",
+        "jjshoots/pybullet_proper2/2wszexx3",
+    ]
     # runs["CCGE2"] = [
     # ]
     run_list.append(runs)
@@ -231,8 +261,18 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/1nd3v4dh",
         "jjshoots/pybullet_proper2/2000jz2c",
     ]
-    # runs["CCGE1"] = [
-    # ]
+    runs["CCGE1"] = [
+        "jjshoots/pybullet_proper2/2zwslh8j",
+        "jjshoots/pybullet_proper2/287kdug2",
+        "jjshoots/pybullet_proper2/257wwxpv",
+        "jjshoots/pybullet_proper2/3gukol9m",
+        "jjshoots/pybullet_proper2/38ga2m4a",
+        "jjshoots/pybullet_proper2/12p9irs1",
+        "jjshoots/pybullet_proper2/3uvrbauh",
+        "jjshoots/pybullet_proper2/3mgsmprg",
+        "jjshoots/pybullet_proper2/5kkyxr1a",
+        "jjshoots/pybullet_proper2/8ob04seg",
+    ]
     # runs["CCGE2"] = [
     # ]
     run_list.append(runs)
