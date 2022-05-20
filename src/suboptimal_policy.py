@@ -9,17 +9,15 @@ class Suboptimal_Actor(nn.Module):
     Actor network
     """
 
-    def __init__(self, num_actions, state_size, big):
+    def __init__(self, num_actions, state_size):
         super().__init__()
         self.num_actions = num_actions
         self.state_size = state_size
 
-        hidden_size = [100, 100] if not big else [400, 300]
-
         _features_description = [
             state_size,
-            hidden_size[0],
-            hidden_size[0],
+            100,
+            100,
             num_actions * 2,
         ]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [

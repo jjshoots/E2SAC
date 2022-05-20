@@ -162,11 +162,21 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/24c90bcd",
         "jjshoots/pybullet_proper2/243z7v5o",
     ]
-    # runs["CCGE2"] = [
-    # ]
+    runs["CCGE1.1"] = [
+        "jjshoots/pybullet_proper2/1a86ublm",
+        "jjshoots/pybullet_proper2/3ka9ihez",
+        "jjshoots/pybullet_proper2/262wf2zo",
+        "jjshoots/pybullet_proper2/1lq7pqxm",
+        "jjshoots/pybullet_proper2/154uq9o3",
+        "jjshoots/pybullet_proper2/21gzao6p",
+        "jjshoots/pybullet_proper2/1da57v6a",
+        "jjshoots/pybullet_proper2/1lcobiai",
+        "jjshoots/pybullet_proper2/3uerg3af",
+        "jjshoots/pybullet_proper2/2jp1jwwq",
+    ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle1"] = 1720.0
+    baselines["Oracle1"] = 2107.0
     baselines["Oracle2"] = 2355.0
     baseline_list.append(baselines)
     env_list.append("AntPyBulletEnv-v0")
@@ -199,11 +209,20 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/2asykiz1",
         "jjshoots/pybullet_proper2/lvahv041",
     ]
-    # runs["CCGE2"] = [
-    # ]
+    runs["CCGE1.1"] = [
+        "jjshoots/pybullet_proper2/1nri49lb",
+        "jjshoots/pybullet_proper2/3u0bafwn",
+        "jjshoots/pybullet_proper2/33bf7biz",
+        "jjshoots/pybullet_proper2/1mq8gj6i",
+        "jjshoots/pybullet_proper2/saakuj9v",
+        "jjshoots/pybullet_proper2/r2elxfv6",
+        "jjshoots/pybullet_proper2/2ki1ksjk",
+        "jjshoots/pybullet_proper2/1fj8pus4",
+        "jjshoots/pybullet_proper2/2nyxbg6b",
+    ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle1"] = 1677.0
+    baselines["Oracle1"] = 2246.0
     baselines["Oracle2"] = 2500.0
     baseline_list.append(baselines)
     env_list.append("HopperPyBulletEnv-v0")
@@ -236,11 +255,35 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/s34cof1j",
         "jjshoots/pybullet_proper2/2wszexx3",
     ]
-    # runs["CCGE2"] = [
-    # ]
+    runs["CCGE1.1_good"] = [
+        "jjshoots/pybullet_proper2/3gp5nyen",
+        "jjshoots/pybullet_proper2/2ractkua",
+        "jjshoots/pybullet_proper2/3hmum2n0",
+        "jjshoots/pybullet_proper2/21e9dne8",
+        "jjshoots/pybullet_proper2/7tvp5l5m",
+        "jjshoots/pybullet_proper2/2qr7wlle",
+        "jjshoots/pybullet_proper2/y340wa16",
+        "jjshoots/pybullet_proper2/1j1ltnxw",
+        "jjshoots/pybullet_proper2/2mlpp813",
+    ]
+    # watch
+    # 926470
+    # 786424
+    # 459656
+    # 219912
+    runs["CCGE1.1_bad"] = [
+        "jjshoots/pybullet_proper2/33rckw0u",
+        "jjshoots/pybullet_proper2/3tvk325r",
+        "jjshoots/pybullet_proper2/5yjlolf6",
+        "jjshoots/pybullet_proper2/1ixju3q6",
+        "jjshoots/pybullet_proper2/1kud7yko",
+        "jjshoots/pybullet_proper2/32ikucco",
+        "jjshoots/pybullet_proper2/18bm2agp",
+        "jjshoots/pybullet_proper2/3o2l899x",
+    ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle1"] = 447.0
+    baselines["Oracle1"] = 787.0
     baselines["Oracle2"] = 1640.0
     baseline_list.append(baselines)
     env_list.append("HalfCheetahPyBulletEnv-v0")
@@ -273,11 +316,21 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/5kkyxr1a",
         "jjshoots/pybullet_proper2/8ob04seg",
     ]
-    # runs["CCGE2"] = [
-    # ]
+    runs["CCGE1.1"] = [
+        "jjshoots/pybullet_proper2/136to5y6",
+        "jjshoots/pybullet_proper2/22vfld1r",
+        "jjshoots/pybullet_proper2/2ef2lzva",
+        "jjshoots/pybullet_proper2/3t9ge95c",
+        "jjshoots/pybullet_proper2/2hgrh2z1",
+        "jjshoots/pybullet_proper2/1pjvxet6",
+        "jjshoots/pybullet_proper2/3mv43nah",
+        "jjshoots/pybullet_proper2/7qfnbjot",
+        "jjshoots/pybullet_proper2/3f3su60g",
+        "jjshoots/pybullet_proper2/3tme0soy",
+    ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle1"] = 788.0
+    baselines["Oracle1"] = 1536.0
     baselines["Oracle2"] = 1733.0
     baseline_list.append(baselines)
     env_list.append("Walker2DPyBulletEnv-v0")

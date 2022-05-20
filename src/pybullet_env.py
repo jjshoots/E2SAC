@@ -15,11 +15,13 @@ class Environment:
     Wrapper for OpenAI gym environments that outputs suboptimal actions also
     """
 
-    def __init__(self, env_name):
+    def __init__(self, env_name, sub_size="smol"):
         super().__init__()
 
-        big = False
-        size = "" if not big else "_big"
+        if sub_size == "smol":
+            size = "_smol"
+        else:
+            size = ""
 
         self.env_name = env_name
         self.env = gym.make(env_name)
@@ -40,7 +42,7 @@ class Environment:
             try:
                 path = f"./suboptimal_policies/{env_name}{size}.pth"
                 self.suboptimal_actor = Suboptimal_Actor(
-                    num_actions=self.num_actions, state_size=self.state_size, big=big
+                    num_actions=self.num_actions, state_size=self.state_size
                 ).to(self.device)
                 self.suboptimal_actor.load_state_dict(torch.load(path))
                 print(f"Loaded {path}")

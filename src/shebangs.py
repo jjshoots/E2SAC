@@ -117,6 +117,15 @@ def arg_parser():
         help="Environment name from pybullet gym.",
     )
 
+    parser.add_argument(
+        "--sub_size",
+        type=str,
+        nargs="?",
+        const=False,
+        default="",
+        help="Size of suboptimal policy.",
+    )
+
     return parser.parse_args()
 
 
@@ -138,9 +147,11 @@ def parse_set():
 
     # format settings a bit
     settings["device"] = get_device()
+
     settings["buffer_size"] = (
         settings["buffer_size_debug"] if args.debug else settings["buffer_size"]
     )
+
     # when formatting net_version, assert that only either args or settings
     # file have a value, not both
     if settings["net_version"] == "" and args.net_version == "":
@@ -170,6 +181,22 @@ def parse_set():
             "env_name cannot be set in both settings.yaml and in args."
         )
     args.env_name = settings["env_name"]
+
+    # when formatting net_version, assert that only either args or settings
+    # file have a value, not both
+    if settings["sub_size"] == "" and args.sub_size == "":
+        raise AssertionError(
+            "need to provide sub_size in either settings.yaml or in args."
+        )
+    elif settings["sub_size"] != "" and args.sub_size == "":
+        settings["sub_size"] = settings["sub_size"]
+    elif settings["sub_size"] == "" and args.sub_size != "":
+        settings["sub_size"] = args.sub_size
+    else:
+        raise AssertionError(
+            "sub_size cannot be set in both settings.yaml and in args."
+        )
+    args.sub_size = settings["sub_size"]
 
     # merge args and settings
     settings = dict({**settings, **vars(args)})
