@@ -177,7 +177,7 @@ if __name__ == "__main__":
     run_list.append(runs)
     baselines = {}
     baselines["Oracle1"] = 2107.0
-    baselines["Oracle2"] = 2355.0
+    baselines["Oracle2"] = 1074.0
     baseline_list.append(baselines)
     env_list.append("AntPyBulletEnv-v0")
 
@@ -223,7 +223,7 @@ if __name__ == "__main__":
     run_list.append(runs)
     baselines = {}
     baselines["Oracle1"] = 2246.0
-    baselines["Oracle2"] = 2500.0
+    baselines["Oracle2"] = 1508.0
     baseline_list.append(baselines)
     env_list.append("HopperPyBulletEnv-v0")
 
@@ -267,10 +267,8 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/2mlpp813",
     ]
     # watch
-    # 926470
-    # 786424
-    # 459656
-    # 219912
+    # 427089
+    # 705238
     runs["CCGE1.1_bad"] = [
         "jjshoots/pybullet_proper2/33rckw0u",
         "jjshoots/pybullet_proper2/3tvk325r",
@@ -284,7 +282,7 @@ if __name__ == "__main__":
     run_list.append(runs)
     baselines = {}
     baselines["Oracle1"] = 787.0
-    baselines["Oracle2"] = 1640.0
+    baselines["Oracle2"] = 796.0
     baseline_list.append(baselines)
     env_list.append("HalfCheetahPyBulletEnv-v0")
 
@@ -331,7 +329,7 @@ if __name__ == "__main__":
     run_list.append(runs)
     baselines = {}
     baselines["Oracle1"] = 1536.0
-    baselines["Oracle2"] = 1733.0
+    baselines["Oracle2"] = 1506.0
     baseline_list.append(baselines)
     env_list.append("Walker2DPyBulletEnv-v0")
 
