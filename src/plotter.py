@@ -174,6 +174,18 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/3uerg3af",
         "jjshoots/pybullet_proper2/2jp1jwwq",
     ]
+    runs["CCGE2"] = [
+        "jjshoots/pybullet_proper2/hv9k0u9z",
+        "jjshoots/pybullet_proper2/32akryk0",
+        "jjshoots/pybullet_proper2/ql7i68yy",
+        "jjshoots/pybullet_proper2/2i76if75",
+        "jjshoots/pybullet_proper2/1nlbjy47",
+        "jjshoots/pybullet_proper2/1fxk7zpi",
+        "jjshoots/pybullet_proper2/trnzurhq",
+        "jjshoots/pybullet_proper2/166eludf",
+        "jjshoots/pybullet_proper2/18faa4fy",
+        "jjshoots/pybullet_proper2/2b2mn47g",
+    ]
     run_list.append(runs)
     baselines = {}
     baselines["Oracle1"] = 2107.0
@@ -220,6 +232,18 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/1fj8pus4",
         "jjshoots/pybullet_proper2/2nyxbg6b",
     ]
+    runs["CCGE2"] = [
+        "jjshoots/pybullet_proper2/1ys86489",
+        "jjshoots/pybullet_proper2/ozn1uhyp",
+        "jjshoots/pybullet_proper2/1limtj36",
+        "jjshoots/pybullet_proper2/35dd0jma",
+        "jjshoots/pybullet_proper2/3rhmkt0r",
+        "jjshoots/pybullet_proper2/2z866q69",
+        "jjshoots/pybullet_proper2/1kvqykmn",
+        "jjshoots/pybullet_proper2/36uah4ty",
+        "jjshoots/pybullet_proper2/1sz3rlfh",
+        "jjshoots/pybullet_proper2/10whr5h3",
+    ]
     run_list.append(runs)
     baselines = {}
     baselines["Oracle1"] = 2246.0
@@ -265,10 +289,8 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/y340wa16",
         "jjshoots/pybullet_proper2/1j1ltnxw",
         "jjshoots/pybullet_proper2/2mlpp813",
+        "jjshoots/pybullet_proper2/wddv49zf",
     ]
-    # watch
-    # 427089
-    # 705238
     runs["CCGE1.1_bad"] = [
         "jjshoots/pybullet_proper2/33rckw0u",
         "jjshoots/pybullet_proper2/3tvk325r",
@@ -278,6 +300,19 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/32ikucco",
         "jjshoots/pybullet_proper2/18bm2agp",
         "jjshoots/pybullet_proper2/3o2l899x",
+        "jjshoots/pybullet_proper2/24d0q0as",
+    ]
+    runs["CCGE2"] = [
+        "jjshoots/pybullet_proper2/39k9e4ha",
+        "jjshoots/pybullet_proper2/3n84n1m1",
+        "jjshoots/pybullet_proper2/24u31w63",
+        "jjshoots/pybullet_proper2/3bqqcm3w",
+        "jjshoots/pybullet_proper2/1nclenww",
+        "jjshoots/pybullet_proper2/3yh1ie5b",
+        "jjshoots/pybullet_proper2/1qq0lp04",
+        "jjshoots/pybullet_proper2/16eo29of",
+        "jjshoots/pybullet_proper2/3u3ig6md",
+        "jjshoots/pybullet_proper2/3333407d",
     ]
     run_list.append(runs)
     baselines = {}
@@ -325,6 +360,18 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/7qfnbjot",
         "jjshoots/pybullet_proper2/3f3su60g",
         "jjshoots/pybullet_proper2/3tme0soy",
+    ]
+    runs["CCGE2"] = [
+        "jjshoots/pybullet_proper2/14g2rr00",
+        "jjshoots/pybullet_proper2/2mkj2pue",
+        "jjshoots/pybullet_proper2/1f445wsa",
+        "jjshoots/pybullet_proper2/fenlrr1h",
+        "jjshoots/pybullet_proper2/v1lnczb9",
+        "jjshoots/pybullet_proper2/1wvndz2h",
+        "jjshoots/pybullet_proper2/c4y2o7or",
+        "jjshoots/pybullet_proper2/j7m6vphn",
+        "jjshoots/pybullet_proper2/35cmivtx",
+        "jjshoots/pybullet_proper2/3dco4ecb",
     ]
     run_list.append(runs)
     baselines = {}
