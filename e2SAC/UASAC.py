@@ -45,8 +45,8 @@ class GaussianActor(nn.Module):
         self.net = UASACNet.Actor(num_actions)
 
     def forward(self, states):
-        output = torch.tanh(self.net(states))
-        return output[0] * 2.0, output[1] * 10.0
+        output = self.net(states)
+        return output[0], output[1]
 
     @staticmethod
     def sample(mu, sigma, n_samples=1):
