@@ -3,7 +3,7 @@ source venv/bin/activate
 
 declare -a pids=()
 
-wandb agent jjshoots/carracing_sweep2/y25egso1 --count 20 &
+wandb agent jjshoots/carracing_sweep2/czd1qkse --count 20 &
 pids+=($!)
 sleep 10
 
