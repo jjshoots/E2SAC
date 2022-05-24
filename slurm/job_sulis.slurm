@@ -15,4 +15,4 @@ module load PyTorch/1.9.0
 module load torchvision/0.10.0-PyTorch-1.9.0
 
 source ~/.bashrc
-./run_bash.sh
+./run_sulis.sh
