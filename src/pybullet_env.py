@@ -18,10 +18,7 @@ class Environment:
     def __init__(self, env_name, sub_size="smol"):
         super().__init__()
 
-        if sub_size == "smol":
-            size = "_smol"
-        else:
-            size = ""
+        size = sub_size
 
         self.env_name = env_name
         self.env = gym.make(env_name)
@@ -35,12 +32,13 @@ class Environment:
 
         self.eval_run = False
 
-        # load suboptimal policy
         self.device = get_device()
+
+        # load suboptimal policy
         load_success = False
-        for _ in range(100):
+        path = f"./suboptimal_policies/{env_name}{size}.pth"
+        for _ in range(5):
             try:
-                path = f"./suboptimal_policies/{env_name}{size}.pth"
                 self.suboptimal_actor = Suboptimal_Actor(
                     num_actions=self.num_actions, state_size=self.state_size
                 ).to(self.device)
@@ -48,17 +46,14 @@ class Environment:
                 print(f"Loaded {path}")
                 load_success = True
             except:
-                warnings.warn("--------------------------------------------------")
-                warnings.warn(f"No subotpimal actor found for {env_name}, retrying...")
-                warnings.warn("--------------------------------------------------")
-                self.suboptimal_actor = None
+                pass
 
             if load_success:
                 break
 
         if not load_success:
             warnings.warn("--------------------------------------------------")
-            warnings.warn(f"Failed to load suboptimal actor for {env_name}, exiting.")
+            warnings.warn(f"Failed to load suboptimal actor {path}, exiting.")
             warnings.warn("--------------------------------------------------")
             exit()
 

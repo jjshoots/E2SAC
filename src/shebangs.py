@@ -182,20 +182,7 @@ def parse_set():
         )
     args.env_name = settings["env_name"]
 
-    # when formatting net_version, assert that only either args or settings
-    # file have a value, not both
-    if settings["sub_size"] == "" and args.sub_size == "":
-        raise AssertionError(
-            "need to provide sub_size in either settings.yaml or in args."
-        )
-    elif settings["sub_size"] != "" and args.sub_size == "":
-        settings["sub_size"] = settings["sub_size"]
-    elif settings["sub_size"] == "" and args.sub_size != "":
-        settings["sub_size"] = args.sub_size
-    else:
-        raise AssertionError(
-            "sub_size cannot be set in both settings.yaml and in args."
-        )
+    # override sub_size with the one in args
     args.sub_size = settings["sub_size"]
 
     # merge args and settings

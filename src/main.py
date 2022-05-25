@@ -138,7 +138,7 @@ def display(set):
     env = setup_env(set)
 
     net = None
-    if True:
+    if False:
         net, _, _, _ = setup_nets(set)
 
     env.display(set, net)
@@ -155,7 +155,7 @@ def evaluate(set):
 
 
 def setup_env(set):
-    env = Environment(set.env_name)
+    env = Environment(set.env_name, sub_size=set.sub_size)
     set.num_actions = env.num_actions
     set.state_size = env.state_size
 
