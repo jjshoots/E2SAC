@@ -87,6 +87,7 @@ class UASAC(nn.Module):
         num_actions,
         entropy_tuning=True,
         target_entropy=None,
+        discount_factor=0.99,
         confidence_lambda=10.0,
         supervision_lambda=10.0,
         n_var_samples=32,
@@ -95,6 +96,7 @@ class UASAC(nn.Module):
 
         self.num_actions = num_actions
         self.use_entropy = entropy_tuning
+        self.gamma = discount_factor
         self.confidence_lambda = confidence_lambda
         self.supervision_lambda = supervision_lambda
         self.n_var_samples = n_var_samples
@@ -136,7 +138,7 @@ class UASAC(nn.Module):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
     def calc_critic_loss(
-        self, states, actions, rewards, next_states, dones, gamma=0.99
+        self, states, actions, rewards, next_states, dones
     ):
         """
         states is of shape B x input_shape
@@ -167,7 +169,7 @@ class UASAC(nn.Module):
             # Q_target = reward + dones * (gamma * next_q + entropy_bonus)
             target_q = (
                 rewards
-                + (-self.log_alpha.exp().detach() * log_probs + gamma * next_q) * dones
+                + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q) * dones
             )
             target_q = target_q.mean(dim=0)
 
@@ -179,7 +181,7 @@ class UASAC(nn.Module):
             next_u = next_u.mean(dim=0)
 
             # U_target = max(bellman_error) + dones * (gamma * mean(next_U))
-            target_u = bellman_error + (gamma * next_u) * dones
+                target_u = bellman_error + (self.gamma * next_u) * dones
 
         # compare predictions with targets to form loss
         q_loss = ((current_q - target_q) ** 2).mean()
