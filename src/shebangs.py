@@ -109,6 +109,15 @@ def arg_parser():
         help="Network weights number.",
     )
 
+    parser.add_argument(
+        "--no_randomize",
+        type=str,
+        nargs="?",
+        const=False,
+        default="",
+        help="Don't randomize environment.",
+    )
+
     return parser.parse_args()
 
 

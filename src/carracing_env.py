@@ -10,13 +10,13 @@ class Environment:
     Wrapper for OpenAI gym environments that outputs suboptimal actions also
     """
 
-    def __init__(self, image_size=(64, 64)):
+    def __init__(self, image_size=(64, 64), randomize=True):
         super().__init__()
 
         self.image_size = image_size
         self.frame_stack = 4
 
-        self.env = gym.make("CarRacing-v1", verbose=False, domain_randomize=True)
+        self.env = gym.make("CarRacing-v1", verbose=False, domain_randomize=randomize)
         self.state = np.zeros((1, *self.image_size))
         self.num_actions = 2
 

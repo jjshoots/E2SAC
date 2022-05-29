@@ -172,7 +172,7 @@ def evaluate(set):
 
 
 def setup_env(set):
-    env = Environment()
+    env = Environment(randomize=(not set.no_randomize))
     set.num_actions = env.num_actions
 
     return env

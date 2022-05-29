@@ -51,4 +51,3 @@ for dir in to_delete:
     version = os.path.basename(dir)
     shutil.rmtree(dir, ignore_errors=False, onerror=None)
     shutil.rmtree(f"./optim_weights/{version}", ignore_errors=False, onerror=None)
-

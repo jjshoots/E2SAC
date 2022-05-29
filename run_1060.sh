@@ -3,10 +3,7 @@ source venv/bin/activate
 
 declare -a pids=()
 
-python3 src/main.py --train --wandb --wandb_name='e2SAC' &
-pids+=($!)
-sleep 10
-python3 src/mainSAC.py --train --wandb --wandb_name='SAC' &
+python3 src/main.py --train --wandb --wandb_name='e2SAC' --no_randomize &
 pids+=($!)
 sleep 10
 

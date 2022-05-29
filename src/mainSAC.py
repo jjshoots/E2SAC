@@ -171,7 +171,7 @@ def evaluate(set):
 
 
 def setup_env(set):
-    env = Environment()
+    env = Environment(randomize=(not set.no_randomize))
     set.num_actions = env.num_actions
 
     return env
@@ -199,7 +199,7 @@ def setup_nets(set):
         num_actions=set.num_actions,
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
-        discount_factor=set.discount_factor
+        discount_factor=set.discount_factor,
     ).to(set.device)
     actor_optim = optim.AdamW(
         net.actor.parameters(), lr=set.learning_rate, amsgrad=True
