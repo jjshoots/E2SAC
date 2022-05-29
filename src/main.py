@@ -200,6 +200,7 @@ def setup_nets(set):
         num_actions=set.num_actions,
         entropy_tuning=set.use_entropy,
         target_entropy=set.target_entropy,
+        discount_factor=set.discount_factor,
         confidence_lambda=set.confidence_lambda,
         supervision_lambda=set.supervision_lambda,
         n_var_samples=set.n_var_samples,
