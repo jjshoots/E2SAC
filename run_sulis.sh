@@ -3,7 +3,15 @@ source venv/bin/activate
 
 declare -a pids=()
 
-python3 src/main.py --train --wandb --wandb_name='e2SAC_randomize' &
+wandb agent jjshoots/carracing_sweep2/zsrueerr --count 1 &
+pids+=($!)
+sleep 10
+
+wandb agent jjshoots/carracing_sweep2/zsrueerr --count 1 &
+pids+=($!)
+sleep 10
+
+wandb agent jjshoots/carracing_sweep2/zsrueerr --count 1 &
 pids+=($!)
 sleep 10
 

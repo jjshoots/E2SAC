@@ -1,6 +1,6 @@
 name: "e2SAC_sweep"
-# program: main.py
-program: mainSAC.py
+program: main.py
+# program: mainSAC.py
 method: random
 metric:
   name: max_eval_perf
@@ -18,17 +18,17 @@ parameters:
   discount_factor:
     min: 0.90
     max: 0.99
-  # confidence_lambda:
-  #   min: 1.0
-  #   max: 100.0
-  # supervision_lambda:
-  #   min: 1.0
-  #   max: 10.0
+  confidence_lambda:
+    min: 1.0
+    max: 10.0
+  supervision_lambda:
+    min: 1.0
+    max: 10.0
 command:
   - python3
-  # - src/main.py
-  - src/mainSAC.py
+  - src/main.py
+  # - src/mainSAC.py
   - "--train"
   - "--wandb"
-  # - "--wandb_name=e2SAC"
-  - "--wandb_name=SAC"
+  - "--wandb_name=$hostname"
+  # - "--wandb_name=SAC"

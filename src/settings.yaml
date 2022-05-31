@@ -1,23 +1,23 @@
 # training params
-buffer_size: 20000
+buffer_size: 30000
 buffer_size_debug: 128
 batch_size: 128
 total_steps: 100000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
-learning_rate: 0.0001
-discount_factor: 0.955
+learning_rate: 0.00005
+discount_factor: 0.96
 
 # exploration settings
 exploration_steps: 0
 
 # algorithm specifics
 supervision_lambda: 1.
-confidence_lambda: 1.
+confidence_lambda: 5.
 use_entropy: true
 target_entropy: null
-n_var_samples: 8
+n_var_samples: 16
 
 # eval settings
 eval_num_episodes: 50

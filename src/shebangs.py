@@ -111,10 +111,10 @@ def arg_parser():
 
     parser.add_argument(
         "--no_randomize",
-        type=str,
+        type=bool,
         nargs="?",
-        const=False,
-        default="",
+        const=True,
+        default=False,
         help="Don't randomize environment.",
     )
 
