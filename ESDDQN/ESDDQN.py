@@ -18,6 +18,7 @@ class ESDDQN(nn.Module):
         state_size,
         exploration_epsilon=0.05,
         target_network_frequency=1000,
+        discount_factor=0.99,
     ):
         super().__init__()
 
@@ -25,6 +26,7 @@ class ESDDQN(nn.Module):
         self.state_size = state_size
         self.exploration_epsilon = exploration_epsilon
         self.target_network_frequency = target_network_frequency
+        self.gamma = discount_factor
         self.num_networks = 1
 
         # twin delayed Q networks
@@ -62,7 +64,7 @@ class ESDDQN(nn.Module):
         if self.gradient_steps % self.target_network_frequency == 0:
             self.q_target.load_state_dict(self.q.state_dict())
 
-    def calc_loss(self, states, actions, rewards, next_states, dones, gamma=0.995):
+    def calc_loss(self, states, actions, rewards, next_states, dones):
         """
         states is of shape B x input_shape
         actions is of shape B x num_actions
@@ -96,7 +98,7 @@ class ESDDQN(nn.Module):
             next_u = next_u.gather(dim=-2, index=next_a)
 
             # Q_target = reward + dones * gamma * next_q
-            target_q = rewards + gamma * next_q * dones
+            target_q = rewards + self.gamma * next_q * dones
 
         # aggregate current_q and current_u for those which we only have actions for
         current_q = q_output.gather(dim=-2, index=actions)
@@ -111,7 +113,7 @@ class ESDDQN(nn.Module):
 
         """U LOSS CALCULATION"""
         # U_target = bellman_error + dones * gamma * next_u
-        target_u = (bellman_error.detach() + (gamma * next_u * dones) ** 2).sqrt()
+        target_u = (bellman_error.detach() + (self.gamma * next_u * dones) ** 2).sqrt()
 
         # compute uncertainty loss
         u_loss = ((current_u - target_u) ** 2).mean()

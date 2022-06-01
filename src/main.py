@@ -176,6 +176,7 @@ def setup_nets(set):
         state_size=set.state_size,
         exploration_epsilon=set.exploration_epsilon,
         target_network_frequency=set.target_network_frequency,
+        discount_factor=set.discount_factor,
     ).to(set.device)
     ddqn_optim = optim.AdamW(net.parameters(), lr=set.learning_rate, amsgrad=True)
 

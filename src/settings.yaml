@@ -1,30 +1,33 @@
 # env type
+env_name: ''
 # env_name: 'CartPole-v1'
 # env_name: 'MountainCar-v0'
-env_name: 'LunarLander-v2'
+# env_name: 'Acrobot-v1'
+# env_name: 'LunarLander-v2'
 
 # training params
-buffer_size: 300000
+buffer_size: 50000
 buffer_size_debug: 100
 batch_size: 256
 total_steps: 500000
-repeats_per_buffer: 2
+repeats_per_buffer: 1
 max_grad_norm: 0.5
 target_network_frequency: 1000
 
 # exploration settings
 exploration_steps: 0
 
-# learning rate and exploration rate
+# algorithm specific
 learning_rate: 0.001
-exploration_epsilon: 0.05
+exploration_epsilon: 0.1
+discount_factor: 0.99
 
 # eval settings
 eval_steps_ratio: 10000
 eval_num_traj: 50
 
 # helper params
-wandb_project: 'lunarlander-turbulance'
+wandb_project: 'DQN'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''

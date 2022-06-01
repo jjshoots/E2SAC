@@ -16,7 +16,7 @@ class Q_Network(nn.Module):
         self.state_size = state_size
 
         _features_description = [state_size, 64, 64, num_actions * 2]
-        _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
+        _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
         self.net = Neural_blocks.generate_linear_stack(
