@@ -4,17 +4,9 @@ metric:
   name: max_eval_perf
   goal: maximize
 parameters:
-  env_name:
-    values:
-      [
-        'AntPyBulletEnv-v0',
-        'HopperPyBulletEnv-v0',
-        'HumanoidPyBulletEnv-v0',
-        'HalfCheetahPyBulletEnv-v0',
-      ]
 command:
   - python3
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=something_here"
+  - "--wandb_name=uncertainty_opt"
