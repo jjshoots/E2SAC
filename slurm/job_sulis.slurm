@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:ampere_a100:1
 #SBATCH --partition=gpu
 #SBATCH --time=48:00:00
-#SBATCH --account=su003-iftc1
+#SBATCH --account=su404-iftc1-gpu
 
 module purge
 module load GCC/10.2.0  CUDA/11.1.1  OpenMPI/4.0.5

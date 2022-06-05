@@ -1,20 +1,18 @@
 # rliable google
-from rliable import library as rly
-from rliable import metrics
-from rliable import plot_utils
-
-# to import stuff from wandb
-import wandb
-
-# normal imports
-import numpy as np
 import matplotlib.patches as patches
-from matplotlib import rcParams
-from matplotlib import rc
 
 # plotting styles
 import matplotlib.pyplot as plt
+
+# normal imports
+import numpy as np
 import seaborn as sns
+from matplotlib import rc, rcParams
+from rliable import library as rly
+from rliable import metrics, plot_utils
+
+# to import stuff from wandb
+import wandb
 
 sns.set_style("white")
 plt.rcParams["font.family"] = "serif"
@@ -217,7 +215,9 @@ if __name__ == "__main__":
         ticklabelsize=24,
     )
 
-    plt.axhline(y=270, color=sns.color_palette("colorblind")[len(algorithms)], linestyle="-")
+    plt.axhline(
+        y=270, color=sns.color_palette("colorblind")[len(algorithms)], linestyle="-"
+    )
     algorithms.append("Oracle")
 
     # form the legend

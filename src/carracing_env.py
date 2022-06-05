@@ -1,8 +1,12 @@
+import warnings
+
 import cv2
 import gym
 import numpy as np
+import torch
 
-from utils.helpers import cpuize, gpuize
+from suboptimal import SuboptimalActor
+from utils.helpers import cpuize, gpuize, get_device
 
 
 class Environment:
@@ -27,6 +31,35 @@ class Environment:
         self.cumulative_reward = 0
 
         self.eval_run = False
+
+        self.device = get_device()
+
+        self.use_learned_suboptimal = True
+
+        # load suboptimal policy
+        if self.use_learned_suboptimal:
+            print("Using learned suboptimal policy")
+            load_success = False
+            path = f"./suboptimal_policies/suboptimal.pth"
+            for _ in range(5):
+                try:
+                    self.suboptimal_actor = SuboptimalActor(
+                        num_actions=self.num_actions
+                    ).to(self.device)
+                    self.suboptimal_actor.load_state_dict(torch.load(path))
+                    print(f"Loaded {path}")
+                    load_success = True
+                except:
+                    pass
+
+                if load_success:
+                    break
+
+            if not load_success:
+                warnings.warn("--------------------------------------------------")
+                warnings.warn(f"Failed to load suboptimal actor {path}, exiting.")
+                warnings.warn("--------------------------------------------------")
+                exit()
 
         self.reset()
 
@@ -81,11 +114,8 @@ class Environment:
             rwd += reward
             self.done = max(done, self.done)
 
-            if i == 0:
-                lbl = (
-                    None if startup else self.get_label(self.transform_obs(observation))
-                )
         self.state = np.concatenate(obs, axis=0)
+        lbl = None if startup else self.get_label(self.transform_obs(self.state[:3]))
 
         # record the number of times we go off track or generate no rewards
         if rwd < 0.0:
@@ -126,20 +156,28 @@ class Environment:
         return obs
 
     def get_label(self, obs):
-        obs = obs[:, 15, :]
-        obs = np.sum(obs, axis=0)
-        obs = obs[1:] - obs[:-1]
+        if self.use_learned_suboptimal:
+            action = self.suboptimal_actor(
+                gpuize(self.state, self.device).unsqueeze(0)
+            ).squeeze(0)
+            action = torch.tanh(action[0])
+            action = cpuize(action)[0]
+            return action
+        else:
+            obs = obs[:, 15, :]
+            obs = np.sum(obs, axis=0)
+            obs = obs[1:] - obs[:-1]
 
-        rise = np.argmax(obs)
-        fall = np.argmin(obs)
+            rise = np.argmax(obs)
+            fall = np.argmin(obs)
 
-        midpoint = (rise + fall) / 2.0
-        midpoint = (midpoint / 64.0) - 0.5
+            midpoint = (rise + fall) / 2.0
+            midpoint = (midpoint / 64.0) - 0.5
 
-        steering = midpoint
-        accel = 0.1
+            steering = midpoint
+            accel = 0.1
 
-        return np.clip(np.array([steering, accel]), -0.99, 0.99)
+            return np.clip(np.array([steering, accel]), -0.99, 0.99)
 
     def evaluate(self, set, net=None):
         if net is not None:

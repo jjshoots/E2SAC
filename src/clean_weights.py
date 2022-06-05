@@ -1,6 +1,6 @@
-import shutil
 import glob
 import os
+import shutil
 
 # all versions
 dirs = glob.glob("./weights/Version*")
