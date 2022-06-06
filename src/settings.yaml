@@ -1,12 +1,12 @@
 # env type
 env_name: ''
-# env_name: 'CartPole-v1'
+env_name: 'CartPole-v1'
 # env_name: 'MountainCar-v0'
 # env_name: 'Acrobot-v1'
 # env_name: 'LunarLander-v2'
 
 # training params
-buffer_size: 100000
+buffer_size: 50000
 buffer_size_debug: 100
 batch_size: 256
 total_steps: 250000
@@ -27,7 +27,7 @@ eval_steps_ratio: 10000
 eval_num_traj: 50
 
 # helper params
-wandb_project: 'DQN'
+wandb_project: 'DQN2'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''
