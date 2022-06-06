@@ -121,7 +121,7 @@ if __name__ == "__main__":
         "jjshoots/carracing_sweep2/j0716sdv",
         "jjshoots/carracing_sweep2/9qc4z4g5",
     ]
-    runs["CCGE"] = [
+    runs["CCGE1"] = [
         "jjshoots/carracing_sweep2/0jf87ral",
         "jjshoots/carracing_sweep2/6ga28xk3",
         "jjshoots/carracing_sweep2/530ugv6q",
@@ -175,6 +175,16 @@ if __name__ == "__main__":
         "jjshoots/carracing_sweep2/zujxlv0a",
         "jjshoots/carracing_sweep2/1oo8xblq",
     ]
+    runs["CCGE"] = [
+        "jjshoots/carracing_sweep2/tgx09ss2",
+        "jjshoots/carracing_sweep2/xnxpfeya",
+        "jjshoots/carracing_sweep2/mnvu1ylw",
+        "jjshoots/carracing_sweep2/jr6kride",
+        "jjshoots/carracing_sweep2/wmamzf7v",
+        "jjshoots/carracing_sweep2/2gbs932p",
+        "jjshoots/carracing_sweep2/mfyxirxx",
+        "jjshoots/carracing_sweep2/l65iah63",
+    ]
 
     # list of algorithms we have
     algorithms = [key for key in runs]
@@ -186,7 +196,9 @@ if __name__ == "__main__":
         score = []
         for run_uri in runs[algorithm]:
             log = get_wandb_log(run_uri, ["num_transitions", "eval_perf"])
-            score.append(np.interp(x_axis, log["num_transitions"], log["eval_perf"]))
+            score.append(
+                np.interp(x_axis, log["num_transitions"], log["eval_perf"] * 1.1875)
+            )
 
         # stack along num_runs axis
         score = np.stack(score, axis=0)
@@ -215,10 +227,15 @@ if __name__ == "__main__":
         ticklabelsize=24,
     )
 
+    # oracle policies
     plt.axhline(
-        y=270, color=sns.color_palette("colorblind")[len(algorithms)], linestyle="-"
+        y=320, color=sns.color_palette("colorblind")[len(algorithms) + 0], linestyle="-"
     )
-    algorithms.append("Oracle")
+    algorithms.append("Heuristic Oracle")
+    plt.axhline(
+        y=704, color=sns.color_palette("colorblind")[len(algorithms) + 1], linestyle="-"
+    )
+    algorithms.append("Learned Oracle")
 
     # form the legend
     color_dict = dict(zip(algorithms, sns.color_palette("colorblind")))

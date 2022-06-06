@@ -75,7 +75,7 @@ class Environment:
         self.cumulative_reward = 0
 
         self.env.reset()
-        for _ in range(50):
+        for _ in range(13):
             self.off_track_t = 0
             self.step(np.zeros(self.num_actions), startup=True)
 
