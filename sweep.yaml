@@ -1,9 +1,12 @@
 program: main.py
+name: cartpole200k
 method: random
 metric:
   name: max_eval_perf
   goal: maximize
 parameters:
+  buffer_size:
+    value: 200000
   batch_size:
     values:
       - 128
@@ -34,4 +37,4 @@ command:
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=cartpole50k"
+  - "--wandb_name=cartpole200k"
