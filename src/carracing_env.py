@@ -23,6 +23,7 @@ class Environment:
         self.env = gym.make("CarRacing-v1", verbose=False, domain_randomize=randomize)
         self.state = np.zeros((1, *self.image_size))
         self.num_actions = 2
+        self.do_nothing = np.zeros((self.num_actions, ))
 
         self.off_track_t = 0
         self.max_off_track = 50
@@ -75,9 +76,9 @@ class Environment:
         self.cumulative_reward = 0
 
         self.env.reset()
-        for _ in range(13):
-            self.off_track_t = 0
-            self.step(np.zeros(self.num_actions), startup=True)
+        do_nothing = np.zeros((3, ))
+        for _ in range(50):
+            self.env.step(do_nothing)
 
         self.state = np.concatenate(
             [self.transform_obs(self.env.env.state)] * self.frame_stack, 0
@@ -215,7 +216,7 @@ class Environment:
         self.eval()
         self.reset()
 
-        action = np.zeros((set.num_actions))
+        action = self.do_nothing
 
         if transformed:
             cv2.namedWindow("display", cv2.WINDOW_NORMAL)
@@ -226,7 +227,7 @@ class Environment:
             if self.is_done:
                 print(f"Total Reward: {self.cumulative_reward}")
                 self.reset()
-                action = np.zeros((set.num_actions))
+                action = self.do_nothing
 
             if net is not None:
                 output = net.actor(gpuize(obs, set.device).unsqueeze(0))
