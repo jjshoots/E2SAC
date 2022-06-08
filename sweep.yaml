@@ -1,5 +1,5 @@
 program: main.py
-name: cartpole200k
+name: lunarlander200k
 method: random
 metric:
   name: max_eval_perf
@@ -26,8 +26,8 @@ parameters:
     min: 0.05
   discount_factor:
     distribution: uniform
-    max: 0.99
-    min: 0.95
+    max: 0.999
+    min: 0.980
   target_network_frequency:
     distribution: int_uniform
     max: 2000
@@ -37,4 +37,4 @@ command:
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=cartpole200k"
+  - "--wandb_name=lunarlander200k"
