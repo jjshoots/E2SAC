@@ -63,7 +63,7 @@ def process_sweep(sweep_name, sweep_uri):
     x_axis = np.linspace(0, num_steps, num_intervals)
 
     # list of algorithms and their corresponding uris from sweep
-    sweep = wandb.Api(timeout=30).sweep("jjshoots/DQN2/a0gjbznv")
+    sweep = wandb.Api(timeout=30).sweep(sweep_uri)
 
     uncer_list = []
     eval_list = []
@@ -142,7 +142,11 @@ def process_sweep(sweep_name, sweep_uri):
     ax2.set_ylabel("Episodic Mean Epistemic Uncertainty", color=palette[1], fontsize=20)
     ax2.set_ylim(top=2.0)
 
-    plt.show()
+    # plt.show()
+    # fig.set_size_inches((8.5, 11))
+    plt.savefig(f"./resource/{sweep_name}.pdf")
+    # fig.close()
+    # plt.show()
 
 
 if __name__ == "__main__":
@@ -151,9 +155,9 @@ if __name__ == "__main__":
     sweeps["CartPole50k"] = "jjshoots/DQN2/a0gjbznv"
     sweeps["CartPole100k"] = "jjshoots/DQN2/u7k2k7qo"
     sweeps["CartPole200k"] = "jjshoots/DQN2/emhvyijs"
-    sweeps["LunarLander50k"] = "jjshoots/DQN2/uccgmxfq"
-    sweeps["LunarLander100k"] = "jjshoots/DQN2/2flhn974"
-    sweeps["LunarLander200k"] = "jjshoots/DQN2/bapn8sg1"
+    # sweeps["LunarLander50k"] = "jjshoots/DQN2/uccgmxfq"
+    # sweeps["LunarLander100k"] = "jjshoots/DQN2/2flhn974"
+    # sweeps["LunarLander200k"] = "jjshoots/DQN2/bapn8sg1"
 
     for key in sweeps:
         process_sweep(key, sweeps[key])
