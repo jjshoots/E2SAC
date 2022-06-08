@@ -175,10 +175,53 @@ if __name__ == "__main__":
         "jjshoots/carracing_sweep2/zujxlv0a",
         "jjshoots/carracing_sweep2/1oo8xblq",
     ]
-    runs["CCGE"] = [
-        "jjshoots/carracing_sweep2/tgx09ss2",
-        "jjshoots/carracing_sweep2/xnxpfeya",
+    runs["CCGE2"] = [
+        "jjshoots/carracing_sweep2/hq6a28sa",
+        "jjshoots/carracing_sweep2/z3d08y4l",
+        "jjshoots/carracing_sweep2/0hy3zgxe",
+        "jjshoots/carracing_sweep2/82afviis",
+        "jjshoots/carracing_sweep2/mat4e84u",
+        "jjshoots/carracing_sweep2/0pwyf9fp",
+        "jjshoots/carracing_sweep2/s06a5ubn",
+        "jjshoots/carracing_sweep2/t0qajb6s",
+        "jjshoots/carracing_sweep2/bnq46az0",
+        "jjshoots/carracing_sweep2/5ope5f0z",
+        "jjshoots/carracing_sweep2/64ljzxe3",
+        "jjshoots/carracing_sweep2/lez965ys",
+        "jjshoots/carracing_sweep2/h6lku3ni",
+        "jjshoots/carracing_sweep2/ylwhf43m",
+        "jjshoots/carracing_sweep2/zqr6c0nt",
+        "jjshoots/carracing_sweep2/5cib561d",
+        "jjshoots/carracing_sweep2/a2jjohub",
+        "jjshoots/carracing_sweep2/hga5207v",
+        "jjshoots/carracing_sweep2/rjls9ckk",
+        "jjshoots/carracing_sweep2/u1oq0ufy",
+        "jjshoots/carracing_sweep2/uw15b1o3",
+        "jjshoots/carracing_sweep2/zjj0jcz2",
+        "jjshoots/carracing_sweep2/v49fbi0x",
+        "jjshoots/carracing_sweep2/5p0sbkcq",
+        "jjshoots/carracing_sweep2/bjcbnvbj",
+        "jjshoots/carracing_sweep2/livnnv3j",
+        "jjshoots/carracing_sweep2/mage7k6l",
+        "jjshoots/carracing_sweep2/orcucy6s",
+        "jjshoots/carracing_sweep2/upfhtr78",
+        "jjshoots/carracing_sweep2/6i61i97i",
+        "jjshoots/carracing_sweep2/0810i94y",
+        "jjshoots/carracing_sweep2/g54z5cjx",
+        "jjshoots/carracing_sweep2/glt0v9jn",
+        "jjshoots/carracing_sweep2/hoqzva48",
+        "jjshoots/carracing_sweep2/mmpbyuvy",
+        "jjshoots/carracing_sweep2/n9dknvol",
+        "jjshoots/carracing_sweep2/vwzrrc9s",
+        "jjshoots/carracing_sweep2/h9kncga0",
+        "jjshoots/carracing_sweep2/p6tu2mpp",
+        "jjshoots/carracing_sweep2/p1d6fe6g",
+        "jjshoots/carracing_sweep2/t5kt6aby",
+        "jjshoots/carracing_sweep2/bjeguhfz",
+        "jjshoots/carracing_sweep2/avfvauxc",
+        "jjshoots/carracing_sweep2/e6xb43nk",
         "jjshoots/carracing_sweep2/mnvu1ylw",
+        "jjshoots/carracing_sweep2/xnxpfeya",
         "jjshoots/carracing_sweep2/jr6kride",
         "jjshoots/carracing_sweep2/wmamzf7v",
         "jjshoots/carracing_sweep2/2gbs932p",
@@ -196,9 +239,14 @@ if __name__ == "__main__":
         score = []
         for run_uri in runs[algorithm]:
             log = get_wandb_log(run_uri, ["num_transitions", "eval_perf"])
-            score.append(
-                np.interp(x_axis, log["num_transitions"], log["eval_perf"] * 1.1875)
-            )
+            if algorithm == "CCGE2":
+                score.append(
+                    np.interp(x_axis, log["num_transitions"], log["eval_perf"])
+                )
+            else:
+                score.append(
+                    np.interp(x_axis, log["num_transitions"], log["eval_perf"] * 1.1875)
+                )
 
         # stack along num_runs axis
         score = np.stack(score, axis=0)
