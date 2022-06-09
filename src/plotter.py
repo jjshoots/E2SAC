@@ -38,10 +38,24 @@ rcParams["ps.fonttype"] = 42
 rc("text", usetex=False)
 
 
-def get_wandb_log(run_uri, keys):
+def get_log_from_uri(uri, keys, api=None):
     assert isinstance(keys, list), "keys must be a list."
-    api = wandb.Api(timeout=30)
-    run = api.run(run_uri)
+    api = wandb.Api(timeout=30) if api is None else api
+    run = api.run(uri)
+    history = run.scan_history(keys=keys)
+
+    data = {}
+    for key in keys:
+        array = np.array([row[key] for row in history])
+        array = array.astype(np.float64)
+        array = np.nan_to_num(array, nan=-100.0, posinf=-100.0, neginf=-100.0)
+        data[key] = array
+
+    return data
+
+
+def get_log_from_run(run, keys):
+    assert isinstance(keys, list), "keys must be a list."
     history = run.scan_history(keys=keys)
 
     data = {}
@@ -62,172 +76,12 @@ if __name__ == "__main__":
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
 
-    # list of algorithms and their corresponding uris
+    # collect runs from sweeps
+    api = wandb.Api(timeout=30)
     runs = {}
-    runs["SAC"] = [
-        "jjshoots/carracing_sweep2/w3ogo5i3",
-        "jjshoots/carracing_sweep2/axsl1n6b",
-        "jjshoots/carracing_sweep2/0fna6aux",
-        "jjshoots/carracing_sweep2/i6p1v3j1",
-        "jjshoots/carracing_sweep2/8yttgptr",
-        "jjshoots/carracing_sweep2/r8rthkfe",
-        "jjshoots/carracing_sweep2/mgoadwrf",
-        "jjshoots/carracing_sweep2/herqnh49",
-        "jjshoots/carracing_sweep2/1cv736lf",
-        "jjshoots/carracing_sweep2/hneliap7",
-        "jjshoots/carracing_sweep2/i2cddx3i",
-        "jjshoots/carracing_sweep2/js786awl",
-        "jjshoots/carracing_sweep2/8hvktctd",
-        "jjshoots/carracing_sweep2/icoqszdi",
-        "jjshoots/carracing_sweep2/lcuxfa72",
-        "jjshoots/carracing_sweep2/uzth8si1",
-        "jjshoots/carracing_sweep2/55u59b54",
-        "jjshoots/carracing_sweep2/yaom6v8d",
-        "jjshoots/carracing_sweep2/2qk1w54c",
-        "jjshoots/carracing_sweep2/3js1el59",
-        "jjshoots/carracing_sweep2/kezq2tqx",
-        "jjshoots/carracing_sweep2/mn67a7i5",
-        "jjshoots/carracing_sweep2/e6aib2wo",
-        "jjshoots/carracing_sweep2/9uo8kmp6",
-        "jjshoots/carracing_sweep2/djmpwti5",
-        "jjshoots/carracing_sweep2/0ud8k3lo",
-        "jjshoots/carracing_sweep2/068nxo3c",
-        "jjshoots/carracing_sweep2/qnjgsadb",
-        "jjshoots/carracing_sweep2/oq98lv5a",
-        "jjshoots/carracing_sweep2/dcec16qz",
-        "jjshoots/carracing_sweep2/ug59gfg5",
-        "jjshoots/carracing_sweep2/tb0yq03j",
-        "jjshoots/carracing_sweep2/2vfzdqkx",
-        "jjshoots/carracing_sweep2/f9im5dwu",
-        "jjshoots/carracing_sweep2/q73d7uba",
-        "jjshoots/carracing_sweep2/w2hruqzn",
-        "jjshoots/carracing_sweep2/cbwsvbhw",
-        "jjshoots/carracing_sweep2/yji6t5e3",
-        "jjshoots/carracing_sweep2/u5v8h19i",
-        "jjshoots/carracing_sweep2/e1s6cbe1",
-        "jjshoots/carracing_sweep2/n2lxg46q",
-        "jjshoots/carracing_sweep2/wgfo4rsi",
-        "jjshoots/carracing_sweep2/pfku7gc6",
-        "jjshoots/carracing_sweep2/f0vzlde8",
-        "jjshoots/carracing_sweep2/20irw8be",
-        "jjshoots/carracing_sweep2/ubwy0wqw",
-        "jjshoots/carracing_sweep2/qmk8p0ra",
-        "jjshoots/carracing_sweep2/768bxcu4",
-        "jjshoots/carracing_sweep2/y05z0f4o",
-        "jjshoots/carracing_sweep2/88s87bdy",
-        "jjshoots/carracing_sweep2/cn8vzqsl",
-        "jjshoots/carracing_sweep2/3wbro7j7",
-        "jjshoots/carracing_sweep2/yt4eg7g8",
-        "jjshoots/carracing_sweep2/j0716sdv",
-        "jjshoots/carracing_sweep2/9qc4z4g5",
-    ]
-    runs["CCGE1"] = [
-        "jjshoots/carracing_sweep2/0jf87ral",
-        "jjshoots/carracing_sweep2/6ga28xk3",
-        "jjshoots/carracing_sweep2/530ugv6q",
-        "jjshoots/carracing_sweep2/5b7o4vl0",
-        "jjshoots/carracing_sweep2/85ms41vx",
-        "jjshoots/carracing_sweep2/i8f4ayle",
-        "jjshoots/carracing_sweep2/ggenlfrc",
-        "jjshoots/carracing_sweep2/8jgqqyb2",
-        "jjshoots/carracing_sweep2/yw1r9pnu",
-        "jjshoots/carracing_sweep2/rv5r4m5r",
-        "jjshoots/carracing_sweep2/6pmii6a2",
-        "jjshoots/carracing_sweep2/5d4mveis",
-        "jjshoots/carracing_sweep2/foyqfwf4",
-        "jjshoots/carracing_sweep2/n1ghdy8b",
-        "jjshoots/carracing_sweep2/e29j6d8l",
-        "jjshoots/carracing_sweep2/hizy1trk",
-        "jjshoots/carracing_sweep2/684ym2x6",
-        "jjshoots/carracing_sweep2/frnye2f4",
-        "jjshoots/carracing_sweep2/p6olvikx",
-        "jjshoots/carracing_sweep2/v20bwawx",
-        "jjshoots/carracing_sweep2/16oesko4",
-        "jjshoots/carracing_sweep2/8cp5z91c",
-        "jjshoots/carracing_sweep2/mlb10ce4",
-        "jjshoots/carracing_sweep2/u2f2prl1",
-        "jjshoots/carracing_sweep2/j0lfy15c",
-        "jjshoots/carracing_sweep2/ng58ir75",
-        "jjshoots/carracing_sweep2/wsq8rl19",
-        "jjshoots/carracing_sweep2/8d4vzq45",
-        "jjshoots/carracing_sweep2/lup8macc",
-        "jjshoots/carracing_sweep2/domhzrw5",
-        "jjshoots/carracing_sweep2/2r8asnyr",
-        "jjshoots/carracing_sweep2/edhmmcwq",
-        "jjshoots/carracing_sweep2/r4sdvzfk",
-        "jjshoots/carracing_sweep2/9s9kmrzs",
-        "jjshoots/carracing_sweep2/9msi8buu",
-        "jjshoots/carracing_sweep2/xxsbmrlm",
-        "jjshoots/carracing_sweep2/qd9qq8qp",
-        "jjshoots/carracing_sweep2/yzelorz1",
-        "jjshoots/carracing_sweep2/lxj88vas",
-        "jjshoots/carracing_sweep2/h2w74jd6",
-        "jjshoots/carracing_sweep2/cix9atte",
-        "jjshoots/carracing_sweep2/5zrznky7",
-        "jjshoots/carracing_sweep2/cc85cp4f",
-        "jjshoots/carracing_sweep2/kna1tl82",
-        "jjshoots/carracing_sweep2/p94skl7j",
-        "jjshoots/carracing_sweep2/ntmh4rqv",
-        "jjshoots/carracing_sweep2/qi51or2p",
-        "jjshoots/carracing_sweep2/tjkic4o0",
-        "jjshoots/carracing_sweep2/y1hav88s",
-        "jjshoots/carracing_sweep2/94sznuj0",
-        "jjshoots/carracing_sweep2/zujxlv0a",
-        "jjshoots/carracing_sweep2/1oo8xblq",
-    ]
-    runs["CCGE2"] = [
-        "jjshoots/carracing_sweep2/hq6a28sa",
-        "jjshoots/carracing_sweep2/z3d08y4l",
-        "jjshoots/carracing_sweep2/0hy3zgxe",
-        "jjshoots/carracing_sweep2/82afviis",
-        "jjshoots/carracing_sweep2/mat4e84u",
-        "jjshoots/carracing_sweep2/0pwyf9fp",
-        "jjshoots/carracing_sweep2/s06a5ubn",
-        "jjshoots/carracing_sweep2/t0qajb6s",
-        "jjshoots/carracing_sweep2/bnq46az0",
-        "jjshoots/carracing_sweep2/5ope5f0z",
-        "jjshoots/carracing_sweep2/64ljzxe3",
-        "jjshoots/carracing_sweep2/lez965ys",
-        "jjshoots/carracing_sweep2/h6lku3ni",
-        "jjshoots/carracing_sweep2/ylwhf43m",
-        "jjshoots/carracing_sweep2/zqr6c0nt",
-        "jjshoots/carracing_sweep2/5cib561d",
-        "jjshoots/carracing_sweep2/a2jjohub",
-        "jjshoots/carracing_sweep2/hga5207v",
-        "jjshoots/carracing_sweep2/rjls9ckk",
-        "jjshoots/carracing_sweep2/u1oq0ufy",
-        "jjshoots/carracing_sweep2/uw15b1o3",
-        "jjshoots/carracing_sweep2/zjj0jcz2",
-        "jjshoots/carracing_sweep2/v49fbi0x",
-        "jjshoots/carracing_sweep2/5p0sbkcq",
-        "jjshoots/carracing_sweep2/bjcbnvbj",
-        "jjshoots/carracing_sweep2/livnnv3j",
-        "jjshoots/carracing_sweep2/mage7k6l",
-        "jjshoots/carracing_sweep2/orcucy6s",
-        "jjshoots/carracing_sweep2/upfhtr78",
-        "jjshoots/carracing_sweep2/6i61i97i",
-        "jjshoots/carracing_sweep2/0810i94y",
-        "jjshoots/carracing_sweep2/g54z5cjx",
-        "jjshoots/carracing_sweep2/glt0v9jn",
-        "jjshoots/carracing_sweep2/hoqzva48",
-        "jjshoots/carracing_sweep2/mmpbyuvy",
-        "jjshoots/carracing_sweep2/n9dknvol",
-        "jjshoots/carracing_sweep2/vwzrrc9s",
-        "jjshoots/carracing_sweep2/h9kncga0",
-        "jjshoots/carracing_sweep2/p6tu2mpp",
-        "jjshoots/carracing_sweep2/p1d6fe6g",
-        "jjshoots/carracing_sweep2/t5kt6aby",
-        "jjshoots/carracing_sweep2/bjeguhfz",
-        "jjshoots/carracing_sweep2/avfvauxc",
-        "jjshoots/carracing_sweep2/e6xb43nk",
-        "jjshoots/carracing_sweep2/mnvu1ylw",
-        "jjshoots/carracing_sweep2/xnxpfeya",
-        "jjshoots/carracing_sweep2/jr6kride",
-        "jjshoots/carracing_sweep2/wmamzf7v",
-        "jjshoots/carracing_sweep2/2gbs932p",
-        "jjshoots/carracing_sweep2/mfyxirxx",
-        "jjshoots/carracing_sweep2/l65iah63",
-    ]
+    runs["SAC"] = api.sweep("jjshoots/carracing_sweep2/u579755o").runs
+    runs["CCGE1"] = api.sweep("jjshoots/carracing_sweep2/f45c9lhj").runs
+    runs["CCGE2"] = api.sweep("jjshoots/carracing_sweep2/m6146wfm").runs
 
     # list of algorithms we have
     algorithms = [key for key in runs]
@@ -237,8 +91,8 @@ if __name__ == "__main__":
     scores = {}
     for algorithm in runs:
         score = []
-        for run_uri in runs[algorithm]:
-            log = get_wandb_log(run_uri, ["num_transitions", "eval_perf"])
+        for run in runs[algorithm]:
+            log = get_log_from_run(run, ["num_transitions", "eval_perf"])
             if algorithm == "CCGE2":
                 score.append(
                     np.interp(x_axis, log["num_transitions"], log["eval_perf"])
