@@ -1,0 +1,30 @@
+name: "optimized_SAC"
+# program: main.py
+program: mainSAC.py
+method: random
+metric:
+  name: max_eval_perf
+  goal: maximize
+parameters:
+  total_steps:
+    value: 300000
+  buffer_size:
+    value: 50000
+  learning_rate:
+    value: 0.00002
+  batch_size:
+    value: 150
+  discount_factor:
+    value: 0.95
+  confidence_lambda:
+    value: 5.0
+  supervision_lambda:
+    value: 5.0
+command:
+  - python3
+  # - src/main.py
+  - src/mainSAC.py
+  - "--train"
+  - "--wandb"
+  # - "--wandb_name=e2SAC"
+  - "--wandb_name=SAC"

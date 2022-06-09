@@ -35,7 +35,7 @@ class Environment:
 
         self.device = get_device()
 
-        self.use_learned_suboptimal = True
+        self.use_learned_suboptimal = False
 
         # load suboptimal policy
         if self.use_learned_suboptimal:
