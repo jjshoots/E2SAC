@@ -3,16 +3,16 @@ source venv/bin/activate
 
 declare -a pids=()
 
-wandb agent jjshoots/carracing_sweep2/ah9k62um --count 1 &
+wandb agent jjshoots/carracing_sweep2/p6kq2zpx --count 1 &
 pids+=($!)
 
-wandb agent jjshoots/carracing_sweep2/ah9k62um --count 1 &
+wandb agent jjshoots/carracing_sweep2/p6kq2zpx --count 1 &
 pids+=($!)
 
-wandb agent jjshoots/carracing_sweep2/h6tq8uag --count 1 &
+wandb agent jjshoots/carracing_sweep2/citm1ioa --count 1 &
 pids+=($!)
 
-wandb agent jjshoots/carracing_sweep2/h6tq8uag --count 1 &
+wandb agent jjshoots/carracing_sweep2/citm1ioa --count 1 &
 pids+=($!)
 
 for pid in ${pids[*]}; do
