@@ -88,7 +88,7 @@ class Environment:
         label = self.get_label(self.transform_obs(self.env.env.state))
         return self.state, None, None, label
 
-    def step(self, action, startup=False):
+    def step(self, action):
 
         """
         actions are expected to be of shape [2]
@@ -116,7 +116,7 @@ class Environment:
             self.done = max(done, self.done)
 
         self.state = np.concatenate(obs, axis=0)
-        lbl = None if startup else self.get_label(self.transform_obs(self.state[:3]))
+        lbl =  self.get_label(self.transform_obs(observation))
 
         # record the number of times we go off track or generate no rewards
         if rwd < 0.0:
@@ -177,6 +177,7 @@ class Environment:
 
             steering = midpoint
             accel = 0.1
+
 
             return np.clip(np.array([steering, accel]), -0.99, 0.99)
 
@@ -248,7 +249,7 @@ class Environment:
                 display = np.uint8((display * 127.5 + 127.5))
                 display = np.transpose(display, (1, 2, 0))
                 cv2.imshow("display", display)
+                cv2.waitKey(int(1000 / 15))
             else:
                 self.env.render()
 
-            cv2.waitKey(int(1000 / 15))
