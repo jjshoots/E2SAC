@@ -1,12 +1,14 @@
 program: main.py
-name: lunarlander200k
+name: lunarlander100k
 method: random
 metric:
   name: max_eval_perf
   goal: maximize
 parameters:
+  total_steps:
+    value: 1000000
   buffer_size:
-    value: 200000
+    value: 100000
   batch_size:
     values:
       - 128
@@ -37,4 +39,4 @@ command:
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=lunarlander200k"
+  - "--wandb_name=lunarlander100k"
