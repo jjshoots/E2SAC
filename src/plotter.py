@@ -54,11 +54,7 @@ def get_wandb_log(run, keys):
     return data
 
 
-def process_sweep(sweep_name, sweep_uri):
-    # parameters
-    num_steps = 250000
-    num_intervals = 200
-
+def process_sweep(sweep_name, sweep_uri, num_steps, num_intervals=200):
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
 
@@ -67,7 +63,7 @@ def process_sweep(sweep_name, sweep_uri):
 
     uncer_list = []
     eval_list = []
-    for run, _ in zip(sweep.runs, range(3)):
+    for run in sweep.runs:
         log = get_wandb_log(run, ["num_transitions", "eval_perf"])
         eval_list.append(np.interp(x_axis, log["num_transitions"], log["eval_perf"]))
 
@@ -155,9 +151,9 @@ if __name__ == "__main__":
     # sweeps["CartPole50k"] = "jjshoots/DQN2/a0gjbznv"
     # sweeps["CartPole100k"] = "jjshoots/DQN2/u7k2k7qo"
     # sweeps["CartPole200k"] = "jjshoots/DQN2/emhvyijs"
-    sweeps["LunarLander50k"] = "jjshoots/DQN2/uccgmxfq"
-    sweeps["LunarLander100k"] = "jjshoots/DQN2/2flhn974"
-    sweeps["LunarLander200k"] = "jjshoots/DQN2/bapn8sg1"
+    sweeps["LunarLander100k"] = "jjshoots/DQN2/ns2i31ul"
+    sweeps["LunarLander200k"] = "jjshoots/DQN2/146u4rcg"
+    sweeps["LunarLander400k"] = "jjshoots/DQN2/0d1c22d0"
 
     for key in sweeps:
-        process_sweep(key, sweeps[key])
+        process_sweep(key, sweeps[key], 1e6)
