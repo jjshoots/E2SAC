@@ -1,4 +1,4 @@
-name: "optimized_e2SAC"
+name: "optimized_e2SAC2"
 program: main.py
 # program: mainSAC.py
 method: random
@@ -17,7 +17,7 @@ parameters:
   discount_factor:
     value: 0.95
   confidence_lambda:
-    value: 5.0
+    value: 10.0
   supervision_lambda:
     value: 3.0
 command:
