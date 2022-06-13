@@ -3,7 +3,8 @@ source venv/bin/activate
 
 declare -a pids=()
 
-wandb agent jjshoots/carracing_sweep2/u579755o --count 10 &
+# python3 src/main.py --train --wandb --wandb_name='e2SAC' &
+python3 src/mainSAC.py --train --wandb --wandb_name='SAC' &
 pids+=($!)
 sleep 10
 
