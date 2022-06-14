@@ -1,23 +1,20 @@
-name: "e2SAC_sweep2"
+name: "e2SAC_sweep"
 program: main.py
-# program: mainSAC.py
-method: random
+method: bayes
 metric:
   name: max_eval_perf
   goal: maximize
 parameters:
+  total_steps:
+    value: 60000
   buffer_size:
-    min: 20000
-    max: 50000
+    value: 50000
   learning_rate:
-    distribution: log_uniform_values
-    min: 0.00001
-    max: 0.001
+    value: 0.00002
   batch_size:
-    values: [50, 100, 150]
+    value: 150
   discount_factor:
-    min: 0.90
-    max: 0.99
+    value: 0.95
   confidence_lambda:
     min: 1.0
     max: 10.0
@@ -30,5 +27,5 @@ command:
   # - src/mainSAC.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=$hostname"
+  - "--wandb_name=e2SAC_sweep"
   # - "--wandb_name=SAC"

@@ -2,7 +2,7 @@
 buffer_size: 50000
 buffer_size_debug: 128
 batch_size: 150
-total_steps: 250000
+total_steps: 100000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
@@ -16,8 +16,8 @@ randomize: false
 exploration_steps: 0
 
 # algorithm specifics
-supervision_lambda: 5.
-confidence_lambda: 5.
+supervision_lambda: 10.
+confidence_lambda: 1.
 use_entropy: true
 target_entropy: null
 n_var_samples: 16
