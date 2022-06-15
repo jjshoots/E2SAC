@@ -148,12 +148,13 @@ def process_sweep(sweep_name, sweep_uri, num_steps, num_intervals=200):
 if __name__ == "__main__":
 
     sweeps = {}
-    # sweeps["CartPole50k"] = "jjshoots/DQN2/a0gjbznv"
-    # sweeps["CartPole100k"] = "jjshoots/DQN2/u7k2k7qo"
-    # sweeps["CartPole200k"] = "jjshoots/DQN2/emhvyijs"
-    sweeps["LunarLander100k"] = "jjshoots/DQN2/ns2i31ul"
-    sweeps["LunarLander200k"] = "jjshoots/DQN2/146u4rcg"
-    sweeps["LunarLander400k"] = "jjshoots/DQN2/0d1c22d0"
+    # sweeps["CartPole50k"] = ["jjshoots/DQN2/a0gjbznv", 0.25e6]
+    # sweeps["CartPole100k"] = ["jjshoots/DQN2/u7k2k7qo", 0.25e6]
+    # sweeps["CartPole200k"] = ["jjshoots/DQN2/emhvyijs", 0.25e6]
+    # sweeps["LunarLander100k"] = ["jjshoots/DQN2/ns2i31ul", 1e6]
+    # sweeps["LunarLander200k"] = ["jjshoots/DQN2/146u4rcg", 1e6]
+    # sweeps["LunarLander400k"] = ["jjshoots/DQN2/0d1c22d0", 1e6]
+    sweeps["LunarLander100k_long"] = ["jjshoots/DQN2/dotzndpe", 3e6]
 
     for key in sweeps:
-        process_sweep(key, sweeps[key], 1e6)
+        process_sweep(key, sweeps[key][0], sweeps[key][1])
