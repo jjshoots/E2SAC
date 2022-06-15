@@ -2,13 +2,13 @@
 source venv/bin/activate
 
 declare -a pids=()
-wandb agent jjshoots/DQN2/dotzndpe --count 5 &
+wandb agent jjshoots/DQN2/dotzndpe --count 2 &
 pids+=($!)
 sleep 10
-wandb agent jjshoots/DQN2/dotzndpe --count 5 &
+wandb agent jjshoots/DQN2/dotzndpe --count 2 &
 pids+=($!)
 sleep 10
-wandb agent jjshoots/DQN2/dotzndpe --count 5 &
+wandb agent jjshoots/DQN2/dotzndpe --count 2 &
 pids+=($!)
 sleep 10
 
