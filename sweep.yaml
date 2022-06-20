@@ -1,5 +1,5 @@
 program: main.py
-name: acrobot200k
+name: mountaincar100k
 method: random
 metric:
   name: max_eval_perf
@@ -8,7 +8,7 @@ parameters:
   total_steps:
     value: 250000
   buffer_size:
-    value: 200000
+    value: 100000
   batch_size:
     values:
       - 128
@@ -39,4 +39,4 @@ command:
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=acrobot200k"
+  - "--wandb_name=mountaincar100k"
