@@ -17,9 +17,9 @@ parameters:
   discount_factor:
     value: 0.95
   confidence_lambda:
-    value: 10.0
+    value: 1.0
   supervision_lambda:
-    value: 3.0
+    value: 10.0
 command:
   - python3
   - src/main.py
