@@ -65,12 +65,13 @@ def process_sweep(sweep_name, sweep_uri, num_steps, num_intervals=200):
     eval_list = []
     for run in sweep.runs:
         log = get_wandb_log(run, ["num_transitions", "eval_perf"])
-        eval_list.append(np.interp(x_axis, log["num_transitions"], log["eval_perf"]))
+        if len(log["eval_perf"]) > 0:
+            eval_list.append(np.interp(x_axis, log["num_transitions"], log["eval_perf"]))
 
-        log = get_wandb_log(run, ["num_transitions", "runtime_uncertainty"])
-        uncer_list.append(
-            np.interp(x_axis, log["num_transitions"], log["runtime_uncertainty"])
-        )
+            log = get_wandb_log(run, ["num_transitions", "runtime_uncertainty"])
+            uncer_list.append(
+                np.interp(x_axis, log["num_transitions"], log["runtime_uncertainty"])
+            )
 
     # expand along num_games axis
     eval_scores = {}
@@ -154,7 +155,10 @@ if __name__ == "__main__":
     # sweeps["LunarLander100k"] = ["jjshoots/DQN2/ns2i31ul", 1e6]
     # sweeps["LunarLander200k"] = ["jjshoots/DQN2/146u4rcg", 1e6]
     # sweeps["LunarLander400k"] = ["jjshoots/DQN2/0d1c22d0", 1e6]
-    sweeps["LunarLander100k_long"] = ["jjshoots/DQN2/dotzndpe", 3e6]
+    # sweeps["LunarLander100k_long"] = ["jjshoots/DQN2/dotzndpe", 3e6]
+    # sweeps["Acrobot50k"] = ["jjshoots/DQN2/5bv1o5du", 0.25e6]
+    sweeps["Acrobot100k"] = ["jjshoots/DQN2/t3e9smkh", 0.25e6]
+    # sweeps["Acrobot200k"] = ["jjshoots/DQN2/6ssn48ak", 0.25e6]
 
     for key in sweeps:
         process_sweep(key, sweeps[key][0], sweeps[key][1])
