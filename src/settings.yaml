@@ -1,5 +1,5 @@
 # training params
-buffer_size: 50000
+buffer_size: 75000
 buffer_size_debug: 128
 batch_size: 150
 total_steps: 300000
@@ -16,7 +16,7 @@ randomize: true
 exploration_steps: 0
 
 # algorithm specifics
-supervision_lambda: 10.
+supervision_lambda: 5.
 confidence_lambda: 1.
 use_entropy: true
 target_entropy: null
