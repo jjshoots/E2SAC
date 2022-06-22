@@ -40,7 +40,7 @@ rcParams["ps.fonttype"] = 42
 rc("text", usetex=False)
 
 
-def get_wandb_log(run, keys):
+def get_wandb_log(run, keys, start_val):
     assert isinstance(keys, list), "keys must be a list."
     history = run.scan_history(keys=keys)
 
@@ -48,13 +48,13 @@ def get_wandb_log(run, keys):
     for key in keys:
         array = np.array([row[key] for row in history])
         array = array.astype(np.float64)
-        array = np.nan_to_num(array, nan=0.0, posinf=0.0, neginf=0.0)
+        array = np.nan_to_num(array, nan=start_val, posinf=start_val, neginf=start_val)
         data[key] = array
 
     return data
 
 
-def process_sweep(sweep_name, sweep_uri, num_steps, num_intervals=200):
+def process_sweep(sweep_name, sweep_uri, num_steps, start_val, num_intervals=200):
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
 
@@ -64,11 +64,14 @@ def process_sweep(sweep_name, sweep_uri, num_steps, num_intervals=200):
     uncer_list = []
     eval_list = []
     for run in sweep.runs:
-        log = get_wandb_log(run, ["num_transitions", "eval_perf"])
-        if len(log["eval_perf"]) > 0:
-            eval_list.append(np.interp(x_axis, log["num_transitions"], log["eval_perf"]))
+        log = get_wandb_log(
+            run, ["num_transitions", "eval_perf", "runtime_uncertainty"], start_val
+        )
+        if len(log["eval_perf"]) > 0 and len(log["runtime_uncertainty"] > 0):
+            eval_list.append(
+                np.interp(x_axis, log["num_transitions"], log["eval_perf"])
+            )
 
-            log = get_wandb_log(run, ["num_transitions", "runtime_uncertainty"])
             uncer_list.append(
                 np.interp(x_axis, log["num_transitions"], log["runtime_uncertainty"])
             )
@@ -149,16 +152,19 @@ def process_sweep(sweep_name, sweep_uri, num_steps, num_intervals=200):
 if __name__ == "__main__":
 
     sweeps = {}
-    # sweeps["CartPole50k"] = ["jjshoots/DQN2/a0gjbznv", 0.25e6]
-    # sweeps["CartPole100k"] = ["jjshoots/DQN2/u7k2k7qo", 0.25e6]
-    # sweeps["CartPole200k"] = ["jjshoots/DQN2/emhvyijs", 0.25e6]
-    # sweeps["LunarLander100k"] = ["jjshoots/DQN2/ns2i31ul", 1e6]
-    # sweeps["LunarLander200k"] = ["jjshoots/DQN2/146u4rcg", 1e6]
-    # sweeps["LunarLander400k"] = ["jjshoots/DQN2/0d1c22d0", 1e6]
-    # sweeps["LunarLander100k_long"] = ["jjshoots/DQN2/dotzndpe", 3e6]
-    # sweeps["Acrobot50k"] = ["jjshoots/DQN2/5bv1o5du", 0.25e6]
-    sweeps["Acrobot100k"] = ["jjshoots/DQN2/t3e9smkh", 0.25e6]
-    # sweeps["Acrobot200k"] = ["jjshoots/DQN2/6ssn48ak", 0.25e6]
+    sweeps["CartPole50k"] = ["jjshoots/DQN2/a0gjbznv", 0.25e6, 100.0]
+    sweeps["CartPole100k"] = ["jjshoots/DQN2/u7k2k7qo", 0.25e6, 100.0]
+    sweeps["CartPole200k"] = ["jjshoots/DQN2/emhvyijs", 0.25e6, 100.0]
+    sweeps["LunarLander100k"] = ["jjshoots/DQN2/ns2i31ul", 1e6, -200.0]
+    sweeps["LunarLander200k"] = ["jjshoots/DQN2/146u4rcg", 1e6, -200.0]
+    sweeps["LunarLander400k"] = ["jjshoots/DQN2/0d1c22d0", 1e6, -200.0]
+    sweeps["LunarLander100k_long"] = ["jjshoots/DQN2/dotzndpe", 3e6, -200.0]
+    sweeps["Acrobot50k"] = ["jjshoots/DQN2/5bv1o5du", 0.25e6, -500.0]
+    sweeps["Acrobot100k"] = ["jjshoots/DQN2/t3e9smkh", 0.25e6, -500.0]
+    sweeps["Acrobot200k"] = ["jjshoots/DQN2/6ssn48ak", 0.25e6, -500.0]
+    sweeps["MountainCar50k"] = ["jjshoots/DQN2/nc1ui7ok", 0.25e6, -200.0]
+    sweeps["MountainCar100k"] = ["jjshoots/DQN2/7vjjj1qc", 0.25e6 - 200.0]
+    sweeps["MountainCar200k"] = ["jjshoots/DQN2/z7whmidz", 0.25e6 - 200.0]
 
     for key in sweeps:
-        process_sweep(key, sweeps[key][0], sweeps[key][1])
+        process_sweep(key, sweeps[key][0], sweeps[key][1], sweeps[key][2])

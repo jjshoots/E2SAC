@@ -1,14 +1,14 @@
 program: main.py
-name: mountaincar100k
+name: mountaincar400k
 method: random
 metric:
   name: max_eval_perf
   goal: maximize
 parameters:
   total_steps:
-    value: 250000
+    value: 1000000
   buffer_size:
-    value: 100000
+    value: 400000
   batch_size:
     values:
       - 128
@@ -39,4 +39,4 @@ command:
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=mountaincar100k"
+  - "--wandb_name=mountaincar400k"
