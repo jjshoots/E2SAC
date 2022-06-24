@@ -16,8 +16,8 @@ randomize: true
 exploration_steps: 0
 
 # algorithm specifics
-supervision_lambda: 5.
-confidence_lambda: 1.
+supervision_lambda: 10.0
+confidence_lambda: 0.5
 use_entropy: true
 target_entropy: null
 n_var_samples: 16
