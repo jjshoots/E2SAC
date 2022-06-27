@@ -54,7 +54,7 @@ def get_wandb_log(run, keys, start_val):
     return data
 
 
-def process_run(run_uri, num_steps, start_val, num_intervals=200):
+def process_run(run_name, run_uri, num_steps, start_val, num_intervals=200):
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
 
@@ -74,30 +74,34 @@ def process_run(run_uri, num_steps, start_val, num_intervals=200):
     # twin plots
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
-    ax1.set_xlabel("Timestep (1e6)")
-    ax1.tick_params(axis="x", labelsize=15)
-    ax1.plot(x_axis, eval, color=palette[0])
+    ax1.set_xlabel("Timestep (1e6)", fontsize=15)
+    ax1.tick_params(axis="x", labelsize=20)
+    ax1.plot(x_axis / 1e6, eval, color=palette[0])
 
     ax1.tick_params(axis="y", labelcolor=palette[0], labelsize=15)
     ax1.set_ylabel("Evaluation Interquartile Mean (IQM)", color=palette[0], fontsize=20)
-    ax2.plot(x_axis, uncer, color=palette[1])
+    ax2.plot(x_axis / 1e6, uncer, color=palette[1])
 
     ax2.tick_params(axis="y", labelcolor=palette[1], labelsize=15)
     ax2.set_ylabel("Episodic Mean Epistemic Uncertainty", color=palette[1], fontsize=20)
     # ax2.set_ylim(top=2.0)
 
-    plt.show()
+    plt.title(run_name, fontsize=20)
 
 
 if __name__ == "__main__":
 
     runs = {}
-    runs["LunarLander_1"] = ["jjshoots/DQN2/v7m9fdid", 1e6, -300.0]
-    runs["LunarLander_2"] = ["jjshoots/DQN2/0nryzwe0", 1e6, -300.0]
-    runs["LunarLander_3"] = ["jjshoots/DQN2/9a87kzrw", 1e6, -300.0]
-    runs["LunarLander_4"] = ["jjshoots/DQN2/4to08c08", 1e6, -300.0]
+    runs["LunarLander_1"] = ["jjshoots/DQN2/v7m9fdid", 1e6, -300.0, "LunarLander"]
+    runs["LunarLander_2"] = ["jjshoots/DQN2/0nryzwe0", 1e6, -300.0, "LunarLander"]
+    runs["LunarLander_3"] = ["jjshoots/DQN2/9a87kzrw", 1e6, -300.0, "LunarLander"]
+    runs["LunarLander_4"] = ["jjshoots/DQN2/4to08c08", 1e6, -300.0, "LunarLander"]
+    runs["MountainCar_1"] = ["jjshoots/DQN2/rl7h863y", 1e6, -200.0, "MountainCar"]
+    runs["MountainCar_2"] = ["jjshoots/DQN2/fao9ib3w", 1e6, -200.0, "MountainCar"]
+    runs["MountainCar_3"] = ["jjshoots/DQN2/teotgmwk", 1e6, -200.0, "MountainCar"]
+    runs["MountainCar_4"] = ["jjshoots/DQN2/5kx1l41n", 1e6, -200.0, "MountainCar"]
 
     for key in runs:
-        process_run(runs[key][0], runs[key][1], runs[key][2])
+        process_run(runs[key][-1], runs[key][0], runs[key][1], runs[key][2])
 
     plt.show()
