@@ -97,8 +97,8 @@ def compute_plots(runs, env_name, baselines):
         algorithms=algorithms,
         xlabel=r"Timesteps (1e6)",
         ylabel="IQM Episodic Total Reward",
-        labelsize="large",
-        ticklabelsize="large",
+        # labelsize="large",
+        # ticklabelsize="large",
     )
 
     # plot suboptimal policy lines
@@ -125,7 +125,7 @@ def compute_plots(runs, env_name, baselines):
         # bbox_to_anchor=(0.5, 1.1),
     )
 
-    plt.title(env_name)
+    plt.title(env_name, fontsize=20)
     # plt.savefig(f"resource/{env_name}.pdf")
 
 
