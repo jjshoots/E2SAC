@@ -15,7 +15,7 @@ class Environment:
     Wrapper for OpenAI gym environments that outputs suboptimal actions also
     """
 
-    def __init__(self, env_name, sub_size="smol"):
+    def __init__(self, env_name, sub_size="_smol"):
         super().__init__()
 
         size = sub_size
@@ -149,7 +149,7 @@ class Environment:
         if net is not None:
             net.eval()
         self.env = gym.make(self.env_name)
-        self.env.render(mode="human")
+        self.env.render()
         self.eval()
         self.reset()
 

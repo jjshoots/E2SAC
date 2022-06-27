@@ -3,10 +3,10 @@ env_name: ''
 # env_name: 'AntPyBulletEnv-v0'
 # env_name: 'HopperPyBulletEnv-v0'
 # env_name: 'HumanoidPyBulletEnv-v0'
-# env_name: 'HalfCheetahPyBulletEnv-v0'
+env_name: 'HalfCheetahPyBulletEnv-v0'
 
 # size of suboptimal policy
-sub_size: ''
+sub_size: '_smol'
 
 # training params
 buffer_size: 300000
