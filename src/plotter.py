@@ -125,7 +125,8 @@ def compute_plots(runs, env_name, baselines):
         # bbox_to_anchor=(0.5, 1.1),
     )
 
-    plt.savefig(f"resource/{env_name}.pdf")
+    plt.title(env_name)
+    # plt.savefig(f"resource/{env_name}.pdf")
 
 
 if __name__ == "__main__":
@@ -150,7 +151,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/1l4vcb9e",
         "jjshoots/pybullet_proper2/odteaj0s",
     ]
-    runs["CCGE1"] = [
+    runs["CCGE no bias w/ Oracle 2"] = [
         "jjshoots/pybullet_proper2/47vas0et",
         "jjshoots/pybullet_proper2/2ud5d7io",
         "jjshoots/pybullet_proper2/1hgvkjsz",
@@ -162,7 +163,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/24c90bcd",
         "jjshoots/pybullet_proper2/243z7v5o",
     ]
-    runs["CCGE1.1"] = [
+    runs["CCGE bias w/ Oracle 2"] = [
         "jjshoots/pybullet_proper2/1a86ublm",
         "jjshoots/pybullet_proper2/3ka9ihez",
         "jjshoots/pybullet_proper2/262wf2zo",
@@ -174,7 +175,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/3uerg3af",
         "jjshoots/pybullet_proper2/2jp1jwwq",
     ]
-    runs["CCGE2"] = [
+    runs["CCGE no bias w/ Oracle 1"] = [
         "jjshoots/pybullet_proper2/hv9k0u9z",
         "jjshoots/pybullet_proper2/32akryk0",
         "jjshoots/pybullet_proper2/ql7i68yy",
@@ -188,8 +189,8 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle1"] = 2107.0
-    baselines["Oracle2"] = 1074.0
+    baselines["Oracle 1"] = 1074.0
+    baselines["Oracle 2"] = 2107.0
     baseline_list.append(baselines)
     env_list.append("AntPyBulletEnv-v0")
 
@@ -209,7 +210,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/3sw9iv69",
         "jjshoots/pybullet_proper2/3nek6wsm",
     ]
-    runs["CCGE1"] = [
+    runs["CCGE no bias w/ Oracle 2"] = [
         "jjshoots/pybullet_proper2/31m1ydp4",
         "jjshoots/pybullet_proper2/bt5tcn2u",
         "jjshoots/pybullet_proper2/1l5of0xc",
@@ -221,7 +222,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/2asykiz1",
         "jjshoots/pybullet_proper2/lvahv041",
     ]
-    runs["CCGE1.1"] = [
+    runs["CCGE bias w/ Oracle 2"] = [
         "jjshoots/pybullet_proper2/1nri49lb",
         "jjshoots/pybullet_proper2/3u0bafwn",
         "jjshoots/pybullet_proper2/33bf7biz",
@@ -232,7 +233,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/1fj8pus4",
         "jjshoots/pybullet_proper2/2nyxbg6b",
     ]
-    runs["CCGE2"] = [
+    runs["CCGE no bias w/ Oracle 1"] = [
         "jjshoots/pybullet_proper2/1ys86489",
         "jjshoots/pybullet_proper2/ozn1uhyp",
         "jjshoots/pybullet_proper2/1limtj36",
@@ -246,8 +247,8 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle1"] = 2246.0
-    baselines["Oracle2"] = 1508.0
+    baselines["Oracle 1"] = 1508.0
+    baselines["Oracle 2"] = 2246.0
     baseline_list.append(baselines)
     env_list.append("HopperPyBulletEnv-v0")
 
@@ -267,7 +268,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/2u1vsnr5",
         "jjshoots/pybullet_proper2/cel76d0i",
     ]
-    runs["CCGE1"] = [
+    runs["CCGE no bias w/ Oracle 2"] = [
         "jjshoots/pybullet_proper2/141jvkir",
         "jjshoots/pybullet_proper2/35iqj6jq",
         "jjshoots/pybullet_proper2/1yewmolf",
@@ -279,7 +280,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/s34cof1j",
         "jjshoots/pybullet_proper2/2wszexx3",
     ]
-    runs["CCGE1.1_good"] = [
+    runs["CCGE bias w/ Oracle 2, good"] = [
         "jjshoots/pybullet_proper2/3gp5nyen",
         "jjshoots/pybullet_proper2/2ractkua",
         "jjshoots/pybullet_proper2/3hmum2n0",
@@ -291,7 +292,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/2mlpp813",
         "jjshoots/pybullet_proper2/wddv49zf",
     ]
-    runs["CCGE1.1_bad"] = [
+    runs["CCGE bias w/ Oracle 2, bad"] = [
         "jjshoots/pybullet_proper2/33rckw0u",
         "jjshoots/pybullet_proper2/3tvk325r",
         "jjshoots/pybullet_proper2/5yjlolf6",
@@ -302,7 +303,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/3o2l899x",
         "jjshoots/pybullet_proper2/24d0q0as",
     ]
-    runs["CCGE2"] = [
+    runs["CCGE no bias w/ Oracle 1"] = [
         "jjshoots/pybullet_proper2/39k9e4ha",
         "jjshoots/pybullet_proper2/3n84n1m1",
         "jjshoots/pybullet_proper2/24u31w63",
@@ -316,8 +317,8 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle1"] = 787.0
-    baselines["Oracle2"] = 796.0
+    baselines["Oracle 1"] = 796.0
+    baselines["Oracle 2"] = 787.0
     baseline_list.append(baselines)
     env_list.append("HalfCheetahPyBulletEnv-v0")
 
@@ -337,7 +338,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/1nd3v4dh",
         "jjshoots/pybullet_proper2/2000jz2c",
     ]
-    runs["CCGE1"] = [
+    runs["CCGE no bias w/ Oracle 2"] = [
         "jjshoots/pybullet_proper2/2zwslh8j",
         "jjshoots/pybullet_proper2/287kdug2",
         "jjshoots/pybullet_proper2/257wwxpv",
@@ -349,7 +350,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/5kkyxr1a",
         "jjshoots/pybullet_proper2/8ob04seg",
     ]
-    runs["CCGE1.1"] = [
+    runs["CCGE bias w/ Oracle 2"] = [
         "jjshoots/pybullet_proper2/136to5y6",
         "jjshoots/pybullet_proper2/22vfld1r",
         "jjshoots/pybullet_proper2/2ef2lzva",
@@ -361,7 +362,7 @@ if __name__ == "__main__":
         "jjshoots/pybullet_proper2/3f3su60g",
         "jjshoots/pybullet_proper2/3tme0soy",
     ]
-    runs["CCGE2"] = [
+    runs["CCGE no bias w/ Oracle 1"] = [
         "jjshoots/pybullet_proper2/14g2rr00",
         "jjshoots/pybullet_proper2/2mkj2pue",
         "jjshoots/pybullet_proper2/1f445wsa",
@@ -375,10 +376,12 @@ if __name__ == "__main__":
     ]
     run_list.append(runs)
     baselines = {}
-    baselines["Oracle1"] = 1536.0
-    baselines["Oracle2"] = 1506.0
+    baselines["Oracle 1"] = 1506.0
+    baselines["Oracle 2"] = 1536.0
     baseline_list.append(baselines)
     env_list.append("Walker2DPyBulletEnv-v0")
 
     for runs, env_name, baselines in zip(run_list, env_list, baseline_list):
         compute_plots(runs, env_name, baselines)
+
+    plt.show()
