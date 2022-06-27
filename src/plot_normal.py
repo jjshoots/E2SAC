@@ -80,8 +80,12 @@ if __name__ == "__main__":
     api = wandb.Api(timeout=30)
     runs = {}
     runs["SAC"] = api.sweep("jjshoots/carracing_sweep2/u579755o").runs
-    runs["CCGE1"] = api.sweep("jjshoots/carracing_sweep2/f45c9lhj").runs
-    runs["CCGE2"] = api.sweep("jjshoots/carracing_sweep2/m6146wfm").runs
+    runs["CCGE w/ Heuristic Oracle"] = api.sweep("jjshoots/carracing_sweep2/f45c9lhj").runs
+    runs["CCGE w/ Learned Oracle"] = api.sweep("jjshoots/carracing_sweep2/m6146wfm").runs
+    scales = {}
+    scales["SAC"] = 1.1875
+    scales["CCGE w/ Heuristic Oracle"] = 1.1875
+    scales["CCGE w/ Learned Oracle"] = 1.0000
 
     # list of algorithms we have
     algorithms = [key for key in runs]
@@ -93,14 +97,9 @@ if __name__ == "__main__":
         score = []
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
-            if algorithm == "CCGE2":
-                score.append(
-                    np.interp(x_axis, log["num_transitions"], log["eval_perf"])
-                )
-            else:
-                score.append(
-                    np.interp(x_axis, log["num_transitions"], log["eval_perf"] * 1.1875)
-                )
+            score.append(
+                np.interp(x_axis, log["num_transitions"], log["eval_perf"] * scales[algorithm])
+            )
 
         # stack along num_runs axis
         score = np.stack(score, axis=0)
