@@ -79,11 +79,11 @@ def process_run(run_name, run_uri, num_steps, start_val, num_intervals=200):
     ax1.plot(x_axis / 1e6, eval, color=palette[0])
 
     ax1.tick_params(axis="y", labelcolor=palette[0], labelsize=15)
-    ax1.set_ylabel("Evaluation Interquartile Mean (IQM)", color=palette[0], fontsize=20)
+    ax1.set_ylabel("Evaluation Score", color=palette[0], fontsize=20)
     ax2.plot(x_axis / 1e6, uncer, color=palette[1])
 
     ax2.tick_params(axis="y", labelcolor=palette[1], labelsize=15)
-    ax2.set_ylabel("Episodic Mean Epistemic Uncertainty", color=palette[1], fontsize=20)
+    ax2.set_ylabel("Episodic Mean F-value", color=palette[1], fontsize=20)
     # ax2.set_ylim(top=2.0)
 
     plt.title(run_name, fontsize=20)
