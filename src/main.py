@@ -149,7 +149,7 @@ def display(set):
     env = setup_env(set)
 
     net = None
-    if True:
+    if False:
         net, _, _, _ = setup_nets(set)
 
     env.display(set, net)

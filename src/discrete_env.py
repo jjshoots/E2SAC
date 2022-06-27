@@ -17,9 +17,11 @@ class Environment:
         self.image_size = image_size
         self.frame_stack = 4
 
-        self.env = gym.make("CarRacing-v1", verbose=False, continuous=False, perky=True)
+        self.env = gym.make("CarRacing-v1", verbose=False, continuous=False)
         self.state = np.zeros((1, *self.image_size))
         self.num_actions = self.env.action_space.n
+
+        self.do_nothing = 0
 
         self.off_track_t = 0
         self.max_off_track = 50
@@ -32,7 +34,7 @@ class Environment:
         self.reset()
 
     def switchup(self):
-        self.env = gym.make("CarRacing-v1", verbose=False, continuous=False, perky=True)
+        self.env = gym.make("CarRacing-v1", verbose=False, continuous=False)
 
     def eval(self):
         self.eval_run = True
@@ -48,7 +50,7 @@ class Environment:
         self.env.reset()
         for _ in range(50):
             self.off_track_t = 0
-            self.step(0, startup=True)
+            self.env.step(self.do_nothing)
 
         self.state = np.concatenate(
             [self.transform_obs(self.env.env.state)] * self.frame_stack, 0
@@ -58,7 +60,7 @@ class Environment:
         label = self.get_label(self.transform_obs(self.env.env.state))
         return self.state, None, None, label
 
-    def step(self, action, startup=False):
+    def step(self, action):
 
         """
         actions are expected to be of shape [1]
@@ -81,10 +83,9 @@ class Environment:
             rwd += reward
             self.done = max(done, self.done)
 
-            if i == 0:
-                lbl = (
-                    None if startup else self.get_label(self.transform_obs(observation))
-                )
+            if i == self.frame_stack - 1:
+                lbl = self.get_label(self.transform_obs(observation))
+
         self.state = np.concatenate(obs, axis=0)
 
         # record the number of times we go off track or generate no rewards
@@ -193,5 +194,5 @@ class Environment:
                 cv2.imshow("display", display)
                 cv2.waitKey(int(1000 / 15))
             else:
-                self.env.render()
+                self.env.render("human")
                 time.sleep(0.03)
