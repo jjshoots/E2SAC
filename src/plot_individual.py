@@ -54,7 +54,7 @@ def get_wandb_log(run, keys, start_val):
     return data
 
 
-def process_run(run_name, run_uri, num_steps, start_val, num_intervals=200):
+def process_run(run_name, env_name, run_uri, num_steps, start_val, num_intervals=200):
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
 
@@ -86,7 +86,9 @@ def process_run(run_name, run_uri, num_steps, start_val, num_intervals=200):
     ax2.set_ylabel("Episodic Mean F-value", color=palette[1], fontsize=20)
     # ax2.set_ylim(top=2.0)
 
-    plt.title(run_name, fontsize=20)
+    plt.title(env_name, fontsize=20)
+    fig.set_size_inches(8, 6)
+    plt.savefig(f"./resource/{run_name}.pdf")
 
 
 if __name__ == "__main__":
@@ -102,6 +104,4 @@ if __name__ == "__main__":
     runs["MountainCar_4"] = ["jjshoots/DQN2/5kx1l41n", 1e6, -200.0, "MountainCar"]
 
     for key in runs:
-        process_run(runs[key][-1], runs[key][0], runs[key][1], runs[key][2])
-
-    plt.show()
+        process_run(key, runs[key][-1], runs[key][0], runs[key][1], runs[key][2])
