@@ -80,8 +80,12 @@ if __name__ == "__main__":
     api = wandb.Api(timeout=30)
     runs = {}
     runs["SAC"] = api.sweep("jjshoots/carracing_sweep2/u579755o").runs
-    runs["CCGE w/ Heuristic Oracle"] = api.sweep("jjshoots/carracing_sweep2/f45c9lhj").runs
-    runs["CCGE w/ Learned Oracle"] = api.sweep("jjshoots/carracing_sweep2/m6146wfm").runs
+    runs["CCGE w/ Heuristic Oracle"] = api.sweep(
+        "jjshoots/carracing_sweep2/f45c9lhj"
+    ).runs
+    runs["CCGE w/ Learned Oracle"] = api.sweep(
+        "jjshoots/carracing_sweep2/m6146wfm"
+    ).runs
     scales = {}
     scales["SAC"] = 1.1875
     scales["CCGE w/ Heuristic Oracle"] = 1.1875
@@ -98,7 +102,9 @@ if __name__ == "__main__":
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
             score.append(
-                np.interp(x_axis, log["num_transitions"], log["eval_perf"] * scales[algorithm])
+                np.interp(
+                    x_axis, log["num_transitions"], log["eval_perf"] * scales[algorithm]
+                )
             )
 
         # stack along num_runs axis
@@ -126,6 +132,7 @@ if __name__ == "__main__":
         ylabel="Evaluation Interquartile Mean (IQM)",
         labelsize=24,
         ticklabelsize=24,
+        figsize=(9, 9)
     )
 
     # oracle policies
@@ -146,16 +153,22 @@ if __name__ == "__main__":
     legend = plt.legend(
         fake_patches,
         algorithms,
-        loc="upper center",
+        loc="lower right",
         fancybox=True,
         # ncol=len(algorithms),
-        ncol=2,
-        fontsize=24,
+        ncol=1,
+        fontsize=18,
         # handleheight=1.8,
-        bbox_to_anchor=(0.5, 1.4),
+        # bbox_to_anchor=(0.5, 1.4),
     )
 
-    # plt.title('Suboptimal Policy Eval = 270')
-    # plt.savefig('resource/carracing.pdf')
-    plt.subplots_adjust(top=0.7, left=0.2, bottom=0.1)
-    plt.show()
+    # plt.subplots_adjust(top=0.7, left=0.2, bottom=0.1)
+
+    plt.title(
+        "Hyperparameter Sweep \n CCGE vs. SAC \n in Domain Randomized CarRacing",
+        fontsize=24,
+    )
+    plt.tight_layout()
+    plt.savefig('resource/carracing.pdf', dpi=100)
+
+    # plt.show()

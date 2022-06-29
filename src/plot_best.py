@@ -126,7 +126,15 @@ if __name__ == "__main__":
         ylabel="Evaluation Interquartile Mean (IQM)",
         labelsize=24,
         ticklabelsize=24,
+        figsize=(9, 9)
     )
+
+
+    # plot suboptimal policy
+    plt.axhline(
+        y=320, color=sns.color_palette("colorblind")[len(algorithms) + 0], linestyle="-"
+    )
+    algorithms.append("Heuristic Oracle")
 
     # form the legend
     color_dict = dict(zip(algorithms, sns.color_palette("colorblind")))
@@ -136,16 +144,19 @@ if __name__ == "__main__":
     legend = plt.legend(
         fake_patches,
         algorithms,
-        loc="upper center",
+        loc="lower center",
         fancybox=True,
         # ncol=len(algorithms),
         ncol=2,
-        fontsize=24,
+        fontsize=18,
         # handleheight=1.8,
-        bbox_to_anchor=(0.5, 1.4),
+        # bbox_to_anchor=(0.5, 1.4),
     )
 
-    # plt.title('Suboptimal Policy Eval = 270')
-    # plt.savefig('resource/carracing.pdf')
-    plt.subplots_adjust(top=0.7, left=0.2, bottom=0.1)
-    plt.show()
+    plt.title(
+        "Best CCGE vs. Best SAC \n in Domain Randomized CarRacing",
+        fontsize=24,
+    )
+    plt.tight_layout()
+    plt.savefig('resource/carracing_best.pdf', dpi=100)
+    # plt.show()
