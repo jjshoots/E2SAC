@@ -99,6 +99,7 @@ def compute_plots(runs, env_name, baselines):
         ylabel="IQM Episodic Total Reward",
         # labelsize="large",
         # ticklabelsize="large",
+        figsize=(9, 9)
     )
 
     # plot suboptimal policy lines
@@ -121,12 +122,13 @@ def compute_plots(runs, env_name, baselines):
         loc="lower right",
         fancybox=True,
         # ncol=len(algorithms),
-        fontsize="large",
+        fontsize=18,
         # bbox_to_anchor=(0.5, 1.1),
     )
 
     plt.title(env_name, fontsize=20)
-    # plt.savefig(f"resource/{env_name}.pdf")
+    plt.tight_layout()
+    plt.savefig(f"resource/{env_name}.pdf")
 
 
 if __name__ == "__main__":
@@ -383,5 +385,3 @@ if __name__ == "__main__":
 
     for runs, env_name, baselines in zip(run_list, env_list, baseline_list):
         compute_plots(runs, env_name, baselines)
-
-    plt.show()
