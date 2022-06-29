@@ -133,8 +133,8 @@ def process_sweep(sweep_name, sweep_uri, num_steps, start_val, num_intervals=200
         algorithms=None,
         xlabel=r"Timesteps (1e6)",
         ylabel="Episodic Mean Epistemic Uncertainty",
-        labelsize="large",
-        ticklabelsize="large",
+        labelsize=24,
+        ticklabelsize=24,
         ax=ax2,
         custom_color=sns.color_palette("colorblind")[1:],
     )
@@ -142,8 +142,9 @@ def process_sweep(sweep_name, sweep_uri, num_steps, start_val, num_intervals=200
     ax2.set_ylabel("Episodic Mean Epistemic Uncertainty", color=palette[1], fontsize=20)
     # ax2.set_ylim(top=2.0)
 
-    plt.title(sweep_name, fontsize=24)
+    plt.title(sweep_name, fontsize=30)
     fig.set_size_inches(9, 9)
+    plt.tight_layout()
     plt.savefig(f"./resource/{sweep_name}.pdf")
 
 
@@ -151,18 +152,18 @@ if __name__ == "__main__":
     # sweeps["LunarLander100k_long"] = ["jjshoots/DQN2/dotzndpe", 3e6, -200.0]
 
     sweeps = {}
-    # sweeps["CartPole50k"] = ["jjshoots/DQN2/a0gjbznv", 0.25e6, 100.0]
-    # sweeps["CartPole100k"] = ["jjshoots/DQN2/u7k2k7qo", 0.25e6, 100.0]
-    # sweeps["CartPole200k"] = ["jjshoots/DQN2/emhvyijs", 0.25e6, 100.0]
-    # sweeps["Acrobot50k"] = ["jjshoots/DQN2/5bv1o5du", 0.25e6, -500.0]
-    # sweeps["Acrobot100k"] = ["jjshoots/DQN2/t3e9smkh", 0.25e6, -500.0]
-    # sweeps["Acrobot200k"] = ["jjshoots/DQN2/6ssn48ak", 0.25e6, -500.0]
+    sweeps["CartPole50k"] = ["jjshoots/DQN2/a0gjbznv", 0.25e6, 100.0]
+    sweeps["CartPole100k"] = ["jjshoots/DQN2/u7k2k7qo", 0.25e6, 100.0]
+    sweeps["CartPole200k"] = ["jjshoots/DQN2/emhvyijs", 0.25e6, 100.0]
+    sweeps["Acrobot50k"] = ["jjshoots/DQN2/5bv1o5du", 0.25e6, -500.0]
+    sweeps["Acrobot100k"] = ["jjshoots/DQN2/t3e9smkh", 0.25e6, -500.0]
+    sweeps["Acrobot200k"] = ["jjshoots/DQN2/6ssn48ak", 0.25e6, -500.0]
     sweeps["MountainCar100k"] = ["jjshoots/DQN2/xy1blq0i", 1e6, -200.0]
     sweeps["MountainCar200k"] = ["jjshoots/DQN2/zlqur3uh", 1e6, -200.0]
     sweeps["MountainCar400k"] = ["jjshoots/DQN2/4zjlky9u", 1e6, -200.0]
-    # sweeps["LunarLander100k"] = ["jjshoots/DQN2/ns2i31ul", 1e6, -200.0]
-    # sweeps["LunarLander200k"] = ["jjshoots/DQN2/146u4rcg", 1e6, -200.0]
-    # sweeps["LunarLander400k"] = ["jjshoots/DQN2/0d1c22d0", 1e6, -200.0]
+    sweeps["LunarLander100k"] = ["jjshoots/DQN2/ns2i31ul", 1e6, -200.0]
+    sweeps["LunarLander200k"] = ["jjshoots/DQN2/146u4rcg", 1e6, -200.0]
+    sweeps["LunarLander400k"] = ["jjshoots/DQN2/0d1c22d0", 1e6, -200.0]
 
     for key in sweeps:
         process_sweep(key, sweeps[key][0], sweeps[key][1], sweeps[key][2])
