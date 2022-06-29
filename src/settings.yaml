@@ -18,7 +18,7 @@ exploration_epsilon: 0.1
 
 # eval settings
 eval_steps_ratio: 5000
-eval_num_traj: 20
+eval_num_traj: 10
 
 # helper params
 wandb_project: 'carracing_discrete'

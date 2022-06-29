@@ -183,3 +183,32 @@ class Environment:
                 cv2.waitKey(int(1000 / 15))
             else:
                 self.env.render("human")
+
+    def evaluate_uncertainty(self, set, net):
+        net.eval()
+        self.eval()
+
+        # list of mean uncertainty for each episode
+        episodic_uncertainty = []
+        # list of uncertainties for each step in an ep
+        uncertainty = []
+
+        while len(episodic_uncertainty) < 50:
+            # get the initial state and action
+            obs, _, _ = self.get_state()
+
+            q, f = net(gpuize(obs, set.device).unsqueeze(0))
+            action = cpuize(net.infer(q, f))
+
+            # get the next state and reward
+            _, _, _ = self.step(action)
+
+            # store the transition uncertainty
+            uncertainty.append(cpuize(f.squeeze()))
+
+            if self.is_done:
+                episodic_uncertainty.append(np.mean(np.asarray(uncertainty)))
+                uncertainty = []
+                self.reset()
+
+        return np.mean(np.asarray(episodic_uncertainty))
