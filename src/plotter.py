@@ -97,8 +97,8 @@ def compute_plots(runs, env_name, baselines):
         algorithms=algorithms,
         xlabel=r"Timesteps (1e6)",
         ylabel="IQM Episodic Total Reward",
-        # labelsize="large",
-        # ticklabelsize="large",
+        labelsize=24,
+        ticklabelsize=24,
         figsize=(9, 9)
     )
 
@@ -126,7 +126,7 @@ def compute_plots(runs, env_name, baselines):
         # bbox_to_anchor=(0.5, 1.1),
     )
 
-    plt.title(env_name, fontsize=20)
+    plt.title(env_name, fontsize=24)
     plt.tight_layout()
     plt.savefig(f"resource/{env_name}.pdf")
 
