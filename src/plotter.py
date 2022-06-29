@@ -91,7 +91,9 @@ if __name__ == "__main__":
         score = []
         for run_uri in runs[algorithm]:
             log = get_wandb_log(run_uri, ["num_transitions", "runtime_uncertainty"])
-            score.append(np.interp(x_axis, log["num_transitions"], log["runtime_uncertainty"]))
+            score.append(
+                np.interp(x_axis, log["num_transitions"], log["runtime_uncertainty"])
+            )
 
         # stack along num_runs axis
         score = np.stack(score, axis=0)
@@ -120,7 +122,7 @@ if __name__ == "__main__":
         ticklabelsize=24,
     )
 
-    plt.axvline(x=250000/1e5, color=sns.color_palette("colorblind")[1], linestyle="-")
+    plt.axvline(x=250000 / 1e5, color=sns.color_palette("colorblind")[1], linestyle="-")
     algorithms.append("Domain Change")
 
     # form the legend

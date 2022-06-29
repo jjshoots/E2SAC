@@ -26,6 +26,7 @@ def train(set):
     to_log["max_eval_perf"] = -np.inf
     last_eval_step = 0
     last_switchup_step = 0
+    has_switchup = False
 
     while memory.count <= set.total_steps + set.eval_steps_ratio:
         to_log["epoch"] += 1
@@ -38,12 +39,12 @@ def train(set):
                 [to_log["max_eval_perf"], to_log["eval_perf"]]
             )
 
-        """SWITCH UP ENV"""
+        """SWITCHUP ENV"""
         if memory.count - last_switchup_step > set.switchup_step:
             last_switchup_step += set.switchup_step
-            env.switchup()
-            # memory.refresh()
-            pass
+            if not has_switchup:
+                env.reset(randomize=True)
+                has_switchup = True
 
         """ENVIRONMENT INTERACTION"""
         env.reset()
@@ -56,7 +57,7 @@ def train(set):
             cumulative_uncertainty = []
             while not env.is_done:
                 # get the initial state and label
-                obs, _, _, _ = env.get_state()
+                obs, _, _ = env.get_state()
 
                 if memory.count < set.exploration_steps:
                     action = np.random.uniform(-1.0, 1.0, 2)
@@ -70,7 +71,7 @@ def train(set):
                 )
 
                 # get the next state and other stuff
-                next_obs, rew, dne, _ = env.step(action)
+                next_obs, rew, dne = env.step(action)
 
                 # store stuff in mem
                 memory.push((obs, action, rew, next_obs, dne))

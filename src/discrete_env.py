@@ -17,7 +17,9 @@ class Environment:
         self.image_size = image_size
         self.frame_stack = 4
 
-        self.env = gym.make("CarRacing-v1", verbose=False, continuous=False)
+        self.env = gym.make(
+            "CarRacing-v1", verbose=False, continuous=False, domain_randomize=True
+        )
         self.state = np.zeros((1, *self.image_size))
         self.num_actions = self.env.action_space.n
 
@@ -33,21 +35,18 @@ class Environment:
 
         self.reset()
 
-    def switchup(self):
-        self.env = gym.make("CarRacing-v1", verbose=False, continuous=False)
-
     def eval(self):
         self.eval_run = True
 
     def train(self):
         self.eval_run = False
 
-    def reset(self):
+    def reset(self, randomize=False):
         self.off_track_t = 0
         self.done = 0
         self.cumulative_reward = 0
 
-        self.env.reset()
+        self.env.reset(options={"randomize": randomize})
         for _ in range(50):
             self.off_track_t = 0
             self.env.step(self.do_nothing)
@@ -57,8 +56,7 @@ class Environment:
         )
 
     def get_state(self):
-        label = self.get_label(self.transform_obs(self.env.env.state))
-        return self.state, None, None, label
+        return self.state, None, None
 
     def step(self, action):
 
@@ -74,22 +72,18 @@ class Environment:
         action = int(np.squeeze(action))
 
         # step through the env for frame stack num times
-        obs = []
-        rwd = 0.0
-        lbl = None
+        observation = []
+        reward = 0.0
         for i in range(self.frame_stack):
-            observation, reward, done, _ = self.env.step(action)
-            obs.append(self.transform_obs(observation))
-            rwd += reward
-            self.done = max(done, self.done)
+            obs, rwd, dne, _ = self.env.step(action)
+            observation.append(self.transform_obs(obs))
+            reward += rwd
+            self.done = max(dne, self.done)
 
-            if i == self.frame_stack - 1:
-                lbl = self.get_label(self.transform_obs(observation))
-
-        self.state = np.concatenate(obs, axis=0)
+        self.state = np.concatenate(observation, axis=0)
 
         # record the number of times we go off track or generate no rewards
-        if rwd < 0.0:
+        if reward < 0.0:
             self.off_track_t += 1
         else:
             self.off_track_t = 0
@@ -98,15 +92,15 @@ class Environment:
         #   - we go off track for more than specified steps (no reward)
         #   - or we go outside the map
         if not self.eval_run:
-            if self.off_track_t >= self.max_off_track or rwd < -50.0:
+            if self.off_track_t >= self.max_off_track or reward < -50.0:
                 self.done = 1.0
             else:
                 self.done = 0.0
 
         # accumulate rewards
-        self.cumulative_reward += rwd
+        self.cumulative_reward += reward
 
-        return self.state, rwd, self.done, lbl
+        return self.state, reward, self.done
 
     @property
     def is_done(self):
@@ -126,9 +120,6 @@ class Environment:
 
         return obs
 
-    def get_label(self, obs):
-        return 0
-
     def evaluate(self, set, net=None):
         if net is not None:
             net.eval()
@@ -139,16 +130,16 @@ class Environment:
 
         while len(eval_perf) < set.eval_num_traj:
             # get the initial state and action
-            obs, _, _, lbl = self.get_state()
+            obs, _, _ = self.get_state()
 
             if net is not None:
                 output = net(gpuize(obs, set.device).unsqueeze(0))
                 action = cpuize(net.infer(*output))
             else:
-                action = lbl
+                action = 0
 
             # get the next state and reward
-            _, _, _, _ = self.step(action)
+            _, _, _ = self.step(action)
 
             if self.is_done:
                 eval_perf.append(self.cumulative_reward)
@@ -164,28 +155,25 @@ class Environment:
         self.eval()
         self.reset()
 
-        action = 0
+        action = self.do_nothing
 
         if transformed:
             cv2.namedWindow("display", cv2.WINDOW_NORMAL)
 
         while True:
-            obs, rwd, dne, lbl = self.step(action)
+            obs, _, _ = self.step(action)
 
             if self.is_done:
                 print(f"Total Reward: {self.cumulative_reward}")
-                self.reset()
-                action = 0
+                self.reset(randomize=True)
+                action = self.do_nothing
 
             if net is not None:
                 output = net.forward(gpuize(obs, set.device).unsqueeze(0))
                 # action = cpuize(net.sample(*output))
                 action = cpuize(net.infer(*output))
-
-                # print(action)
-                # print(output.squeeze())
             else:
-                action = lbl
+                action = 0
 
             if transformed:
                 display = obs[:3, ...]
@@ -195,4 +183,3 @@ class Environment:
                 cv2.waitKey(int(1000 / 15))
             else:
                 self.env.render("human")
-                time.sleep(0.03)

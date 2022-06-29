@@ -22,4 +22,4 @@ if [[ $NJOBS -gt 1 ]]; then
   screen="-screen 1 1400x900x24";
 fi
 
-xvfb-run -s "$screen" wandb agent --count=1 jjshoots/UA3SAC_gym/yp3kgbaf
+./run_sulis.sh
