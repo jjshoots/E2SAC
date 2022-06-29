@@ -119,7 +119,7 @@ def compute_plots(runs, env_name, baselines):
     plt.legend(
         fake_patches,
         algorithms,
-        loc="lower right",
+        loc="upper left",
         fancybox=True,
         # ncol=len(algorithms),
         fontsize=18,
@@ -137,122 +137,122 @@ if __name__ == "__main__":
     env_list = []
     baseline_list = []
 
-    # Ant
-    runs = {}
-    runs["SAC"] = [
-        "jjshoots/pybullet_proper2/5u53xvbr",
-        "jjshoots/pybullet_proper2/my12ylhy",
-        "jjshoots/pybullet_proper2/qs8fjteo",
-        "jjshoots/pybullet_proper2/2nos2ruq",
-        "jjshoots/pybullet_proper2/2n7flvkr",
-        "jjshoots/pybullet_proper2/3f5d6i2z",
-        "jjshoots/pybullet_proper2/3j02w4uw",
-        "jjshoots/pybullet_proper2/1lwslgqt",
-        "jjshoots/pybullet_proper2/c7giyxke",
-        "jjshoots/pybullet_proper2/1t9xa0xq",
-        "jjshoots/pybullet_proper2/1l4vcb9e",
-        "jjshoots/pybullet_proper2/odteaj0s",
-    ]
-    runs["CCGE no bias w/ Oracle 2"] = [
-        "jjshoots/pybullet_proper2/47vas0et",
-        "jjshoots/pybullet_proper2/2ud5d7io",
-        "jjshoots/pybullet_proper2/1hgvkjsz",
-        "jjshoots/pybullet_proper2/19x23xod",
-        "jjshoots/pybullet_proper2/1u90gdof",
-        "jjshoots/pybullet_proper2/3jr4fw5t",
-        "jjshoots/pybullet_proper2/1y6ylnmh",
-        "jjshoots/pybullet_proper2/1gmnwa4g",
-        "jjshoots/pybullet_proper2/24c90bcd",
-        "jjshoots/pybullet_proper2/243z7v5o",
-    ]
-    runs["CCGE bias w/ Oracle 2"] = [
-        "jjshoots/pybullet_proper2/1a86ublm",
-        "jjshoots/pybullet_proper2/3ka9ihez",
-        "jjshoots/pybullet_proper2/262wf2zo",
-        "jjshoots/pybullet_proper2/1lq7pqxm",
-        "jjshoots/pybullet_proper2/154uq9o3",
-        "jjshoots/pybullet_proper2/21gzao6p",
-        "jjshoots/pybullet_proper2/1da57v6a",
-        "jjshoots/pybullet_proper2/1lcobiai",
-        "jjshoots/pybullet_proper2/3uerg3af",
-        "jjshoots/pybullet_proper2/2jp1jwwq",
-    ]
-    runs["CCGE no bias w/ Oracle 1"] = [
-        "jjshoots/pybullet_proper2/hv9k0u9z",
-        "jjshoots/pybullet_proper2/32akryk0",
-        "jjshoots/pybullet_proper2/ql7i68yy",
-        "jjshoots/pybullet_proper2/2i76if75",
-        "jjshoots/pybullet_proper2/1nlbjy47",
-        "jjshoots/pybullet_proper2/1fxk7zpi",
-        "jjshoots/pybullet_proper2/trnzurhq",
-        "jjshoots/pybullet_proper2/166eludf",
-        "jjshoots/pybullet_proper2/18faa4fy",
-        "jjshoots/pybullet_proper2/2b2mn47g",
-    ]
-    run_list.append(runs)
-    baselines = {}
-    baselines["Oracle 1"] = 1074.0
-    baselines["Oracle 2"] = 2107.0
-    baseline_list.append(baselines)
-    env_list.append("AntPyBulletEnv-v0")
+    # # Ant
+    # runs = {}
+    # runs["SAC"] = [
+    #     "jjshoots/pybullet_proper2/5u53xvbr",
+    #     "jjshoots/pybullet_proper2/my12ylhy",
+    #     "jjshoots/pybullet_proper2/qs8fjteo",
+    #     "jjshoots/pybullet_proper2/2nos2ruq",
+    #     "jjshoots/pybullet_proper2/2n7flvkr",
+    #     "jjshoots/pybullet_proper2/3f5d6i2z",
+    #     "jjshoots/pybullet_proper2/3j02w4uw",
+    #     "jjshoots/pybullet_proper2/1lwslgqt",
+    #     "jjshoots/pybullet_proper2/c7giyxke",
+    #     "jjshoots/pybullet_proper2/1t9xa0xq",
+    #     "jjshoots/pybullet_proper2/1l4vcb9e",
+    #     "jjshoots/pybullet_proper2/odteaj0s",
+    # ]
+    # runs["CCGE no bias w/ Oracle 2"] = [
+    #     "jjshoots/pybullet_proper2/47vas0et",
+    #     "jjshoots/pybullet_proper2/2ud5d7io",
+    #     "jjshoots/pybullet_proper2/1hgvkjsz",
+    #     "jjshoots/pybullet_proper2/19x23xod",
+    #     "jjshoots/pybullet_proper2/1u90gdof",
+    #     "jjshoots/pybullet_proper2/3jr4fw5t",
+    #     "jjshoots/pybullet_proper2/1y6ylnmh",
+    #     "jjshoots/pybullet_proper2/1gmnwa4g",
+    #     "jjshoots/pybullet_proper2/24c90bcd",
+    #     "jjshoots/pybullet_proper2/243z7v5o",
+    # ]
+    # runs["CCGE bias w/ Oracle 2"] = [
+    #     "jjshoots/pybullet_proper2/1a86ublm",
+    #     "jjshoots/pybullet_proper2/3ka9ihez",
+    #     "jjshoots/pybullet_proper2/262wf2zo",
+    #     "jjshoots/pybullet_proper2/1lq7pqxm",
+    #     "jjshoots/pybullet_proper2/154uq9o3",
+    #     "jjshoots/pybullet_proper2/21gzao6p",
+    #     "jjshoots/pybullet_proper2/1da57v6a",
+    #     "jjshoots/pybullet_proper2/1lcobiai",
+    #     "jjshoots/pybullet_proper2/3uerg3af",
+    #     "jjshoots/pybullet_proper2/2jp1jwwq",
+    # ]
+    # runs["CCGE no bias w/ Oracle 1"] = [
+    #     "jjshoots/pybullet_proper2/hv9k0u9z",
+    #     "jjshoots/pybullet_proper2/32akryk0",
+    #     "jjshoots/pybullet_proper2/ql7i68yy",
+    #     "jjshoots/pybullet_proper2/2i76if75",
+    #     "jjshoots/pybullet_proper2/1nlbjy47",
+    #     "jjshoots/pybullet_proper2/1fxk7zpi",
+    #     "jjshoots/pybullet_proper2/trnzurhq",
+    #     "jjshoots/pybullet_proper2/166eludf",
+    #     "jjshoots/pybullet_proper2/18faa4fy",
+    #     "jjshoots/pybullet_proper2/2b2mn47g",
+    # ]
+    # run_list.append(runs)
+    # baselines = {}
+    # baselines["Oracle 1"] = 1074.0
+    # baselines["Oracle 2"] = 2107.0
+    # baseline_list.append(baselines)
+    # env_list.append("AntPyBulletEnv-v0")
 
-    # Hopper
-    runs = {}
-    runs["SAC"] = [
-        "jjshoots/pybullet_proper2/3agi889l",
-        "jjshoots/pybullet_proper2/1cerdbg1",
-        "jjshoots/pybullet_proper2/vwkcs9e8",
-        "jjshoots/pybullet_proper2/1mxw7c76",
-        "jjshoots/pybullet_proper2/27q7wd3j",
-        "jjshoots/pybullet_proper2/gyvok2m6",
-        "jjshoots/pybullet_proper2/12xo59aa",
-        "jjshoots/pybullet_proper2/2jq2bia7",
-        "jjshoots/pybullet_proper2/2tzvly3r",
-        "jjshoots/pybullet_proper2/xozzppob",
-        "jjshoots/pybullet_proper2/3sw9iv69",
-        "jjshoots/pybullet_proper2/3nek6wsm",
-    ]
-    runs["CCGE no bias w/ Oracle 2"] = [
-        "jjshoots/pybullet_proper2/31m1ydp4",
-        "jjshoots/pybullet_proper2/bt5tcn2u",
-        "jjshoots/pybullet_proper2/1l5of0xc",
-        "jjshoots/pybullet_proper2/771eb2ye",
-        "jjshoots/pybullet_proper2/266spyl2",
-        "jjshoots/pybullet_proper2/1xcwyouz",
-        "jjshoots/pybullet_proper2/2iz9ynna",
-        "jjshoots/pybullet_proper2/2k95xw45",
-        "jjshoots/pybullet_proper2/2asykiz1",
-        "jjshoots/pybullet_proper2/lvahv041",
-    ]
-    runs["CCGE bias w/ Oracle 2"] = [
-        "jjshoots/pybullet_proper2/1nri49lb",
-        "jjshoots/pybullet_proper2/3u0bafwn",
-        "jjshoots/pybullet_proper2/33bf7biz",
-        "jjshoots/pybullet_proper2/1mq8gj6i",
-        "jjshoots/pybullet_proper2/saakuj9v",
-        "jjshoots/pybullet_proper2/r2elxfv6",
-        "jjshoots/pybullet_proper2/2ki1ksjk",
-        "jjshoots/pybullet_proper2/1fj8pus4",
-        "jjshoots/pybullet_proper2/2nyxbg6b",
-    ]
-    runs["CCGE no bias w/ Oracle 1"] = [
-        "jjshoots/pybullet_proper2/1ys86489",
-        "jjshoots/pybullet_proper2/ozn1uhyp",
-        "jjshoots/pybullet_proper2/1limtj36",
-        "jjshoots/pybullet_proper2/35dd0jma",
-        "jjshoots/pybullet_proper2/3rhmkt0r",
-        "jjshoots/pybullet_proper2/2z866q69",
-        "jjshoots/pybullet_proper2/1kvqykmn",
-        "jjshoots/pybullet_proper2/36uah4ty",
-        "jjshoots/pybullet_proper2/1sz3rlfh",
-        "jjshoots/pybullet_proper2/10whr5h3",
-    ]
-    run_list.append(runs)
-    baselines = {}
-    baselines["Oracle 1"] = 1508.0
-    baselines["Oracle 2"] = 2246.0
-    baseline_list.append(baselines)
-    env_list.append("HopperPyBulletEnv-v0")
+    # # Hopper
+    # runs = {}
+    # runs["SAC"] = [
+    #     "jjshoots/pybullet_proper2/3agi889l",
+    #     "jjshoots/pybullet_proper2/1cerdbg1",
+    #     "jjshoots/pybullet_proper2/vwkcs9e8",
+    #     "jjshoots/pybullet_proper2/1mxw7c76",
+    #     "jjshoots/pybullet_proper2/27q7wd3j",
+    #     "jjshoots/pybullet_proper2/gyvok2m6",
+    #     "jjshoots/pybullet_proper2/12xo59aa",
+    #     "jjshoots/pybullet_proper2/2jq2bia7",
+    #     "jjshoots/pybullet_proper2/2tzvly3r",
+    #     "jjshoots/pybullet_proper2/xozzppob",
+    #     "jjshoots/pybullet_proper2/3sw9iv69",
+    #     "jjshoots/pybullet_proper2/3nek6wsm",
+    # ]
+    # runs["CCGE no bias w/ Oracle 2"] = [
+    #     "jjshoots/pybullet_proper2/31m1ydp4",
+    #     "jjshoots/pybullet_proper2/bt5tcn2u",
+    #     "jjshoots/pybullet_proper2/1l5of0xc",
+    #     "jjshoots/pybullet_proper2/771eb2ye",
+    #     "jjshoots/pybullet_proper2/266spyl2",
+    #     "jjshoots/pybullet_proper2/1xcwyouz",
+    #     "jjshoots/pybullet_proper2/2iz9ynna",
+    #     "jjshoots/pybullet_proper2/2k95xw45",
+    #     "jjshoots/pybullet_proper2/2asykiz1",
+    #     "jjshoots/pybullet_proper2/lvahv041",
+    # ]
+    # runs["CCGE bias w/ Oracle 2"] = [
+    #     "jjshoots/pybullet_proper2/1nri49lb",
+    #     "jjshoots/pybullet_proper2/3u0bafwn",
+    #     "jjshoots/pybullet_proper2/33bf7biz",
+    #     "jjshoots/pybullet_proper2/1mq8gj6i",
+    #     "jjshoots/pybullet_proper2/saakuj9v",
+    #     "jjshoots/pybullet_proper2/r2elxfv6",
+    #     "jjshoots/pybullet_proper2/2ki1ksjk",
+    #     "jjshoots/pybullet_proper2/1fj8pus4",
+    #     "jjshoots/pybullet_proper2/2nyxbg6b",
+    # ]
+    # runs["CCGE no bias w/ Oracle 1"] = [
+    #     "jjshoots/pybullet_proper2/1ys86489",
+    #     "jjshoots/pybullet_proper2/ozn1uhyp",
+    #     "jjshoots/pybullet_proper2/1limtj36",
+    #     "jjshoots/pybullet_proper2/35dd0jma",
+    #     "jjshoots/pybullet_proper2/3rhmkt0r",
+    #     "jjshoots/pybullet_proper2/2z866q69",
+    #     "jjshoots/pybullet_proper2/1kvqykmn",
+    #     "jjshoots/pybullet_proper2/36uah4ty",
+    #     "jjshoots/pybullet_proper2/1sz3rlfh",
+    #     "jjshoots/pybullet_proper2/10whr5h3",
+    # ]
+    # run_list.append(runs)
+    # baselines = {}
+    # baselines["Oracle 1"] = 1508.0
+    # baselines["Oracle 2"] = 2246.0
+    # baseline_list.append(baselines)
+    # env_list.append("HopperPyBulletEnv-v0")
 
     # HalfCheetah
     runs = {}
@@ -324,64 +324,64 @@ if __name__ == "__main__":
     baseline_list.append(baselines)
     env_list.append("HalfCheetahPyBulletEnv-v0")
 
-    # Walker2D
-    runs = {}
-    runs["SAC"] = [
-        "jjshoots/pybullet_proper2/iv83lvpe",
-        "jjshoots/pybullet_proper2/1nugaeda",
-        "jjshoots/pybullet_proper2/1l99vuyl",
-        "jjshoots/pybullet_proper2/lgab8igk",
-        "jjshoots/pybullet_proper2/xwziupc5",
-        "jjshoots/pybullet_proper2/3d59105o",
-        "jjshoots/pybullet_proper2/13p6apja",
-        "jjshoots/pybullet_proper2/3bb8whna",
-        "jjshoots/pybullet_proper2/1gsqjuow",
-        "jjshoots/pybullet_proper2/1vyczwt2",
-        "jjshoots/pybullet_proper2/1nd3v4dh",
-        "jjshoots/pybullet_proper2/2000jz2c",
-    ]
-    runs["CCGE no bias w/ Oracle 2"] = [
-        "jjshoots/pybullet_proper2/2zwslh8j",
-        "jjshoots/pybullet_proper2/287kdug2",
-        "jjshoots/pybullet_proper2/257wwxpv",
-        "jjshoots/pybullet_proper2/3gukol9m",
-        "jjshoots/pybullet_proper2/38ga2m4a",
-        "jjshoots/pybullet_proper2/12p9irs1",
-        "jjshoots/pybullet_proper2/3uvrbauh",
-        "jjshoots/pybullet_proper2/3mgsmprg",
-        "jjshoots/pybullet_proper2/5kkyxr1a",
-        "jjshoots/pybullet_proper2/8ob04seg",
-    ]
-    runs["CCGE bias w/ Oracle 2"] = [
-        "jjshoots/pybullet_proper2/136to5y6",
-        "jjshoots/pybullet_proper2/22vfld1r",
-        "jjshoots/pybullet_proper2/2ef2lzva",
-        "jjshoots/pybullet_proper2/3t9ge95c",
-        "jjshoots/pybullet_proper2/2hgrh2z1",
-        "jjshoots/pybullet_proper2/1pjvxet6",
-        "jjshoots/pybullet_proper2/3mv43nah",
-        "jjshoots/pybullet_proper2/7qfnbjot",
-        "jjshoots/pybullet_proper2/3f3su60g",
-        "jjshoots/pybullet_proper2/3tme0soy",
-    ]
-    runs["CCGE no bias w/ Oracle 1"] = [
-        "jjshoots/pybullet_proper2/14g2rr00",
-        "jjshoots/pybullet_proper2/2mkj2pue",
-        "jjshoots/pybullet_proper2/1f445wsa",
-        "jjshoots/pybullet_proper2/fenlrr1h",
-        "jjshoots/pybullet_proper2/v1lnczb9",
-        "jjshoots/pybullet_proper2/1wvndz2h",
-        "jjshoots/pybullet_proper2/c4y2o7or",
-        "jjshoots/pybullet_proper2/j7m6vphn",
-        "jjshoots/pybullet_proper2/35cmivtx",
-        "jjshoots/pybullet_proper2/3dco4ecb",
-    ]
-    run_list.append(runs)
-    baselines = {}
-    baselines["Oracle 1"] = 1506.0
-    baselines["Oracle 2"] = 1536.0
-    baseline_list.append(baselines)
-    env_list.append("Walker2DPyBulletEnv-v0")
+    # # Walker2D
+    # runs = {}
+    # runs["SAC"] = [
+    #     "jjshoots/pybullet_proper2/iv83lvpe",
+    #     "jjshoots/pybullet_proper2/1nugaeda",
+    #     "jjshoots/pybullet_proper2/1l99vuyl",
+    #     "jjshoots/pybullet_proper2/lgab8igk",
+    #     "jjshoots/pybullet_proper2/xwziupc5",
+    #     "jjshoots/pybullet_proper2/3d59105o",
+    #     "jjshoots/pybullet_proper2/13p6apja",
+    #     "jjshoots/pybullet_proper2/3bb8whna",
+    #     "jjshoots/pybullet_proper2/1gsqjuow",
+    #     "jjshoots/pybullet_proper2/1vyczwt2",
+    #     "jjshoots/pybullet_proper2/1nd3v4dh",
+    #     "jjshoots/pybullet_proper2/2000jz2c",
+    # ]
+    # runs["CCGE no bias w/ Oracle 2"] = [
+    #     "jjshoots/pybullet_proper2/2zwslh8j",
+    #     "jjshoots/pybullet_proper2/287kdug2",
+    #     "jjshoots/pybullet_proper2/257wwxpv",
+    #     "jjshoots/pybullet_proper2/3gukol9m",
+    #     "jjshoots/pybullet_proper2/38ga2m4a",
+    #     "jjshoots/pybullet_proper2/12p9irs1",
+    #     "jjshoots/pybullet_proper2/3uvrbauh",
+    #     "jjshoots/pybullet_proper2/3mgsmprg",
+    #     "jjshoots/pybullet_proper2/5kkyxr1a",
+    #     "jjshoots/pybullet_proper2/8ob04seg",
+    # ]
+    # runs["CCGE bias w/ Oracle 2"] = [
+    #     "jjshoots/pybullet_proper2/136to5y6",
+    #     "jjshoots/pybullet_proper2/22vfld1r",
+    #     "jjshoots/pybullet_proper2/2ef2lzva",
+    #     "jjshoots/pybullet_proper2/3t9ge95c",
+    #     "jjshoots/pybullet_proper2/2hgrh2z1",
+    #     "jjshoots/pybullet_proper2/1pjvxet6",
+    #     "jjshoots/pybullet_proper2/3mv43nah",
+    #     "jjshoots/pybullet_proper2/7qfnbjot",
+    #     "jjshoots/pybullet_proper2/3f3su60g",
+    #     "jjshoots/pybullet_proper2/3tme0soy",
+    # ]
+    # runs["CCGE no bias w/ Oracle 1"] = [
+    #     "jjshoots/pybullet_proper2/14g2rr00",
+    #     "jjshoots/pybullet_proper2/2mkj2pue",
+    #     "jjshoots/pybullet_proper2/1f445wsa",
+    #     "jjshoots/pybullet_proper2/fenlrr1h",
+    #     "jjshoots/pybullet_proper2/v1lnczb9",
+    #     "jjshoots/pybullet_proper2/1wvndz2h",
+    #     "jjshoots/pybullet_proper2/c4y2o7or",
+    #     "jjshoots/pybullet_proper2/j7m6vphn",
+    #     "jjshoots/pybullet_proper2/35cmivtx",
+    #     "jjshoots/pybullet_proper2/3dco4ecb",
+    # ]
+    # run_list.append(runs)
+    # baselines = {}
+    # baselines["Oracle 1"] = 1506.0
+    # baselines["Oracle 2"] = 1536.0
+    # baseline_list.append(baselines)
+    # env_list.append("Walker2DPyBulletEnv-v0")
 
     for runs, env_name, baselines in zip(run_list, env_list, baseline_list):
         compute_plots(runs, env_name, baselines)
