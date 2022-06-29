@@ -1,20 +1,33 @@
+name: "e2SAC_sweep"
 program: main.py
-method: bayes
+method: random
 metric:
   name: max_eval_perf
   goal: maximize
 parameters:
-  env_name:
-    values:
-      [
-        'AntPyBulletEnv-v0',
-        'HopperPyBulletEnv-v0',
-        'HumanoidPyBulletEnv-v0',
-        'HalfCheetahPyBulletEnv-v0',
-      ]
+  discount_factor:
+    distribution: uniform
+    max: 0.999
+    min: 0.98
+  exploration_epsilon:
+    distribution: uniform
+    max: 0.15
+    min: 0.05
+  learning_rate:
+    distribution: uniform
+    max: 0.001
+    min: 0.0001
+  max_grad_norm:
+    distribution: log_uniform_values
+    max: 1
+    min: 0.25
+  target_network_frequency:
+    distribution: int_uniform
+    max: 2000
+    min: 500
 command:
   - python3
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=something_here"
+  - "--wandb_name=carracing_discrete"
