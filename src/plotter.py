@@ -116,7 +116,11 @@ def process_sweep(sweep_uri, sweep_name, start_val=-100):
 
     # draw the vertical line at domain change
     legend_list.append("Domain Change")
-    plt.axvline(x=50000 / 1e3, color=sns.color_palette("colorblind")[len(legend_list) - 1], linestyle="-")
+    plt.axvline(
+        x=50000 / 1e3,
+        color=sns.color_palette("colorblind")[len(legend_list) - 1],
+        linestyle="-",
+    )
 
     # form the legend
     color_dict = dict(zip(legend_list, sns.color_palette("colorblind")))
@@ -133,7 +137,7 @@ def process_sweep(sweep_uri, sweep_name, start_val=-100):
         # bbox_to_anchor=(0.5, 1.1),
     )
 
-    plt.title('CarRacing w/ Domain Change F-value', fontsize=24)
+    plt.title("CarRacing w/ Domain Change F-value", fontsize=24)
     plt.tight_layout()
     # plt.savefig('resource/RuntimeUncertaintyCarRacing.pdf')
     plt.show()
