@@ -75,19 +75,25 @@ def process_run(run_name, env_name, run_uri, num_steps, start_val, num_intervals
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     ax1.set_xlabel("Timestep (1e6)", fontsize=20)
-    ax1.tick_params(axis="x", labelsize=20)
+    ax1.tick_params(axis="x", labelsize=20, length=0)
     ax1.plot(x_axis / 1e6, eval, color=palette[0])
 
-    ax1.tick_params(axis="y", labelcolor=palette[0], labelsize=20)
+    ax1.tick_params(axis="y", labelcolor=palette[0], labelsize=20, length=0)
     ax1.set_ylabel("Evaluation Score", color=palette[0], fontsize=20)
     ax2.plot(x_axis / 1e6, uncer, color=palette[1])
 
-    ax2.tick_params(axis="y", labelcolor=palette[1], labelsize=20)
+    ax2.tick_params(axis="y", labelcolor=palette[1], labelsize=20, length=0)
     ax2.set_ylabel("Episodic Mean F-value", color=palette[1], fontsize=20)
     # ax2.set_ylim(top=2.0)
 
+    # remove the spines for top and right
+    ax1.spines.top.set_visible(False)
+    ax1.spines.right.set_visible(False)
+    ax2.spines.top.set_visible(False)
+    ax2.spines.right.set_visible(False)
+
     plt.title(env_name, fontsize=24)
-    fig.set_size_inches(8, 6)
+    fig.set_size_inches(8, 8)
     plt.tight_layout()
     plt.savefig(f"./resource/{run_name}.pdf")
 
