@@ -1,4 +1,4 @@
-name: "longer-ood-test"
+name: "longer-ood-test-w/-q"
 program: main.py
 method: random
 metric:

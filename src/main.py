@@ -44,13 +44,19 @@ def train(set):
             last_switchup_step += set.switchup_step
             if not has_switchup:
                 # pre switchup uncertainty
-                to_log["pre_switchup_uncertainty"] = env.evaluate_uncertainty(set, net)
+                log_u, log_q = env.evaluate_pre_post(set, net)
+                to_log["pre_switchup_uncertainty"] = log_u
+                to_log["pre_switchup_q"] = log_q
 
                 # switchup
                 env.reset(randomize=True)
 
                 # post switchup uncertainty
-                to_log["post_switchup_uncertainty"] = env.evaluate_uncertainty(set, net)
+                log_u, log_q = env.evaluate_pre_post(set, net)
+                to_log["post_switchup_uncertainty"] = log_u
+                to_log["post_switchup_q"] = log_q
+
+                # don't repeat switchup
                 has_switchup = True
             else:
                 to_log.pop("pre_switchup_uncertainty")

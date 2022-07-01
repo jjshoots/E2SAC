@@ -75,10 +75,10 @@ def process_sweep(sweep_uri, sweep_name, start_val=-100):
             log["post_switchup_uncertainty"] = log["post_switchup_uncertainty"][0]
             post_list.append(log["post_switchup_uncertainty"])
 
-
     # expand along num_games axis
     pre_list = np.expand_dims(pre_list, axis=1)
     post_list = np.expand_dims(post_list, axis=1)
+    print(len(pre_list))
 
     # put things in a dict
     uncer_list = {}
@@ -112,3 +112,4 @@ def process_sweep(sweep_uri, sweep_name, start_val=-100):
 
 if __name__ == "__main__":
     process_sweep("jjshoots/carracing_discrete/s73mfuy2", "CarRacing w/ Domain Change")
+    process_sweep("jjshoots/carracing_discrete/mv3zhd3i", "CarRacing w/ Domain Change")

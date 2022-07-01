@@ -184,14 +184,16 @@ class Environment:
             else:
                 self.env.render("human")
 
-    def evaluate_uncertainty(self, set, net):
+    def evaluate_pre_post(self, set, net):
         net.eval()
         self.eval()
 
         # list of mean uncertainty for each episode
         episodic_uncertainty = []
+        episodic_value = []
         # list of uncertainties for each step in an ep
         uncertainty = []
+        value = []
 
         while len(episodic_uncertainty) < 50:
             # get the initial state and action
@@ -205,10 +207,15 @@ class Environment:
 
             # store the transition uncertainty
             uncertainty.append(cpuize(f.squeeze()))
+            value.append(cpuize(q.squeeze()))
 
             if self.is_done:
                 episodic_uncertainty.append(np.mean(np.asarray(uncertainty)))
+                episodic_value.append(np.mean(np.asarray(value)))
                 uncertainty = []
+                value = []
                 self.reset()
 
-        return np.mean(np.asarray(episodic_uncertainty))
+        return np.mean(np.asarray(episodic_uncertainty)), np.mean(
+            np.asarray(episodic_value)
+        )
