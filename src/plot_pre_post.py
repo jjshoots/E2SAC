@@ -100,17 +100,17 @@ def process_sweep(sweep_uri, sweep_name, start_val=-100):
 
     # put things in a dict
     plot1 = {}
-    plot1["pre_f"] = pre_f
-    plot1["post_f"] = post_f
+    plot1["Before"] = pre_f
+    plot1["After"] = post_f
     plot2 = {}
-    plot2["pre_q"] = pre_q
-    plot2["post_q"] = post_q
+    plot2["Before"] = pre_q
+    plot2["After"] = post_q
     plots = [plot1, plot2]
 
     # titles
     titles = []
-    titles.append("CarRacing Pre and Post \n Domain Change F-value")
-    titles.append("CarRacing Pre and Post \n Domain Change Q-value")
+    titles.append("CarRacing Before and After \n Domain Change F-value")
+    titles.append("CarRacing Before and After \n Domain Change Q-value")
 
     for plot, title in zip(plots, titles):
         aggregate_func = lambda x: np.array(
@@ -133,7 +133,7 @@ def process_sweep(sweep_uri, sweep_name, start_val=-100):
         )
 
         plt.title(title, fontsize=24)
-        # plt.tight_layout()
+        plt.tight_layout()
         # plt.savefig('resource/RuntimeUncertaintyCarRacing.pdf')
 
     plt.show()
