@@ -61,55 +61,83 @@ def process_sweep(sweep_uri, sweep_name, start_val=-100):
 
     # load scores as dictionary mapping algorithms to their scores
     # each score is of size (num_runs x num_games); in our case it'll be (n x 1)
-    pre_list = []
-    post_list = []
+    pre_f = []
+    post_f = []
+    pre_q = []
+    post_q = []
     for run in sweep.runs:
         log = get_wandb_log(
-            run, ["pre_switchup_uncertainty", "post_switchup_uncertainty"], start_val
+            run,
+            [
+                "pre_switchup_uncertainty",
+                "post_switchup_uncertainty",
+                "pre_switchup_q",
+                "post_switchup_q",
+            ],
+            start_val,
         )
         if len(log["pre_switchup_uncertainty"]) > 0:
             log["pre_switchup_uncertainty"] = log["pre_switchup_uncertainty"][0]
-            pre_list.append(log["pre_switchup_uncertainty"])
+            pre_f.append(log["pre_switchup_uncertainty"])
 
         if len(log["post_switchup_uncertainty"]) > 0:
             log["post_switchup_uncertainty"] = log["post_switchup_uncertainty"][0]
-            post_list.append(log["post_switchup_uncertainty"])
+            post_f.append(log["post_switchup_uncertainty"])
+
+        if len(log["pre_switchup_q"]) > 0:
+            log["pre_switchup_q"] = log["pre_switchup_q"][0]
+            pre_q.append(log["pre_switchup_q"])
+
+        if len(log["post_switchup_q"]) > 0:
+            log["post_switchup_q"] = log["post_switchup_q"][0]
+            post_q.append(log["post_switchup_q"])
 
     # expand along num_games axis
-    pre_list = np.expand_dims(pre_list, axis=1)
-    post_list = np.expand_dims(post_list, axis=1)
-    print(len(pre_list))
+    pre_f = np.expand_dims(pre_f, axis=1)
+    post_f = np.expand_dims(post_f, axis=1)
+    pre_q = np.expand_dims(pre_q, axis=1)
+    post_q = np.expand_dims(post_q, axis=1)
 
     # put things in a dict
-    uncer_list = {}
-    uncer_list["pre"] = pre_list
-    uncer_list["post"] = post_list
+    plot1 = {}
+    plot1["pre_f"] = pre_f
+    plot1["post_f"] = post_f
+    plot2 = {}
+    plot2["pre_q"] = pre_q
+    plot2["post_q"] = post_q
+    plots = [plot1, plot2]
 
-    aggregate_func = lambda x: np.array(
-        [
-            # metrics.aggregate_median(x),
-            metrics.aggregate_iqm(x),
-            # metrics.aggregate_mean(x),
-        ]
-    )
-    aggregate_scores, aggregate_score_cis = rly.get_interval_estimates(
-        uncer_list, aggregate_func, reps=50000
-    )
+    # titles
+    titles = []
+    titles.append("CarRacing Pre and Post \n Domain Change F-value")
+    titles.append("CarRacing Pre and Post \n Domain Change Q-value")
 
-    fig, axes = plot_utils.plot_interval_estimates(
-        aggregate_scores,
-        aggregate_score_cis,
-        metric_names=["IQM"],
-        algorithms=None,
-        xlabel="Mean Episodic F-value",
-    )
+    for plot, title in zip(plots, titles):
+        aggregate_func = lambda x: np.array(
+            [
+                # metrics.aggregate_median(x),
+                metrics.aggregate_iqm(x),
+                # metrics.aggregate_mean(x),
+            ]
+        )
+        aggregate_scores, aggregate_score_cis = rly.get_interval_estimates(
+            plot, aggregate_func, reps=50000
+        )
 
-    plt.title("CarRacing w/ Domain Change F-value", fontsize=24)
-    # plt.tight_layout()
-    # plt.savefig('resource/RuntimeUncertaintyCarRacing.pdf')
+        fig, axes = plot_utils.plot_interval_estimates(
+            aggregate_scores,
+            aggregate_score_cis,
+            metric_names=["IQM"],
+            algorithms=None,
+            xlabel="Mean Episodic F-value",
+        )
+
+        plt.title(title, fontsize=24)
+        # plt.tight_layout()
+        # plt.savefig('resource/RuntimeUncertaintyCarRacing.pdf')
+
     plt.show()
 
 
 if __name__ == "__main__":
-    process_sweep("jjshoots/carracing_discrete/s73mfuy2", "CarRacing w/ Domain Change")
-    process_sweep("jjshoots/carracing_discrete/mv3zhd3i", "CarRacing w/ Domain Change")
+    process_sweep("jjshoots/carracing_discrete/9cnmud6a", "CarRacing w/ Domain Change")
