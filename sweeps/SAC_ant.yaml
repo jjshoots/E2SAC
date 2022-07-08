@@ -1,0 +1,19 @@
+name: 'SAC ant'
+program: mainSAC.py
+method: random
+metric:
+  name: max_eval_perf
+  goal: maximize
+parameters:
+  env_name:
+    value:
+      'AntPyBulletEnv-v0'
+  sub_size:
+    value:
+      ''
+command:
+  - python3
+  - src/mainSAC.py
+  - "--train"
+  - "--wandb"
+  - "--wandb_name=SAC_ant"

@@ -22,6 +22,7 @@ class Environment:
 
         self.env_name = env_name
         self.env = gym.make(env_name)
+        self.env.metadata["render_modes"] = ["human"]
         self.state = np.zeros_like(self.env.reset())
         self.state_size = self.state.shape[0]
         self.num_actions = self.env.action_space.shape[0]

@@ -1,9 +1,8 @@
 # env type
-env_name: ''
-# env_name: 'AntPyBulletEnv-v0'
+env_name: 'AntPyBulletEnv-v0'
 # env_name: 'HopperPyBulletEnv-v0'
-# env_name: 'HumanoidPyBulletEnv-v0'
-env_name: 'HalfCheetahPyBulletEnv-v0'
+# env_name: 'Walker2DPyBulletEnv-v0'
+# env_name: 'HalfCheetahPyBulletEnv-v0'
 
 # size of suboptimal policy
 sub_size: '_smol'

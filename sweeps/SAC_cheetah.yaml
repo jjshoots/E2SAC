@@ -1,0 +1,19 @@
+name: 'SAC cheetah'
+program: mainSAC.py
+method: random
+metric:
+  name: max_eval_perf
+  goal: maximize
+parameters:
+  env_name:
+    value:
+      'HalfCheetahPyBulletEnv-v0'
+  sub_size:
+    value:
+      ''
+command:
+  - python3
+  - src/mainSAC.py
+  - "--train"
+  - "--wandb"
+  - "--wandb_name=SAC_cheetah"

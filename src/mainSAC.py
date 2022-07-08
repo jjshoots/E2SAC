@@ -218,7 +218,7 @@ def setup_nets(set):
         print(f"Lowest Running Loss for Net: {net_helper.lowest_running_loss}")
 
     # torch.save(net.actor.net.state_dict(), f"./{set.env_name}_smol.pth")
-    exit()
+    # exit()
 
     return net, net_helper, optim_set, optim_helper
 
