@@ -99,7 +99,7 @@ def compute_plots(runs, env_name, baselines):
         ylabel="IQM Episodic Total Reward",
         labelsize=24,
         ticklabelsize=24,
-        figsize=(9, 9)
+        figsize=(9, 9),
     )
 
     # plot suboptimal policy lines
