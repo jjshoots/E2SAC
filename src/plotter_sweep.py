@@ -62,7 +62,7 @@ def get_log_from_run(run, keys):
     for key in keys:
         array = np.array([row[key] for row in history])
         array = array.astype(np.float64)
-        array = np.nan_to_num(array, nan=-100.0, posinf=-100.0, neginf=-100.0)
+        array = np.nan_to_num(array, nan=0.0, posinf=0.0, neginf=0.0)
         data[key] = array
 
     return data
@@ -94,11 +94,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         score = []
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
-            score.append(
-                np.interp(
-                    x_axis, log["num_transitions"], log["eval_perf"] * scales[algorithm]
-                )
-            )
+            score.append(np.interp(x_axis, log["num_transitions"], log["eval_perf"]))
 
         # stack along num_runs axis
         score = np.stack(score, axis=0)
@@ -164,11 +160,50 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
 
 
 if __name__ == "__main__":
-    title = "Hopper"
+    title = "HopperPyBulletEnv-v0"
     sweep_uri_dict = {}
     sweep_uri_dict["SAC"] = "jjshoots/pybullet3/7zrnctkl"
-    sweep_uri_dict["Walker"] = "jjshoots/pybullet3/hvdsmej"
+    sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/femsqxpk"
+    sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/uapvwtal"
+    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
+    sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 1508.0
     baselines_dict["Oracle 2"] = 2246.0
+    process_sweeps(title, sweep_uri_dict, baselines_dict)
+
+    title = "AntPyBulletEnv-v0"
+    sweep_uri_dict = {}
+    sweep_uri_dict["SAC"] = "jjshoots/pybullet3/yp5pim4q"
+    sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/j0dvoamd"
+    sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/w6k8glav"
+    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
+    sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
+    baselines_dict = {}
+    baselines_dict["Oracle 1"] = 1074.0
+    baselines_dict["Oracle 2"] = 2107.0
+    process_sweeps(title, sweep_uri_dict, baselines_dict)
+
+    title = "HalfCheetahPyBulletEnv-v0"
+    sweep_uri_dict = {}
+    sweep_uri_dict["SAC"] = "jjshoots/pybullet3/do1jpm0c"
+    sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/y9q16c2d"
+    sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/wfvijb3o"
+    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
+    sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
+    baselines_dict = {}
+    baselines_dict["Oracle 1"] = 796.0
+    baselines_dict["Oracle 2"] = 787.0
+    process_sweeps(title, sweep_uri_dict, baselines_dict)
+
+    title = "Walker2DPyBulletEnv-v0"
+    sweep_uri_dict = {}
+    sweep_uri_dict["SAC"] = "jjshoots/pybullet3/hvdsmej5"
+    sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/j7z38a2b"
+    sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/t45aurh0"
+    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
+    sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
+    baselines_dict = {}
+    baselines_dict["Oracle 1"] = 1506.0
+    baselines_dict["Oracle 2"] = 1536.0
     process_sweeps(title, sweep_uri_dict, baselines_dict)
