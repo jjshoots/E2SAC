@@ -154,9 +154,10 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         title,
         fontsize=24,
     )
+
     plt.tight_layout()
-    # plt.savefig(f"resource/{title}.pdf", dpi=100)
-    plt.show()
+    plt.savefig(f"resource/{title}.pdf", dpi=100)
+    # plt.show()
 
 
 if __name__ == "__main__":
@@ -165,8 +166,8 @@ if __name__ == "__main__":
     sweep_uri_dict["SAC"] = "jjshoots/pybullet3/7zrnctkl"
     sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/femsqxpk"
     sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/uapvwtal"
-    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
-    sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
+    # sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
+    # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 1508.0
     baselines_dict["Oracle 2"] = 2246.0
@@ -177,8 +178,8 @@ if __name__ == "__main__":
     sweep_uri_dict["SAC"] = "jjshoots/pybullet3/yp5pim4q"
     sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/j0dvoamd"
     sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/w6k8glav"
-    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
-    sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
+    # sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
+    # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 1074.0
     baselines_dict["Oracle 2"] = 2107.0
@@ -189,8 +190,8 @@ if __name__ == "__main__":
     sweep_uri_dict["SAC"] = "jjshoots/pybullet3/do1jpm0c"
     sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/y9q16c2d"
     sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/wfvijb3o"
-    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
-    sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
+    # sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
+    # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 796.0
     baselines_dict["Oracle 2"] = 787.0
@@ -201,8 +202,8 @@ if __name__ == "__main__":
     sweep_uri_dict["SAC"] = "jjshoots/pybullet3/hvdsmej5"
     sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/j7z38a2b"
     sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/t45aurh0"
-    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
-    sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
+    # sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
+    # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 1506.0
     baselines_dict["Oracle 2"] = 1536.0
