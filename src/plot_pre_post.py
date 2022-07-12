@@ -2,7 +2,6 @@
 from rliable import library as rly
 from rliable import metrics
 from rliable import plot_utils
-
 # to import stuff from wandb
 import wandb
 
@@ -109,8 +108,8 @@ def process_sweep(sweep_uri, sweep_name, start_val=-100):
 
     # titles
     titles = []
-    titles.append("CarRacing Before and After \n Domain Change F-value")
-    titles.append("CarRacing Before and After \n Domain Change Q-value")
+    titles.append("F-value Before and After \n Domain Change in CarRacing")
+    titles.append("Q-value Before and After \n Domain Change in CarRacing")
 
     for plot, title in zip(plots, titles):
         aggregate_func = lambda x: np.array(
@@ -132,7 +131,7 @@ def process_sweep(sweep_uri, sweep_name, start_val=-100):
             xlabel="Mean Episodic F-value",
         )
 
-        plt.title(title, fontsize=24)
+        plt.title(title, fontsize=18)
         plt.tight_layout()
         # plt.savefig('resource/RuntimeUncertaintyCarRacing.pdf')
 
