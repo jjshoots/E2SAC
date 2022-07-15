@@ -6,7 +6,7 @@ import torch
 import torch.optim as optim
 
 import wandb
-from pybullet_env import Environment
+from two_mountain_env import Environment
 from SAC.SAC import SAC
 from shebangs import check_venv, parse_set, shutdown_handler
 from utils.helpers import Helpers, cpuize, gpuize
@@ -154,7 +154,7 @@ def evaluate(set):
 
 
 def setup_env(set):
-    env = Environment(set.env_name, set.sub_size)
+    env = Environment()
     set.num_actions = env.num_actions
     set.state_size = env.state_size
 
@@ -216,9 +216,6 @@ def setup_nets(set):
         net_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
         optim_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
         print(f"Lowest Running Loss for Net: {net_helper.lowest_running_loss}")
-
-    # torch.save(net.actor.net.state_dict(), f"./{set.env_name}_smol.pth")
-    # exit()
 
     return net, net_helper, optim_set, optim_helper
 

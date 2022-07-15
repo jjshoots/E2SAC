@@ -108,24 +108,6 @@ def arg_parser():
         help="Network weights number.",
     )
 
-    parser.add_argument(
-        "--env_name",
-        type=str,
-        nargs="?",
-        const=False,
-        default="",
-        help="Environment name from pybullet gym.",
-    )
-
-    parser.add_argument(
-        "--sub_size",
-        type=str,
-        nargs="?",
-        const=False,
-        default="",
-        help="Size of suboptimal policy.",
-    )
-
     return parser.parse_args()
 
 
@@ -165,25 +147,6 @@ def parse_set():
             "net_version cannot be set in both settings.yaml and in args."
         )
     args.net_version = settings["net_version"]
-
-    # when formatting env_name, assert that only either args or settings
-    # file have a value, not both
-    if settings["env_name"] == "" and args.env_name == "":
-        raise AssertionError(
-            "need to provide env_name in either settings.yaml or in args."
-        )
-    elif settings["env_name"] != "" and args.env_name == "":
-        settings["env_name"] = settings["env_name"]
-    elif settings["env_name"] == "" and args.env_name != "":
-        settings["env_name"] = args.env_name
-    else:
-        raise AssertionError(
-            "env_name cannot be set in both settings.yaml and in args."
-        )
-    args.env_name = settings["env_name"]
-
-    # override sub_size with the one in args
-    args.sub_size = settings["sub_size"]
 
     # merge args and settings
     settings = dict({**settings, **vars(args)})
