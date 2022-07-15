@@ -2,6 +2,20 @@
 
 source venv/bin/activate
 
+
+declare -a pids=()
+
+wandb agent jjshoots/pybullet3/40efsd2p --count 2 &
+pids+=($!)
+wandb agent jjshoots/pybullet3/40efsd2p --count 2 &
+pids+=($!)
+wandb agent jjshoots/pybullet3/40efsd2p --count 2 &
+pids+=($!)
+
+for pid in ${pids[*]}; do
+    wait $pid
+done
+
 # declare -a pids=()
 
 # wandb agent jjshoots/pybullet3/7zrnctkl --count 1 &
@@ -54,106 +68,106 @@ source venv/bin/activate
 #     wait $pid
 # done
 
-declare -a pids=()
+# declare -a pids=()
 
-wandb agent jjshoots/pybullet3/w6k8glav --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/w6k8glav --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/w6k8glav --count 1 &
-pids+=($!)
+# wandb agent jjshoots/pybullet3/w6k8glav --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/w6k8glav --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/w6k8glav --count 1 &
+# pids+=($!)
 
-for pid in ${pids[*]}; do
-    wait $pid
-done
+# for pid in ${pids[*]}; do
+#     wait $pid
+# done
 
-declare -a pids=()
+# declare -a pids=()
 
-wandb agent jjshoots/pybullet3/j0dvoamd --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/j0dvoamd --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/j0dvoamd --count 1 &
-pids+=($!)
+# wandb agent jjshoots/pybullet3/j0dvoamd --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/j0dvoamd --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/j0dvoamd --count 1 &
+# pids+=($!)
 
-for pid in ${pids[*]}; do
-    wait $pid
-done
+# for pid in ${pids[*]}; do
+#     wait $pid
+# done
 
-declare -a pids=()
+# declare -a pids=()
 
-wandb agent jjshoots/pybullet3/wfvijb3o --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/wfvijb3o --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/wfvijb3o --count 1 &
-pids+=($!)
+# wandb agent jjshoots/pybullet3/wfvijb3o --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/wfvijb3o --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/wfvijb3o --count 1 &
+# pids+=($!)
 
-for pid in ${pids[*]}; do
-    wait $pid
-done
+# for pid in ${pids[*]}; do
+#     wait $pid
+# done
 
-declare -a pids=()
+# declare -a pids=()
 
-wandb agent jjshoots/pybullet3/y9q16c2d --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/y9q16c2d --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/y9q16c2d --count 1 &
-pids+=($!)
+# wandb agent jjshoots/pybullet3/y9q16c2d --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/y9q16c2d --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/y9q16c2d --count 1 &
+# pids+=($!)
 
-for pid in ${pids[*]}; do
-    wait $pid
-done
+# for pid in ${pids[*]}; do
+#     wait $pid
+# done
 
-declare -a pids=()
+# declare -a pids=()
 
-wandb agent jjshoots/pybullet3/femsqxpk --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/femsqxpk --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/femsqxpk --count 1 &
-pids+=($!)
+# wandb agent jjshoots/pybullet3/femsqxpk --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/femsqxpk --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/femsqxpk --count 1 &
+# pids+=($!)
 
-for pid in ${pids[*]}; do
-    wait $pid
-done
+# for pid in ${pids[*]}; do
+#     wait $pid
+# done
 
-declare -a pids=()
+# declare -a pids=()
 
-wandb agent jjshoots/pybullet3/uapvwtal --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/uapvwtal --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/uapvwtal --count 1 &
-pids+=($!)
+# wandb agent jjshoots/pybullet3/uapvwtal --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/uapvwtal --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/uapvwtal --count 1 &
+# pids+=($!)
 
-for pid in ${pids[*]}; do
-    wait $pid
-done
+# for pid in ${pids[*]}; do
+#     wait $pid
+# done
 
-declare -a pids=()
+# declare -a pids=()
 
-wandb agent jjshoots/pybullet3/t45aurh0 --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/t45aurh0 --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/t45aurh0 --count 1 &
-pids+=($!)
+# wandb agent jjshoots/pybullet3/t45aurh0 --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/t45aurh0 --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/t45aurh0 --count 1 &
+# pids+=($!)
 
-for pid in ${pids[*]}; do
-    wait $pid
-done
+# for pid in ${pids[*]}; do
+#     wait $pid
+# done
 
-declare -a pids=()
+# declare -a pids=()
 
-wandb agent jjshoots/pybullet3/j7z38a2b --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/j7z38a2b --count 1 &
-pids+=($!)
-wandb agent jjshoots/pybullet3/j7z38a2b --count 1 &
-pids+=($!)
+# wandb agent jjshoots/pybullet3/j7z38a2b --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/j7z38a2b --count 1 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/j7z38a2b --count 1 &
+# pids+=($!)
 
-for pid in ${pids[*]}; do
-    wait $pid
-done
+# for pid in ${pids[*]}; do
+#     wait $pid
+# done

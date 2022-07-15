@@ -1,11 +1,11 @@
 # env type
-env_name: 'AntPyBulletEnv-v0'
+# env_name: 'AntPyBulletEnv-v0'
 # env_name: 'HopperPyBulletEnv-v0'
 # env_name: 'Walker2DPyBulletEnv-v0'
-# env_name: 'HalfCheetahPyBulletEnv-v0'
+env_name: 'HalfCheetahPyBulletEnv-v0'
 
 # size of suboptimal policy
-sub_size: '_smol'
+sub_size: '_2'
 
 # training params
 buffer_size: 300000
@@ -33,7 +33,7 @@ eval_num_episodes: 10
 eval_steps_ratio: 20000
 
 # helper params
-wandb_project: 'pybullet_proper2'
+wandb_project: 'pybullet3'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''
