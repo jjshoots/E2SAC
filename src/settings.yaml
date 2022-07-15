@@ -1,13 +1,13 @@
 # training params
-buffer_size: 300000
+buffer_size: 10000
 buffer_size_debug: 100
 batch_size: 256
-total_steps: 1000000
-repeats_per_buffer: 1
+total_steps: 10000
+repeats_per_buffer: 5
 critic_update_multiplier: 1
 actor_update_multiplier: 1
-discount_factor: 0.98
-learning_rate: 0.0004
+discount_factor: 0.99
+learning_rate: 0.001
 
 # exploration settings
 exploration_steps: 0
@@ -21,10 +21,10 @@ n_var_samples: 16
 
 # eval settings
 eval_num_episodes: 10
-eval_steps_ratio: 20000
+eval_steps_ratio: 1000
 
 # helper params
-wandb_project: 'pybullet3'
+wandb_project: 'two_mountain'
 weights_directory: 'weights'
 optim_weights_directory: 'optim_weights'
 net_version: ''

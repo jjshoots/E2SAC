@@ -3,10 +3,7 @@ import warnings
 
 import gym
 import numpy as np
-import pybulletgym
-import torch
 
-from suboptimal_policy import Suboptimal_Actor
 from utils.helpers import cpuize, get_device, gpuize
 
 
@@ -15,18 +12,17 @@ class Environment:
     Wrapper for OpenAI gym environments that outputs suboptimal actions also
     """
 
-    def __init__(self, env_name, sub_size="_smol"):
+    def __init__(self):
         super().__init__()
 
-        size = sub_size
-
-        self.env_name = env_name
-        self.env = gym.make(env_name)
-        self.env.metadata["render_modes"] = ["human"]
-        self.state = np.zeros_like(self.env.reset())
+        self.state = np.zeros((2,))
         self.state_size = self.state.shape[0]
-        self.num_actions = self.env.action_space.shape[0]
-        self.do_nothing = np.zeros(self.num_actions)
+        self.num_actions = 1
+        self.do_nothing = np.zeros((1,))
+        self.label = np.array([-1.0])
+
+        self.total_steps = 1000
+        self.steps = 0
 
         self.done = 0
         self.cumulative_reward = 0
@@ -34,29 +30,6 @@ class Environment:
         self.eval_run = False
 
         self.device = get_device()
-
-        # load suboptimal policy
-        load_success = False
-        path = f"./suboptimal_policies/{env_name}{size}.pth"
-        for _ in range(5):
-            try:
-                self.suboptimal_actor = Suboptimal_Actor(
-                    num_actions=self.num_actions, state_size=self.state_size
-                ).to(self.device)
-                self.suboptimal_actor.load_state_dict(torch.load(path))
-                print(f"Loaded {path}")
-                load_success = True
-            except:
-                pass
-
-            if load_success:
-                break
-
-        if not load_success:
-            warnings.warn("--------------------------------------------------")
-            warnings.warn(f"Failed to load suboptimal actor {path}, exiting.")
-            warnings.warn("--------------------------------------------------")
-            exit()
 
         self.reset()
 
@@ -67,19 +40,20 @@ class Environment:
         self.eval_run = False
 
     def reset(self):
+        self.steps = 0
         self.done = 0
         self.cumulative_reward = 0
 
-        self.state = self.env.reset()
+        self.state *= 0.0
 
     def get_state(self):
         label = self.get_label(self.state)
         return self.state, None, None, label
 
-    def step(self, action, startup=False):
+    def step(self, action):
 
         """
-        actions are expected to be of shape [8]
+        actions are expected to be of shape [1]
 
         output:
             observations of shape [observation_shape]
@@ -89,14 +63,36 @@ class Environment:
         """
         action = action.squeeze()
 
-        # step through the env
-        self.state, reward, self.done, _ = self.env.step(action)
+        # the environment is just a line stretching from -100 to 100
+        self.state[0] = np.clip(self.state[0] + action, -100.0, 100.0)
+        self.state[1] = self.steps / self.total_steps
+
+        # if we are distance 1 away from the left target, end the enviroment
+        if abs(self.state[0] + 10.0) < 1.0:
+            reward = -0.1
+            self.done = True
+
+        # if we are distance 1 away from the right target, end the environment
+        elif abs(self.state[0] - 90.0) < 1.0:
+            reward = 100.0
+            self.done = True
+
+        # otherwise just continue
+        else:
+            reward = -0.1
+            self.done = False
 
         # accumulate rewards
         self.cumulative_reward += reward
 
         # get label
         label = self.get_label(self.state)
+
+        # check for time truncation
+        if self.steps > self.total_steps:
+            self.done = True
+
+        self.steps += 1
 
         return self.state, reward, self.done, label
 
@@ -108,13 +104,7 @@ class Environment:
         return self.done
 
     def get_label(self, obs):
-        if self.suboptimal_actor is not None:
-            action = self.suboptimal_actor(gpuize(obs, self.device))
-            action = torch.tanh(action[0])
-            action = cpuize(action)[0]
-            return action
-        else:
-            return self.do_nothing
+        return self.label
 
     def evaluate(self, set, net=None):
         if net is not None:
@@ -149,12 +139,10 @@ class Environment:
 
         if net is not None:
             net.eval()
-        self.env = gym.make(self.env_name)
-        self.env.render("human")
         self.eval()
         self.reset()
 
-        action = np.zeros((set.num_actions))
+        action = self.do_nothing
 
         while True:
             obs, rwd, dne, lbl = self.step(action)
@@ -162,21 +150,16 @@ class Environment:
             if self.is_done:
                 print(f"Total Reward: {self.cumulative_reward}")
                 self.reset()
-                action = np.zeros((set.num_actions))
+                action = self.do_nothing
 
             if net is not None:
                 output = net.actor(gpuize(obs, set.device).unsqueeze(0))
                 # action = cpuize(net.actor.sample(*output)[0][0])
                 action = cpuize(net.actor.infer(*output))
-
-                # print(action)
-                print(
-                    net.critic.forward(
-                        gpuize(obs, set.device).unsqueeze(0),
-                        net.actor.infer(*output),
-                    ).squeeze()
-                )
             else:
                 action = lbl
+
+            # this is the state lol
+            print(self.state)
 
             time.sleep(0.03)
