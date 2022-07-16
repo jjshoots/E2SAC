@@ -189,12 +189,13 @@ if __name__ == "__main__":
     sweep_uri_dict = {}
     sweep_uri_dict["SAC"] = "jjshoots/pybullet3/do1jpm0c"
     sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/y9q16c2d"
-    sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/wfvijb3o"
+    # sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/wfvijb3o"
+    sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/40efsd2p"
     # sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
     # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 796.0
-    baselines_dict["Oracle 2"] = 787.0
+    baselines_dict["Oracle 2"] = 1340.0
     process_sweeps(title, sweep_uri_dict, baselines_dict)
 
     title = "Walker2DPyBulletEnv-v0"
