@@ -5,16 +5,29 @@ source venv/bin/activate
 
 declare -a pids=()
 
-wandb agent jjshoots/pybullet3/40efsd2p --count 3 &
+wandb agent jjshoots/pybullet3/w6dhd3qw --count 1 &
 pids+=($!)
-wandb agent jjshoots/pybullet3/40efsd2p --count 3 &
+wandb agent jjshoots/pybullet3/w6dhd3qw --count 1 &
 pids+=($!)
-wandb agent jjshoots/pybullet3/40efsd2p --count 3 &
+wandb agent jjshoots/pybullet3/w6dhd3qw --count 1 &
 pids+=($!)
 
 for pid in ${pids[*]}; do
     wait $pid
 done
+
+# declare -a pids=()
+
+# wandb agent jjshoots/pybullet3/40efsd2p --count 3 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/40efsd2p --count 3 &
+# pids+=($!)
+# wandb agent jjshoots/pybullet3/40efsd2p --count 3 &
+# pids+=($!)
+
+# for pid in ${pids[*]}; do
+#     wait $pid
+# done
 
 # declare -a pids=()
 

@@ -44,7 +44,7 @@ def train(set):
         with torch.no_grad():
             while not env.is_done:
                 # get the initial state and label
-                obs, _, _, lbl = env.get_state()
+                obs, _, _, _ = env.get_state()
 
                 if memory.count < set.exploration_steps:
                     action = env.env.action_space.sample()
@@ -57,7 +57,7 @@ def train(set):
                 next_obs, rew, dne, _ = env.step(action)
 
                 # store stuff in mem
-                memory.push((obs, action, rew, next_obs, dne, lbl))
+                memory.push((obs, action, rew, next_obs, dne))
 
             # for logging
             to_log["total_reward"] = env.cumulative_reward
@@ -76,7 +76,6 @@ def train(set):
                 rewards = gpuize(stuff[2], set.device)
                 next_states = gpuize(stuff[3], set.device)
                 dones = gpuize(stuff[4], set.device)
-                labels = gpuize(stuff[5], set.device)
 
                 # train critic
                 for _ in range(set.critic_update_multiplier):
@@ -92,7 +91,7 @@ def train(set):
                 # train actor
                 for _ in range(set.actor_update_multiplier):
                     net.zero_grad()
-                    rnf_loss, log = net.calc_actor_loss(states, dones, labels)
+                    rnf_loss, log = net.calc_actor_loss(states, dones)
                     to_log = {**to_log, **log}
                     rnf_loss.backward()
                     optim_set["actor"].step()

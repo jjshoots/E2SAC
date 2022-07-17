@@ -202,7 +202,7 @@ class UASAC(nn.Module):
 
         return critic_loss, log
 
-    def calc_actor_loss(self, states, dones, labels):
+    def calc_actor_loss(self, states, dones):
         """
         states is of shape B x input_shape
         dones is of shape B x 1
@@ -213,51 +213,22 @@ class UASAC(nn.Module):
         output = self.actor(states)
         actions, entropies = self.actor.sample(*output)
 
-        # stack actions and labels to perform inference on both together
-        actions_labels = torch.stack((actions, labels), dim=0)
-
         # put all actions and labels and states through critic
         # shape is 2 x 2 x B x num_networks,
         # value_uncertainty x actions_labels x batch x num_networks
-        critic_output = self.critic(states, actions_labels)
+        critic_output = self.critic(states, actions)
 
         # splice the output to get what we want
-        expected_q = critic_output[0, 0, ...]
-
-        """ SUPERVISION SCALE DERIVATION """
-        # uncertainty is upper bound difference between suboptimal and learned
-        uncertainty = (
-            (
-                critic_output[0, 1, ...].mean(dim=-1, keepdim=True)
-                + critic_output[1, 1, ...].max(dim=-1, keepdim=True)[0]
-            )
-            - (
-                critic_output[0, 0, ...].mean(dim=-1, keepdim=True)
-                + critic_output[1, 0, ...].min(dim=-1, keepdim=True)[0]
-            )
-        ).detach()
-
-        # normalize uncertainty
-        uncertainty = (
-            uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs()
-        ).detach()
-
-        # calculate supervision scale
-        sup_scale = torch.clamp(
-            uncertainty * self.confidence_lambda, min=0.0, max=1.0
-        ).detach()
+        expected_q = critic_output[0, ...]
+        expected_u = critic_output[1, ...]
 
         """ REINFORCEMENT LOSS """
-        # expectations of Q with clipped double Q
+        # expectations of Q and U with clipped double Q
         expected_q, _ = torch.min(expected_q, dim=-1, keepdim=True)
+        expected_u, _ = torch.max(expected_u, dim=-1, keepdim=True)
 
-        # reinforcement target is maximization of Q * done
-        rnf_loss = -(expected_q * dones)
-
-        """ SUPERVISION LOSS"""
-        # supervisory loss is difference between predicted and label
-        sup_loss = func.mse_loss(labels, actions, reduction="none")
-        sup_loss *= self.supervision_lambda
+        # reinforcement target is maximization of (Q + U) * done
+        rnf_loss = -((expected_q + expected_u) * dones).mean()
 
         """ ENTROPY LOSS"""
         # entropy calculation
@@ -268,17 +239,11 @@ class UASAC(nn.Module):
             ent_loss = 0.0
 
         """ TOTAL LOSS DERIVATION"""
-        # convex combo
-        rnf_loss = ((1.0 - sup_scale) * rnf_loss).mean()
-        sup_loss = (sup_scale * sup_loss).mean()
-
         # sum the losses
-        actor_loss = rnf_loss + sup_loss + ent_loss
+        actor_loss = rnf_loss + ent_loss
 
         log = dict()
-        log["sup_scale"] = sup_scale.mean().detach()
-        log["sup_scale_std"] = sup_scale.std().detach()
-        log["uncertainty"] = uncertainty.mean().detach()
+        log["uncertainty"] = expected_u.mean().detach()
 
         return actor_loss, log
 
