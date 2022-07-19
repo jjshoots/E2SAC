@@ -58,6 +58,7 @@ class Critic(nn.Module):
 
         value, uncertainty = torch.split(output, 1, dim=-1)
 
-        uncertainty = F.softplus(uncertainty + self.uncertainty_bias)
+        # uncertainty = F.softplus(uncertainty + self.uncertainty_bias)
+        uncertainty = F.softplus(uncertainty)
 
         return torch.stack((value, uncertainty), dim=0)
