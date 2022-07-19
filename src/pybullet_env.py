@@ -170,12 +170,12 @@ class Environment:
                 action = cpuize(net.actor.infer(*output))
 
                 # print(action)
-                print(
-                    net.critic.forward(
-                        gpuize(obs, set.device).unsqueeze(0),
-                        net.actor.infer(*output),
-                    ).squeeze()
-                )
+                # print(
+                #     net.critic.forward(
+                #         gpuize(obs, set.device).unsqueeze(0),
+                #         net.actor.infer(*output),
+                #     ).squeeze()
+                # )
             else:
                 action = lbl
 

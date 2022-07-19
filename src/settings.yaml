@@ -1,11 +1,12 @@
 # env type
-# env_name: 'AntPyBulletEnv-v0'
+env_name: 'AntPyBulletEnv-v0'
 # env_name: 'HopperPyBulletEnv-v0'
 # env_name: 'Walker2DPyBulletEnv-v0'
-env_name: 'HalfCheetahPyBulletEnv-v0'
+# env_name: 'HalfCheetahPyBulletEnv-v0'
 
 # size of suboptimal policy
-sub_size: '_2'
+sub_size: '_smol'
+# sub_size: '_2'
 
 # training params
 buffer_size: 300000

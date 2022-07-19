@@ -16,8 +16,8 @@ class Suboptimal_Actor(nn.Module):
 
         _features_description = [
             state_size,
-            200,
-            200,
+            100,
+            100,
             num_actions * 2,
         ]
         _activation_description = ["lrelu"] * (len(_features_description) - 2) + [
