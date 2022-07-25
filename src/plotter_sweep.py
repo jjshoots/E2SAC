@@ -161,29 +161,29 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
 
 
 if __name__ == "__main__":
-    # title = "HopperPyBulletEnv-v0"
-    # sweep_uri_dict = {}
-    # sweep_uri_dict["SAC"] = "jjshoots/pybullet3/7zrnctkl"
-    # sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/femsqxpk"
-    # sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/uapvwtal"
-    # # sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
-    # # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
-    # baselines_dict = {}
-    # baselines_dict["Oracle 1"] = 1508.0
-    # baselines_dict["Oracle 2"] = 2246.0
-    # process_sweeps(title, sweep_uri_dict, baselines_dict)
+    title = "HopperPyBulletEnv-v0"
+    sweep_uri_dict = {}
+    sweep_uri_dict["SAC"] = "jjshoots/pybullet3/7zrnctkl"
+    sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/femsqxpk"
+    sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/uapvwtal"
+    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = "jjshoots/pybullet3/6t1dtya7"
+    # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
+    baselines_dict = {}
+    baselines_dict["Oracle 1"] = 1508.0
+    baselines_dict["Oracle 2"] = 2246.0
+    process_sweeps(title, sweep_uri_dict, baselines_dict)
 
-    # title = "AntPyBulletEnv-v0"
-    # sweep_uri_dict = {}
-    # sweep_uri_dict["SAC"] = "jjshoots/pybullet3/yp5pim4q"
-    # sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/j0dvoamd"
-    # sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/w6k8glav"
-    # # sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
-    # # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
-    # baselines_dict = {}
-    # baselines_dict["Oracle 1"] = 1074.0
-    # baselines_dict["Oracle 2"] = 2107.0
-    # process_sweeps(title, sweep_uri_dict, baselines_dict)
+    title = "AntPyBulletEnv-v0"
+    sweep_uri_dict = {}
+    sweep_uri_dict["SAC"] = "jjshoots/pybullet3/yp5pim4q"
+    sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/j0dvoamd"
+    sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/w6k8glav"
+    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = "jjshoots/pybullet3/s7j5w7vg"
+    # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
+    baselines_dict = {}
+    baselines_dict["Oracle 1"] = 1074.0
+    baselines_dict["Oracle 2"] = 2107.0
+    process_sweeps(title, sweep_uri_dict, baselines_dict)
 
     title = "HalfCheetahPyBulletEnv-v0"
     sweep_uri_dict = {}
@@ -191,21 +191,21 @@ if __name__ == "__main__":
     sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/y9q16c2d"
     # sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/wfvijb3o"
     sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/40efsd2p"
-    # sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
+    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = "jjshoots/pybullet3/6bls9o5w"
     # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 796.0
     baselines_dict["Oracle 2"] = 1340.0
     process_sweeps(title, sweep_uri_dict, baselines_dict)
 
-    # title = "Walker2DPyBulletEnv-v0"
-    # sweep_uri_dict = {}
-    # sweep_uri_dict["SAC"] = "jjshoots/pybullet3/hvdsmej5"
-    # sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/j7z38a2b"
-    # sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/t45aurh0"
-    # # sweep_uri_dict["CCGE no bias w/ Oracle 1"] = ""
-    # # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
-    # baselines_dict = {}
-    # baselines_dict["Oracle 1"] = 1506.0
-    # baselines_dict["Oracle 2"] = 1536.0
-    # process_sweeps(title, sweep_uri_dict, baselines_dict)
+    title = "Walker2DPyBulletEnv-v0"
+    sweep_uri_dict = {}
+    sweep_uri_dict["SAC"] = "jjshoots/pybullet3/hvdsmej5"
+    sweep_uri_dict["CCGE bias w/ Oracle 1"] = "jjshoots/pybullet3/j7z38a2b"
+    sweep_uri_dict["CCGE bias w/ Oracle 2"] = "jjshoots/pybullet3/t45aurh0"
+    sweep_uri_dict["CCGE no bias w/ Oracle 1"] = "jjshoots/pybullet3/2c7ze04n"
+    # sweep_uri_dict["CCGE no bias w/ Oracle 2"] = ""
+    baselines_dict = {}
+    baselines_dict["Oracle 1"] = 1506.0
+    baselines_dict["Oracle 2"] = 1536.0
+    process_sweeps(title, sweep_uri_dict, baselines_dict)
