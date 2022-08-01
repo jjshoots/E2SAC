@@ -1,5 +1,5 @@
 program: main.py
-name: mountaincar400k
+name: LunarLanderDDQN
 method: random
 metric:
   name: max_eval_perf
@@ -8,35 +8,22 @@ parameters:
   total_steps:
     value: 1000000
   buffer_size:
-    value: 400000
+    value: 250000
   batch_size:
-    values:
-      - 128
-      - 256
-      - 512
+    value: 512
   max_grad_norm:
-    distribution: log_uniform_values
-    max: 1.00
-    min: 0.25
+    value: 0.5
   learning_rate:
-    distribution: uniform
-    max: 0.001
-    min: 0.0001
+    value: 0.0004
   exploration_epsilon:
-    distribution: uniform
-    max: 0.15
-    min: 0.05
+    value: 0.05
   discount_factor:
-    distribution: uniform
-    max: 0.999
-    min: 0.980
+    value: 0.99
   target_network_frequency:
-    distribution: int_uniform
-    max: 2000
-    min: 500
+    value: 1000
 command:
   - python3
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=mountaincar400k"
+  - "--wandb_name=LunarLanderDDQN"

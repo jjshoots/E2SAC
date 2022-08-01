@@ -2,7 +2,7 @@
 if [ "$hostname" = "arctic-linx" ]
   sleep 2
   ssh availab-dl1 'tmux send-keys -t 0 "./run_availab.sh" ENTER'
-  ssh availab-dl2 'tmux send-keys -t 0 "./run_availab.sh" ENTER'
+  # ssh availab-dl2 'tmux send-keys -t 0 "./run_availab.sh" ENTER'
   # ssh availab-dl3 'tmux send-keys -t 0 "./run_availab.sh" ENTER'
   # ssh availab-dl4 'tmux send-keys -t 0 "./run_availab.sh" ENTER'
   # ssh dream 'tmux send-keys -t 0 "./run_dream_prophet.sh" ENTER'
