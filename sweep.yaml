@@ -21,6 +21,8 @@ parameters:
     value: 0.99
   target_network_frequency:
     value: 1000
+  env_name:
+    value: "LunarLander-v2"
 command:
   - python3
   - src/main.py
