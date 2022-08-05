@@ -107,7 +107,7 @@ def process_sweep(sweep_name, sweep_uri, num_steps, start_val, num_intervals=200
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     ax1.set_xlabel("Timestep (1e6)")
-    ax1.tick_params(axis="x", labelsize=15)
+    ax1.tick_params(axis="x", labelsize=30)
 
     # plot sample efficiency curve
     plot_utils.plot_sample_efficiency_curve(
@@ -116,14 +116,14 @@ def process_sweep(sweep_name, sweep_uri, num_steps, start_val, num_intervals=200
         eval_cis,
         algorithms=None,
         xlabel=r"Timesteps (1e6)",
-        ylabel="Evaluation Interquartile Mean (IQM)",
+        ylabel="Evaluation IQM",
         labelsize=30,
         ticklabelsize=30,
         ax=ax1,
         custom_color=sns.color_palette("colorblind")[0:],
     )
-    ax1.tick_params(axis="y", labelcolor=palette[0], labelsize=15)
-    ax1.set_ylabel("Evaluation Interquartile Mean (IQM)", color=palette[0], fontsize=30)
+    ax1.tick_params(axis="y", labelcolor=palette[0], labelsize=30)
+    ax1.set_ylabel("Evaluation IQM", color=palette[0], fontsize=30)
 
     # plot sample efficiency curve
     plot_utils.plot_sample_efficiency_curve(
@@ -138,7 +138,7 @@ def process_sweep(sweep_name, sweep_uri, num_steps, start_val, num_intervals=200
         ax=ax2,
         custom_color=sns.color_palette("colorblind")[1:],
     )
-    ax2.tick_params(axis="y", labelcolor=palette[1], labelsize=15)
+    ax2.tick_params(axis="y", labelcolor=palette[1], labelsize=30)
     ax2.set_ylabel("Episodic Mean Epistemic Uncertainty", color=palette[1], fontsize=30)
     # ax2.set_ylim(top=2.0)
 
