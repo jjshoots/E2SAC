@@ -118,9 +118,9 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         iqm_cis,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e4)",
-        ylabel="Evaluation Interquartile Mean (IQM)",
-        labelsize=24,
-        ticklabelsize=24,
+        ylabel="Evaluation IQM",
+        labelsize=30,
+        ticklabelsize=30,
         figsize=(9, 9),
     )
 
@@ -152,7 +152,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
 
     plt.title(
         title,
-        fontsize=24,
+        fontsize=30,
     )
 
     plt.tight_layout()
