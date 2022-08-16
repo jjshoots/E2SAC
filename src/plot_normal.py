@@ -129,9 +129,9 @@ if __name__ == "__main__":
         iqm_cis,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e4)",
-        ylabel="Evaluation Interquartile Mean (IQM)",
-        labelsize=24,
-        ticklabelsize=24,
+        ylabel="Evaluation IQM",
+        labelsize=30,
+        ticklabelsize=30,
         figsize=(9, 9)
     )
 
@@ -165,8 +165,8 @@ if __name__ == "__main__":
     # plt.subplots_adjust(top=0.7, left=0.2, bottom=0.1)
 
     plt.title(
-        "Hyperparameter Sweep \n CCGE vs. SAC \n in Domain Randomized CarRacing",
-        fontsize=24,
+        "Hyperparameter Sweep \n CCGE vs. SAC",
+        fontsize=30,
     )
     plt.tight_layout()
     plt.savefig('resource/carracing.pdf', dpi=100)

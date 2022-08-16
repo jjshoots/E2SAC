@@ -123,9 +123,9 @@ if __name__ == "__main__":
         iqm_cis,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e4)",
-        ylabel="Evaluation Interquartile Mean (IQM)",
-        labelsize=24,
-        ticklabelsize=24,
+        ylabel="Evaluation IQM",
+        labelsize=30,
+        ticklabelsize=30,
         figsize=(9, 9)
     )
 
@@ -144,18 +144,18 @@ if __name__ == "__main__":
     legend = plt.legend(
         fake_patches,
         algorithms,
-        loc="lower center",
+        loc="lower right",
         fancybox=True,
         # ncol=len(algorithms),
-        ncol=2,
-        fontsize=18,
+        ncol=1,
+        fontsize=24,
         # handleheight=1.8,
         # bbox_to_anchor=(0.5, 1.4),
     )
 
     plt.title(
-        "Best CCGE vs. Best SAC \n in Domain Randomized CarRacing",
-        fontsize=24,
+        "Best CCGE vs. Best SAC",
+        fontsize=30,
     )
     plt.tight_layout()
     plt.savefig('resource/carracing_best.pdf', dpi=100)
