@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from utils.neural_blocks import Neural_blocks
+from wingman import NeuralBlocks
 
 
 class Actor(nn.Module):
@@ -19,7 +19,7 @@ class Actor(nn.Module):
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
-        self.net = Neural_blocks.generate_linear_stack(
+        self.net = NeuralBlocks.generate_linear_stack(
             _features_description, _activation_description
         )
 
@@ -43,7 +43,7 @@ class Critic(nn.Module):
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
-        self.net = Neural_blocks.generate_linear_stack(
+        self.net = NeuralBlocks.generate_linear_stack(
             _features_description, _activation_description
         )
 

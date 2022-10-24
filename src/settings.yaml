@@ -6,7 +6,6 @@ env_name: 'AntPyBulletEnv-v0'
 
 # size of suboptimal policy
 sub_size: '_smol'
-# sub_size: '_2'
 
 # training params
 buffer_size: 300000
@@ -33,12 +32,25 @@ n_var_samples: 16
 eval_num_episodes: 10
 eval_steps_ratio: 20000
 
-# helper params
-wandb_project: 'pybullet3'
+# display settings
+display: false
+
+# wingman required params
+debug: false
+
 weights_directory: 'weights'
-optim_weights_directory: 'optim_weights'
-net_version: ''
-net_number: 0
+version_number: null
+mark_number: 0
+
+increment: false
 epoch_interval: 1
 batch_interval: -1
+max_skips: 5
+greater_than: 0.0
 
+wandb: false
+wandb_name: ''
+wandb_notes: ''
+wandb_id: ''
+wandb_entity: 'jjshoots'
+wandb_project: 'ccge_dm_control'

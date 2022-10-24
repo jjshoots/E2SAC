@@ -1,4 +1,3 @@
-import os
 from signal import SIGINT, signal
 
 import numpy as np
@@ -7,16 +6,18 @@ import torch.optim as optim
 
 import wandb
 from e2SAC.UASAC import UASAC
-from pybullet_env import Environment
-from shebangs import check_venv, parse_set, shutdown_handler
-from utils.helpers import Helpers, cpuize, gpuize
-from utils.replay_buffer import ReplayBuffer
+from dm_control_env import Environment
+from wingman import Wingman, cpuize, gpuize, shutdown_handler, ReplayBuffer
 
 
-def train(set):
-    env = setup_env(set)
-    net, net_helper, optim_set, optim_helper = setup_nets(set)
-    memory = ReplayBuffer(set.buffer_size)
+def train(wm: Wingman):
+    # grab config
+    cfg = wm.cfg
+
+    # setup env, model, replaybuffer
+    env = setup_env(wm)
+    net, optim_set = setup_nets(wm)
+    memory = ReplayBuffer(cfg.buffer_size)
 
     to_log = dict()
     to_log["epoch"] = 0
@@ -24,13 +25,13 @@ def train(set):
     to_log["max_eval_perf"] = -np.inf
     last_eval_step = 0
 
-    while memory.count <= set.total_steps:
+    while memory.count <= cfg.total_steps:
         to_log["epoch"] += 1
 
         """EVAL RUN"""
-        if memory.count - last_eval_step > set.eval_steps_ratio:
-            last_eval_step += set.eval_steps_ratio
-            to_log["eval_perf"] = env.evaluate(set, net)
+        if memory.count - last_eval_step > cfg.eval_steps_ratio:
+            last_eval_step += cfg.eval_steps_ratio
+            to_log["eval_perf"] = env.evaluate(cfg, net)
             to_log["max_eval_perf"] = max(
                 [to_log["max_eval_perf"], to_log["eval_perf"]]
             )
@@ -46,10 +47,10 @@ def train(set):
                 # get the initial state and label
                 obs, _, _, lbl = env.get_state()
 
-                if memory.count < set.exploration_steps:
+                if memory.count < cfg.exploration_steps:
                     action = env.env.action_space.sample()
                 else:
-                    output = net.actor(gpuize(obs, set.device).unsqueeze(0))
+                    output = net.actor(gpuize(obs, cfg.device).unsqueeze(0))
                     action, _ = net.actor.sample(*output)
                     action = cpuize(action).squeeze(0)
 
@@ -64,22 +65,22 @@ def train(set):
 
         """TRAINING RUN"""
         dataloader = torch.utils.data.DataLoader(
-            memory, batch_size=set.batch_size, shuffle=True, drop_last=False
+            memory, batch_size=cfg.batch_size, shuffle=True, drop_last=False
         )
 
-        for repeat_num in range(int(set.repeats_per_buffer)):
+        for repeat_num in range(int(cfg.repeats_per_buffer)):
             for batch_num, stuff in enumerate(dataloader):
                 net.train()
 
-                states = gpuize(stuff[0], set.device)
-                actions = gpuize(stuff[1], set.device)
-                rewards = gpuize(stuff[2], set.device)
-                next_states = gpuize(stuff[3], set.device)
-                dones = gpuize(stuff[4], set.device)
-                labels = gpuize(stuff[5], set.device)
+                states = gpuize(stuff[0], cfg.device)
+                actions = gpuize(stuff[1], cfg.device)
+                rewards = gpuize(stuff[2], cfg.device)
+                next_states = gpuize(stuff[3], cfg.device)
+                dones = gpuize(stuff[4], cfg.device)
+                labels = gpuize(stuff[5], cfg.device)
 
                 # train critic
-                for _ in range(set.critic_update_multiplier):
+                for _ in range(cfg.critic_update_multiplier):
                     net.zero_grad()
                     q_loss, log = net.calc_critic_loss(
                         states, actions, rewards, next_states, dones
@@ -90,7 +91,7 @@ def train(set):
                     net.update_q_target()
 
                 # train actor
-                for _ in range(set.actor_update_multiplier):
+                for _ in range(cfg.actor_update_multiplier):
                     net.zero_grad()
                     rnf_loss, log = net.calc_actor_loss(states, dones, labels)
                     to_log = {**to_log, **log}
@@ -128,68 +129,57 @@ def train(set):
                     )
 
                 """WANDB"""
-                if set.wandb and repeat_num == 0 and batch_num == 0:
+                if cfg.wandb and repeat_num == 0 and batch_num == 0:
                     to_log["num_transitions"] = memory.count
                     to_log["buffer_size"] = memory.__len__()
                     wandb.log(to_log)
 
 
-def display(set):
-    env = setup_env(set)
+def display(wm: Wingman):
+    cfg = wm.cfg
+    env = setup_env(wm)
 
     net = None
     if True:
-        net, _, _, _ = setup_nets(set)
+        net, _, _, _ = setup_nets(cfg)
 
-    env.display(set, net)
+    env.display(cfg, net)
 
 
-def evaluate(set):
-    env = setup_env(set)
+def evaluate(wm: Wingman):
+    cfg = wm.cfg
+    env = setup_env(wm)
 
     net = None
     if False:
-        net, _, _, _ = setup_nets(set)
+        net, _, _, _ = setup_nets(cfg)
 
-    print(env.evaluate(set, net))
+    print(env.evaluate(cfg, net))
 
 
-def setup_env(set):
-    env = Environment(set.env_name, sub_size=set.sub_size)
-    set.num_actions = env.num_actions
-    set.state_size = env.state_size
+def setup_env(wm: Wingman):
+    cfg = wm.cfg
+    env = Environment(cfg.env_name, sub_size=cfg.sub_size)
+    cfg.num_actions = env.num_actions
+    cfg.state_size = env.state_size
 
     return env
 
 
-def setup_nets(set):
-    net_helper = Helpers(
-        mark_number=set.net_number,
-        version_number=set.net_version,
-        weights_location=set.weights_directory,
-        epoch_interval=set.epoch_interval,
-        batch_interval=set.batch_interval,
-    )
-    optim_helper = Helpers(
-        mark_number=0,
-        version_number=set.net_version,
-        weights_location=set.optim_weights_directory,
-        epoch_interval=set.epoch_interval,
-        batch_interval=set.batch_interval,
-        increment=False,
-    )
+def setup_nets(wm: Wingman):
+    cfg = wm.cfg
 
     # set up networks and optimizers
     net = UASAC(
-        num_actions=set.num_actions,
-        state_size=set.state_size,
-        entropy_tuning=set.use_entropy,
-        target_entropy=set.target_entropy,
-        discount_factor=set.discount_factor,
-        confidence_lambda=set.confidence_lambda,
-        supervision_lambda=set.supervision_lambda,
-        n_var_samples=set.n_var_samples,
-    ).to(set.device)
+        num_actions=cfg.num_actions,
+        state_size=cfg.state_size,
+        entropy_tuning=cfg.use_entropy,
+        target_entropy=cfg.target_entropy,
+        discount_factor=cfg.discount_factor,
+        confidence_lambda=cfg.confidence_lambda,
+        supervision_lambda=cfg.supervision_lambda,
+        n_var_samples=cfg.n_var_samples,
+    ).to(cfg.device)
     actor_optim = optim.AdamW(
         net.actor.parameters(), lr=set.learning_rate, amsgrad=True
     )
@@ -204,45 +194,36 @@ def setup_nets(set):
     optim_set["alpha"] = alpha_optim
 
     # get latest weight files
-    net_weights = net_helper.get_weight_file()
-    if net_weights != -1:
-        net.load_state_dict(torch.load(net_weights))
+    has_weights, model_file, optim_file = wm.get_weight_files()
+    if has_weights:
+        # load the model
+        net.load_state_dict(torch.load(model_file))
 
-    # get latest optimizer states
-    net_optimizer_weights = optim_helper.get_weight_file()
-    if net_optimizer_weights != -1:
-        checkpoint = torch.load(net_optimizer_weights)
+        # load the optimizer
+        checkpoint = torch.load(model_file)
 
         for opt_key in optim_set:
             optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
 
-        net_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
-        optim_helper.lowest_running_loss = checkpoint["lowest_running_loss"]
-        print(f"Lowest Running Loss for Net: {net_helper.lowest_running_loss}")
+        print(f"Lowest Running Loss for Net: {wm.lowest_loss}")
 
     # torch.save(net.actor.net.state_dict(), f"./{set.env_name}_big.pth")
     # exit()
 
-    return net, net_helper, optim_set, optim_helper
+    return net, optim_set
 
 
 if __name__ == "__main__":
     signal(SIGINT, shutdown_handler)
-    set = parse_set()
-    check_venv()
+    wm = Wingman(config_yaml="./settings.yaml")
 
     """ SCRIPTS HERE """
 
-    if set.display:
-        display(set)
-    elif set.train:
-        train(set)
-    elif set.evaluate:
-        evaluate(set)
+    if wm.cfg.display:
+        display(wm)
+    elif wm.cfg.train:
+        train(wm)
+    elif wm.cfg.evaluate:
+        evaluate(wm)
     else:
         print("Guess this is life now.")
-
-    """ SCRIPTS END """
-
-    if set.shutdown:
-        os.system("poweroff")

@@ -1,9 +1,8 @@
 import time
 import warnings
 
-import gym
+import gymnasium as gym
 import numpy as np
-import pybulletgym
 import torch
 
 from suboptimal_policy import Suboptimal_Actor
