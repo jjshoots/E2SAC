@@ -1,20 +1,17 @@
 program: main.py
-method: bayes
+method: random
 metric:
   name: max_eval_perf
   goal: maximize
 parameters:
   env_name:
-    values:
-      [
-        'AntPyBulletEnv-v0',
-        'HopperPyBulletEnv-v0',
-        'HumanoidPyBulletEnv-v0',
-        'HalfCheetahPyBulletEnv-v0',
-      ]
+    value: "HalfCheetah-v4"
+  total_steps:
+    value: 1000000
+name: "SAC_HalfCheetah-v4"
 command:
   - python3
-  - src/main.py
+  - src/mainSAC.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=something_here"
+  - "--wandb_name=SAC_HalfCheetah-v4"

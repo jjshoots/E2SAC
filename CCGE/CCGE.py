@@ -6,7 +6,7 @@ import torch.distributions as dist
 import torch.nn as nn
 import torch.nn.functional as func
 
-import e2SAC.UASACNet as UASACNet
+import CCGE.CCGENet as CCGENet
 
 
 class Q_Ensemble(nn.Module):
@@ -14,18 +14,16 @@ class Q_Ensemble(nn.Module):
     Q Network Ensembles with uncertainty estimates
     """
 
-    def __init__(self, num_actions, state_size, num_networks=2):
+    def __init__(self, act_size, obs_size, num_networks=2):
         super().__init__()
 
-        networks = [
-            UASACNet.Critic(num_actions, state_size) for _ in range(num_networks)
-        ]
+        networks = [CCGENet.Critic(act_size, obs_size) for _ in range(num_networks)]
         self.networks = nn.ModuleList(networks)
 
     def forward(self, states, actions):
         """
         states is of shape B x input_shape
-        actions is of shape B x num_actions
+        actions is of shape B x act_size
         output is a tuple of 2 x B x num_networks
         """
         output = []
@@ -42,9 +40,9 @@ class GaussianActor(nn.Module):
     Gaussian Actor
     """
 
-    def __init__(self, num_actions, state_size):
+    def __init__(self, act_size, obs_size):
         super().__init__()
-        self.net = UASACNet.Actor(num_actions, state_size)
+        self.net = CCGENet.Actor(act_size, obs_size)
 
     def forward(self, states):
         output = self.net(states)
@@ -54,7 +52,7 @@ class GaussianActor(nn.Module):
     def sample(mu, sigma, n_samples=1):
         """
         output:
-            actions is of shape B x num_actions
+            actions is of shape B x act_size
             entropies is of shape B x 1
         """
         # lower bound sigma and bias it
@@ -79,15 +77,15 @@ class GaussianActor(nn.Module):
         return torch.tanh(mu)
 
 
-class UASAC(nn.Module):
+class CCGE(nn.Module):
     """
-    Uncertainty Aware Actor Critic
+    Critic Confidence Guided Exploration
     """
 
     def __init__(
         self,
-        num_actions,
-        state_size,
+        act_size,
+        obs_size,
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.99,
@@ -97,8 +95,8 @@ class UASAC(nn.Module):
     ):
         super().__init__()
 
-        self.num_actions = num_actions
-        self.state_size = state_size
+        self.obs_size = obs_size
+        self.act_size = act_size
         self.use_entropy = entropy_tuning
         self.gamma = discount_factor
         self.confidence_lambda = confidence_lambda
@@ -106,11 +104,11 @@ class UASAC(nn.Module):
         self.n_var_samples = n_var_samples
 
         # actor head
-        self.actor = GaussianActor(num_actions, state_size)
+        self.actor = GaussianActor(act_size, obs_size)
 
         # twin delayed Q networks
-        self.critic = Q_Ensemble(num_actions, state_size)
-        self.critic_target = Q_Ensemble(num_actions, state_size).eval()
+        self.critic = Q_Ensemble(act_size, obs_size)
+        self.critic_target = Q_Ensemble(act_size, obs_size).eval()
 
         # copy weights and disable gradients for the target network
         self.critic_target.load_state_dict(self.critic.state_dict())
@@ -121,7 +119,7 @@ class UASAC(nn.Module):
         self.entropy_tuning = entropy_tuning
         if entropy_tuning:
             if target_entropy is None:
-                self.target_entropy = -float(num_actions)
+                self.target_entropy = -float(act_size)
             else:
                 if target_entropy > 0.0:
                     warnings.warn(
@@ -141,14 +139,14 @@ class UASAC(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_critic_loss(self, states, actions, rewards, next_states, dones):
+    def calc_critic_loss(self, states, actions, rewards, next_states, terms):
         """
         states is of shape B x input_shape
-        actions is of shape B x num_actions
+        actions is of shape B x act_size
         rewards is of shape B x 1
-        dones is of shape B x 1
+        terms is of shape B x 1
         """
-        dones = 1.0 - dones
+        terms = 1.0 - terms
 
         # current Q, output is num_networks x B x 1
         current_q, current_u = self.critic(states, actions)
@@ -172,7 +170,7 @@ class UASAC(nn.Module):
             target_q = (
                 rewards
                 + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
-                * dones
+                * terms
             )
             target_q = target_q.mean(dim=0)
 
@@ -187,7 +185,7 @@ class UASAC(nn.Module):
         q_loss = bellman_error.mean()
 
         # U_target = sqrt(bellman_error + next_u^2)
-        target_u = (bellman_error.detach() + (self.gamma * next_u * dones) ** 2).sqrt()
+        target_u = (bellman_error.detach() + (self.gamma * next_u * terms) ** 2).sqrt()
         u_loss = ((current_u - target_u) ** 2).mean()
 
         # critic loss is q loss plus uncertainty loss, scale losses to have the same mag
@@ -202,12 +200,12 @@ class UASAC(nn.Module):
 
         return critic_loss, log
 
-    def calc_actor_loss(self, states, dones, labels):
+    def calc_actor_loss(self, states, terms, labels):
         """
         states is of shape B x input_shape
-        dones is of shape B x 1
+        terms is of shape B x 1
         """
-        dones = 1.0 - dones
+        terms = 1.0 - terms
 
         # We re-sample actions to calculate expectations of Q.
         output = self.actor(states)
@@ -252,7 +250,7 @@ class UASAC(nn.Module):
         expected_q, _ = torch.min(expected_q, dim=-1, keepdim=True)
 
         # reinforcement target is maximization of Q * done
-        rnf_loss = -(expected_q * dones)
+        rnf_loss = -(expected_q * terms)
 
         """ SUPERVISION LOSS"""
         # supervisory loss is difference between predicted and label
@@ -262,7 +260,7 @@ class UASAC(nn.Module):
         """ ENTROPY LOSS"""
         # entropy calculation
         if self.use_entropy:
-            ent_loss = self.log_alpha.exp().detach() * entropies * dones
+            ent_loss = self.log_alpha.exp().detach() * entropies * terms
             ent_loss = ent_loss.mean()
         else:
             ent_loss = 0.0

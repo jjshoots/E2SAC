@@ -14,16 +14,16 @@ class Q_Ensemble(nn.Module):
     Q Network Ensembles
     """
 
-    def __init__(self, num_actions, state_size, num_networks=2):
+    def __init__(self, act_size, obs_size, num_networks=2):
         super().__init__()
 
-        networks = [SACNet.Critic(num_actions, state_size) for _ in range(num_networks)]
+        networks = [SACNet.Critic(act_size, obs_size) for _ in range(num_networks)]
         self.networks = nn.ModuleList(networks)
 
     def forward(self, states, actions):
         """
         states is of shape B x input_shape
-        actions is of shape B x num_actions
+        actions is of shape B x act_size
         output is a tuple of B x num_networks
         """
         output = []
@@ -40,9 +40,9 @@ class GaussianActor(nn.Module):
     Gaussian Actor
     """
 
-    def __init__(self, num_actions, state_size):
+    def __init__(self, act_size, obs_size):
         super().__init__()
-        self.net = SACNet.Actor(num_actions, state_size)
+        self.net = SACNet.Actor(act_size, obs_size)
 
     def forward(self, states):
         output = self.net(states)
@@ -52,7 +52,7 @@ class GaussianActor(nn.Module):
     def sample(mu, sigma):
         """
         output:
-            actions is of shape B x num_actions
+            actions is of shape B x act_size
             entropies is of shape B x 1
         """
         # lower bound sigma and bias it
@@ -80,25 +80,25 @@ class SAC(nn.Module):
 
     def __init__(
         self,
-        num_actions,
-        state_size,
+        act_size,
+        obs_size,
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.98,
     ):
         super().__init__()
 
-        self.num_actions = num_actions
-        self.state_size = state_size
+        self.act_size = act_size
+        self.obs_size = obs_size
         self.use_entropy = entropy_tuning
         self.gamma = discount_factor
 
         # actor head
-        self.actor = GaussianActor(num_actions, state_size)
+        self.actor = GaussianActor(act_size, obs_size)
 
         # twin delayed Q networks
-        self.critic = Q_Ensemble(num_actions, state_size)
-        self.critic_target = Q_Ensemble(num_actions, state_size).eval()
+        self.critic = Q_Ensemble(act_size, obs_size)
+        self.critic_target = Q_Ensemble(act_size, obs_size).eval()
 
         # copy weights and disable gradients for the target network
         self.critic_target.load_state_dict(self.critic.state_dict())
@@ -109,7 +109,7 @@ class SAC(nn.Module):
         self.entropy_tuning = entropy_tuning
         if entropy_tuning:
             if target_entropy is None:
-                self.target_entropy = -float(num_actions)
+                self.target_entropy = -float(act_size)
             else:
                 if target_entropy > 0.0:
                     warnings.warn(
@@ -129,14 +129,14 @@ class SAC(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_critic_loss(self, states, actions, rewards, next_states, dones):
+    def calc_critic_loss(self, states, actions, rewards, next_states, terms):
         """
         states is of shape B x input_shape
-        actions is of shape B x num_actions
+        actions is of shape B x act_size
         rewards is of shape B x 1
-        dones is of shape B x 1
+        terms is of shape B x 1
         """
-        dones = 1.0 - dones
+        terms = 1.0 - terms
 
         # current Q, output is num_networks x B x 1
         current_q = self.critic(states, actions)
@@ -157,7 +157,7 @@ class SAC(nn.Module):
             target_q = (
                 rewards
                 + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
-                * dones
+                * terms
             )
 
         # critic loss is mean squared TD errors
@@ -170,12 +170,12 @@ class SAC(nn.Module):
 
         return critic_loss, log
 
-    def calc_actor_loss(self, states, dones):
+    def calc_actor_loss(self, states, terms):
         """
         states is of shape B x input_shape
-        dones is of shape B x 1
+        terms is of shape B x 1
         """
-        dones = 1.0 - dones
+        terms = 1.0 - terms
 
         # We re-sample actions to calculate expectations of Q.
         output = self.actor(states)
@@ -187,9 +187,9 @@ class SAC(nn.Module):
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         if self.use_entropy:
-            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * dones)
+            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * terms)
         else:
-            rnf_loss = -(q * dones)
+            rnf_loss = -(q * terms)
 
         actor_loss = rnf_loss.mean()
 

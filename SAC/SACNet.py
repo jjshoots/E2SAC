@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 from wingman import NeuralBlocks
 
 
@@ -10,12 +9,12 @@ class Actor(nn.Module):
     Actor network
     """
 
-    def __init__(self, num_actions, state_size):
+    def __init__(self, act_size, obs_size):
         super().__init__()
-        self.num_actions = num_actions
-        self.state_size = state_size
+        self.act_size = act_size
+        self.obs_size = obs_size
 
-        _features_description = [state_size, 200, 200, num_actions * 2]
+        _features_description = [obs_size, 100, 100, act_size * 2]
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -24,7 +23,7 @@ class Actor(nn.Module):
         )
 
     def forward(self, states):
-        output = self.net(states).reshape(-1, 2, self.num_actions).permute(1, 0, 2)
+        output = self.net(states).reshape(-1, 2, self.act_size).permute(1, 0, 2)
 
         return output
 
@@ -34,12 +33,12 @@ class Critic(nn.Module):
     Critic Network
     """
 
-    def __init__(self, num_actions, state_size):
+    def __init__(self, act_size, obs_size):
         super().__init__()
-        self.num_actions = num_actions
-        self.state_size = state_size
+        self.act_size = act_size
+        self.obs_size = obs_size
 
-        _features_description = [num_actions + state_size, 200, 200, 1]
+        _features_description = [act_size + obs_size, 100, 100, 1]
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
