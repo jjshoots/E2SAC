@@ -46,17 +46,32 @@ def train(wm: Wingman):
                 lbl = env.get_label(obs)
 
                 if memory.count < cfg.exploration_steps:
-                    action = env.env.action_space.sample()
+                    act = env.env.action_space.sample()
                 else:
-                    output = net.actor(gpuize(obs, cfg.device).unsqueeze(0))
-                    action, _ = net.actor.sample(*output)
-                    action = cpuize(action).squeeze(0)
+                    # move observation to gpu
+                    t_obs = gpuize(obs, cfg.device)
+
+                    # get the action from policy
+                    output = net.actor(t_obs)
+                    t_act, _ = net.actor.sample(*output)
+                    t_act = t_act
+
+                    # move label to gpu
+                    t_lbl = gpuize(lbl, cfg.device)
+
+                    # figure out whether to follow policy or oracle
+                    sup_scale, *_ = net.calc_sup_scale(t_obs, t_act, t_lbl)
+
+                    if sup_scale.squeeze(0) == 1.0:
+                        act = cpuize(t_act)
+                    else:
+                        act = lbl
 
                 # get the next state and other stuff
-                next_obs, rew, term = env.step(action)
+                next_obs, rew, term = env.step(act)
 
                 # store stuff in mem
-                memory.push((obs, action, rew, next_obs, term, lbl))
+                memory.push((obs, act, rew, next_obs, term, lbl))
 
             # for logging
             wm.log["total_reward"] = env.cumulative_reward
@@ -164,7 +179,6 @@ def setup_nets(wm: Wingman):
         discount_factor=cfg.discount_factor,
         confidence_lambda=cfg.confidence_lambda,
         supervision_lambda=cfg.supervision_lambda,
-        n_var_samples=cfg.n_var_samples,
     ).to(cfg.device)
     actor_optim = optim.AdamW(
         net.actor.parameters(), lr=cfg.learning_rate, amsgrad=True

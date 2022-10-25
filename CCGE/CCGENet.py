@@ -23,7 +23,10 @@ class Actor(nn.Module):
         )
 
     def forward(self, states):
-        output = self.net(states).reshape(-1, 2, self.act_size).permute(1, 0, 2)
+        output = self.net(states).reshape(*states.shape[:-1], 2, self.act_size)
+
+        if len(output.shape) > 2:
+            output = output.moveaxis(-2, 0)
 
         return output
 
@@ -57,7 +60,6 @@ class Critic(nn.Module):
 
         value, uncertainty = torch.split(output, 1, dim=-1)
 
-        # uncertainty = F.softplus(uncertainty + self.uncertainty_bias)
-        uncertainty = F.softplus(uncertainty)
+        uncertainty = F.softplus(uncertainty + self.uncertainty_bias)
 
         return torch.stack((value, uncertainty), dim=0)

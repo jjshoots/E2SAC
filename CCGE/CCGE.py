@@ -49,7 +49,7 @@ class GaussianActor(nn.Module):
         return output[0], output[1]
 
     @staticmethod
-    def sample(mu, sigma, n_samples=1):
+    def sample(mu, sigma):
         """
         output:
             actions is of shape B x act_size
@@ -59,10 +59,7 @@ class GaussianActor(nn.Module):
         normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
 
         # sample from dist
-        if n_samples > 1:
-            mu_samples = normals.rsample([n_samples])
-        else:
-            mu_samples = normals.rsample()
+        mu_samples = normals.rsample()
 
         actions = torch.tanh(mu_samples)
 
@@ -91,7 +88,6 @@ class CCGE(nn.Module):
         discount_factor=0.99,
         confidence_lambda=10.0,
         supervision_lambda=10.0,
-        n_var_samples=32,
     ):
         super().__init__()
 
@@ -101,7 +97,6 @@ class CCGE(nn.Module):
         self.gamma = discount_factor
         self.confidence_lambda = confidence_lambda
         self.supervision_lambda = supervision_lambda
-        self.n_var_samples = n_var_samples
 
         # actor head
         self.actor = GaussianActor(act_size, obs_size)
@@ -139,6 +134,45 @@ class CCGE(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
+    def calc_sup_scale(self, states, actions, labels):
+        # stack actions and labels to perform inference on both together
+        actions_labels = torch.stack((actions, labels), dim=0)
+
+        # put all actions and labels and states through critic
+        # shape is 2 x 2 x B x num_networks,
+        # value_uncertainty x actions_labels x batch x num_networks
+        critic_output = self.critic(states, actions_labels)
+
+        # splice the output to get q of actions
+        expected_q = critic_output[0, 0, ...]
+
+        """ SUPERVISION SCALE DERIVATION """
+        # uncertainty is upper bound difference between suboptimal and learned
+        uncertainty = (
+            (
+                critic_output[0, 1, ...].mean(dim=-1, keepdim=True)
+                + critic_output[1, 1, ...].max(dim=-1, keepdim=True)[0]
+            )
+            - (
+                critic_output[0, 0, ...].mean(dim=-1, keepdim=True)
+                + critic_output[1, 0, ...].min(dim=-1, keepdim=True)[0]
+            )
+        ).detach()
+
+        # normalize uncertainty
+        uncertainty = (
+            (uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs())
+            * self.confidence_lambda
+        ).detach()
+
+        # supervision scale is a switch
+        sup_scale = (uncertainty > 0.5) * 1.0
+
+        log = dict()
+        log["uncertainty"] = uncertainty.mean().detach()
+
+        return sup_scale, expected_q, log
+
     def calc_critic_loss(self, states, actions, rewards, next_states, terms):
         """
         states is of shape B x input_shape
@@ -148,21 +182,19 @@ class CCGE(nn.Module):
         """
         terms = 1.0 - terms
 
-        # current Q, output is num_networks x B x 1
+        # current Q and U
         current_q, current_u = self.critic(states, actions)
 
         # target Q
         with torch.no_grad():
             # sample the next actions based on the current policy
             output = self.actor(next_states)
-            next_actions, log_probs = self.actor.sample(
-                *output, n_samples=self.n_var_samples
-            )
+            next_actions, log_probs = self.actor.sample(*output)
 
             # get the next q and u lists and get the value, then...
             next_q, next_u = self.critic_target(next_states, next_actions)
 
-            # ...take the min at the cat dimension
+            # ...take the min among ensembles
             next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
             next_u, _ = torch.min(next_u, dim=-1, keepdim=True)
 
@@ -172,10 +204,6 @@ class CCGE(nn.Module):
                 + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
                 * terms
             )
-            target_q = target_q.mean(dim=0)
-
-            # calculate next_u and take expectation over all next actions
-            next_u = next_u.mean(dim=0)
 
         # calculate bellman error and take expectation over all networks
         bellman_error = (current_q - target_q) ** 2
@@ -211,39 +239,8 @@ class CCGE(nn.Module):
         output = self.actor(states)
         actions, entropies = self.actor.sample(*output)
 
-        # stack actions and labels to perform inference on both together
-        actions_labels = torch.stack((actions, labels), dim=0)
-
-        # put all actions and labels and states through critic
-        # shape is 2 x 2 x B x num_networks,
-        # value_uncertainty x actions_labels x batch x num_networks
-        critic_output = self.critic(states, actions_labels)
-
-        # splice the output to get what we want
-        expected_q = critic_output[0, 0, ...]
-
-        """ SUPERVISION SCALE DERIVATION """
-        # uncertainty is upper bound difference between suboptimal and learned
-        uncertainty = (
-            (
-                critic_output[0, 1, ...].mean(dim=-1, keepdim=True)
-                + critic_output[1, 1, ...].max(dim=-1, keepdim=True)[0]
-            )
-            - (
-                critic_output[0, 0, ...].mean(dim=-1, keepdim=True)
-                + critic_output[1, 0, ...].min(dim=-1, keepdim=True)[0]
-            )
-        ).detach()
-
-        # normalize uncertainty
-        uncertainty = (
-            uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs()
-        ).detach()
-
-        # calculate supervision scale
-        sup_scale = torch.clamp(
-            uncertainty * self.confidence_lambda, min=0.0, max=1.0
-        ).detach()
+        # compute supervision scale and expected q for actions
+        sup_scale, expected_q, to_log = self.calc_sup_scale(states, actions, labels)
 
         """ REINFORCEMENT LOSS """
         # expectations of Q with clipped double Q
@@ -276,7 +273,7 @@ class CCGE(nn.Module):
         log = dict()
         log["sup_scale"] = sup_scale.mean().detach()
         log["sup_scale_std"] = sup_scale.std().detach()
-        log["uncertainty"] = uncertainty.mean().detach()
+        log = {**log, **log}
 
         return actor_loss, log
 

@@ -5,13 +5,13 @@ metric:
   goal: maximize
 parameters:
   env_name:
-    value: "HalfCheetah-v4"
+    value: "Hopper-v4"
   total_steps:
     value: 1000000
-name: "SAC_HalfCheetah-v4"
+name: "SAC_Hopper-v4"
 command:
   - python3
   - src/mainSAC.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=SAC_HalfCheetah-v4"
+  - "--wandb_name=SAC_Hopper-v4"
