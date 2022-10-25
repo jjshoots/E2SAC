@@ -61,11 +61,7 @@ def train(wm: Wingman):
 
                     # figure out whether to follow policy or oracle
                     sup_scale, *_ = net.calc_sup_scale(t_obs, t_act, t_lbl)
-
-                    if sup_scale.squeeze(0) == 1.0:
-                        act = cpuize(t_act)
-                    else:
-                        act = lbl
+                    act = lbl if sup_scale.squeeze(0) == 1.0 else cpuize(t_act)
 
                 # get the next state and other stuff
                 next_obs, rew, term = env.step(act)
