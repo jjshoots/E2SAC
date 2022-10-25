@@ -4,16 +4,16 @@ source venv/bin/activate
 
 declare -a pids=()
 
-python3 src/mainSAC.py --train --env_name="Hopper-v4" --wandb_name="SAC_Hopper" --wandb &
+python3 src/main.py --train --env_name="Hopper-v4" --wandb_name="CCGE_Hopper_100" --wandb --confidence_lambda=100 &
 pids+=($!)
 sleep 4
-python3 src/mainSAC.py --train --env_name="Hopper-v4" --wandb_name="SAC_Hopper" --wandb &
+python3 src/main.py --train --env_name="Hopper-v4" --wandb_name="CCGE_Hopper_100" --wandb --confidence_lambda=100 &
 pids+=($!)
 sleep 4
-python3 src/main.py --train --env_name="Hopper-v4" --wandb_name="CCGE_Hopper" --wandb &
+python3 src/main.py --train --env_name="Hopper-v4" --wandb_name="CCGE_Hopper_50" --wandb --confidence_lambda=50 &
 pids+=($!)
 sleep 4
-python3 src/main.py --train  --env_name="Hopper-v4" --wandb_name="CCGE_Hopper" --wandb &
+python3 src/main.py --train --env_name="Hopper-v4" --wandb_name="CCGE_Hopper_50" --wandb --confidence_lambda=50 &
 pids+=($!)
 sleep 4
 
