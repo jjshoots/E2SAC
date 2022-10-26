@@ -71,7 +71,7 @@ def get_log_from_run(run, keys):
 def process_sweeps(title, sweep_uri_dict, baselines_dict):
     # parameters
     num_steps = 1000000
-    num_intervals = 51
+    num_intervals = 101
 
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
@@ -94,7 +94,8 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         score = []
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
-            score.append(np.interp(x_axis, log["num_transitions"], log["eval_perf"]))
+            if log["num_transitions"].shape[0] > 30:
+                score.append(np.interp(x_axis, log["num_transitions"], log["eval_perf"]))
 
         # stack along num_runs axis
         score = np.stack(score, axis=0)
