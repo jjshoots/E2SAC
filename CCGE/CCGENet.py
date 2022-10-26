@@ -14,7 +14,7 @@ class Actor(nn.Module):
         self.act_size = act_size
         self.obs_size = obs_size
 
-        _features_description = [obs_size, 400, 300, act_size * 2]
+        _features_description = [obs_size, 256, 256, act_size * 2]
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]
@@ -41,7 +41,7 @@ class Critic(nn.Module):
         self.act_size = act_size
         self.obs_size = obs_size
 
-        _features_description = [act_size + obs_size, 400, 300, 2]
+        _features_description = [act_size + obs_size, 256, 256, 2]
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]

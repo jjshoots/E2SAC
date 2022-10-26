@@ -21,14 +21,16 @@ def train(wm: Wingman):
     wm.log["epoch"] = 0
     wm.log["eval_perf"] = -math.inf
     wm.log["max_eval_perf"] = -math.inf
-    last_eval_step = 0
+    next_eval_step = 0
 
     while memory.count <= cfg.total_steps:
         wm.log["epoch"] += 1
 
         """EVAL RUN"""
-        if memory.count - last_eval_step > cfg.eval_steps_ratio:
-            last_eval_step += cfg.eval_steps_ratio
+        if memory.count >= next_eval_step:
+            next_eval_step = (
+                int(memory.count / cfg.eval_steps_ratio) + 1
+            ) * cfg.eval_steps_ratio
             wm.log["eval_perf"] = env.evaluate(cfg, net)
             wm.log["max_eval_perf"] = max(
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
@@ -108,7 +110,7 @@ def train(wm: Wingman):
 
                 """WEIGHTS SAVING"""
                 to_update, model_file, optim_file = wm.checkpoint(
-                    loss=-float(wm.log["eval_perf"]), batch=0, epoch=wm.log["epoch"]
+                    loss=-float(wm.log["eval_perf"]), step=wm.log["num_transitions"]
                 )
                 if to_update:
                     torch.save(net.state_dict(), model_file)
