@@ -6,7 +6,7 @@ env_name: ''
 # env_name: 'Walker2d-v4'
 
 # size of suboptimal policy
-sub_size: 100
+sub_size: 200
 
 # learning params
 buffer_size: 300000
@@ -22,7 +22,7 @@ exploration_steps: 0
 
 # CCGE params
 supervision_lambda: 1.0
-confidence_lambda: 50.0
+confidence_lambda: 10.0
 
 # core SAC params
 use_entropy: true
