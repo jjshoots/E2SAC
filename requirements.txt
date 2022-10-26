@@ -1,2 +1,5 @@
 jj-wingman
 gymnasium[mujoco]
+matplotlib
+seaborn
+git+https://github.com/jjshoots/rliable.git
