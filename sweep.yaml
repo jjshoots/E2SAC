@@ -6,11 +6,13 @@ metric:
 parameters:
   env_name:
     value: "Hopper-v4"
-name: "SAC_Hopper-v4"
+  confidence_lambda:
+    value: 10
+name: "CCGE-10_Hopper-v4"
 command:
   - python3
-  - src/mainSAC.py
-  # - src/main.py
+  # - src/mainSAC.py
+  - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=SAC_Hopper-v4"
+  - "--wandb_name=CCGE-10_Hopper-v4"

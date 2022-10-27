@@ -127,8 +127,8 @@ def train(wm: Wingman):
                         optim_file,
                     )
 
-    path = f"./suboptimal_policies/{cfg.env_name}_{cfg.sub_size}.pth"
-    torch.save(net.actor.net.state_dict(), path)
+    # path = f"./suboptimal_policies/{cfg.env_name}_{cfg.sub_size}.pth"
+    # torch.save(net.actor.net.state_dict(), path)
 
 
 def eval_display(wm: Wingman):
