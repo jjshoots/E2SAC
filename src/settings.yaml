@@ -21,15 +21,14 @@ learning_rate: 0.0004
 exploration_steps: 0
 
 # CCGE params
-supervision_lambda: 1.0
-confidence_lambda: 10.0
+confidence_lambda: 1.0
 
 # core SAC params
 use_entropy: true
 target_entropy: null
 
 # eval settings
-eval_num_episodes: 20
+eval_num_episodes: 50
 eval_steps_ratio: 10000
 
 # wingman required params

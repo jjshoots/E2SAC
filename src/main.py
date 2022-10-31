@@ -153,7 +153,8 @@ def eval_display(wm: Wingman):
     if wm.cfg.display:
         env.display(cfg, net)
     elif wm.cfg.evaluate:
-        print(env.evaluate(cfg, net))
+        while True:
+            print(env.evaluate(cfg, net))
 
 
 def setup_env(wm: Wingman):
@@ -176,7 +177,6 @@ def setup_nets(wm: Wingman):
         target_entropy=cfg.target_entropy,
         discount_factor=cfg.discount_factor,
         confidence_lambda=cfg.confidence_lambda,
-        supervision_lambda=cfg.supervision_lambda,
     ).to(cfg.device)
     actor_optim = optim.AdamW(
         net.actor.parameters(), lr=cfg.learning_rate, amsgrad=True

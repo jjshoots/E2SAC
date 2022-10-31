@@ -86,8 +86,7 @@ class CCGE(nn.Module):
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.99,
-        confidence_lambda=10.0,
-        supervision_lambda=10.0,
+        confidence_lambda=1.0,
     ):
         super().__init__()
 
@@ -96,7 +95,6 @@ class CCGE(nn.Module):
         self.use_entropy = entropy_tuning
         self.gamma = discount_factor
         self.confidence_lambda = confidence_lambda
-        self.supervision_lambda = supervision_lambda
 
         # actor head
         self.actor = GaussianActor(act_size, obs_size)
@@ -182,49 +180,49 @@ class CCGE(nn.Module):
         """
         terms = 1.0 - terms
 
-        # current Q and U
-        current_q, current_u = self.critic(states, actions)
+        # current predicted f and f
+        current_q, current_f = self.critic(states, actions)
 
-        # target Q
+        # compute next q and next f and target_q
         with torch.no_grad():
             # sample the next actions based on the current policy
             output = self.actor(next_states)
             next_actions, log_probs = self.actor.sample(*output)
 
-            # get the next q and u lists and get the value, then...
-            next_q, next_u = self.critic_target(next_states, next_actions)
+            # get the next q and f lists and get the value, then...
+            next_q, next_f = self.critic_target(next_states, next_actions)
 
             # ...take the min among ensembles
             next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
-            next_u, _ = torch.min(next_u, dim=-1, keepdim=True)
+            next_f, _ = torch.min(next_f, dim=-1, keepdim=True)
 
-            # Q_target = reward + dones * (gamma * next_q + entropy_bonus)
+            # q_target = reward + next_q
             target_q = (
                 rewards
                 + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
                 * terms
             )
 
-        # calculate bellman error and take expectation over all networks
-        bellman_error = (current_q - target_q) ** 2
-        bellman_error = bellman_error.mean(dim=-1, keepdim=True)
+        # calculate bellman loss and take expectation over all networks
+        bellman_loss = (current_q - target_q) ** 2
+        bellman_loss = bellman_loss.mean(dim=-1, keepdim=True)
 
         # q loss is just bellman error
-        q_loss = bellman_error.mean()
+        q_loss = bellman_loss.mean()
 
-        # U_target = sqrt(bellman_error + next_u^2)
-        target_u = (bellman_error.detach() + (self.gamma * next_u * terms) ** 2).sqrt()
-        u_loss = ((current_u - target_u) ** 2).mean()
+        # f_target = projected_bellman_error + next_f
+        # U_target = sqrt(bellman_error + next_f^2)
+        target_f = (bellman_loss.detach() + (self.gamma * next_f * terms) ** 2).sqrt()
+        f_loss = ((current_f - target_f) ** 2).mean()
 
-        # critic loss is q loss plus uncertainty loss, scale losses to have the same mag
-        critic_loss = q_loss + u_loss
+        # critic loss is q loss plus uncertainty loss
+        critic_loss = q_loss + f_loss
 
         log = dict()
-        log["bellman_error"] = bellman_error.mean().detach()
-        log["target_u"] = target_u.mean().detach()
+        log["target_f"] = target_f.mean().detach()
         log["target_q"] = target_q.mean().detach()
         log["q_loss"] = q_loss.mean().detach()
-        log["u_loss"] = u_loss.mean().detach()
+        log["f_loss"] = f_loss.mean().detach()
 
         return critic_loss, log
 
@@ -252,7 +250,6 @@ class CCGE(nn.Module):
         """ SUPERVISION LOSS"""
         # supervisory loss is difference between predicted and label
         sup_loss = func.mse_loss(labels, actions, reduction="none")
-        sup_loss *= self.supervision_lambda
 
         """ ENTROPY LOSS"""
         # entropy calculation
@@ -272,7 +269,6 @@ class CCGE(nn.Module):
 
         log = dict()
         log["sup_scale"] = sup_scale.mean().detach()
-        log["sup_scale_std"] = sup_scale.std().detach()
         log = {**log, **log}
 
         return actor_loss, log

@@ -48,7 +48,7 @@ def get_log_from_uri(uri, keys, api=None):
     for key in keys:
         array = np.array([row[key] for row in history])
         array = array.astype(np.float64)
-        array = np.nan_to_num(array, nan=-100.0, posinf=-100.0, neginf=-100.0)
+        # array = np.nan_to_num(array, nan=-100.0, posinf=-100.0, neginf=-100.0)
         data[key] = array
 
     return data
@@ -72,6 +72,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
     # parameters
     num_steps = 1000000
     num_intervals = 101
+    avg_window = 3
 
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
@@ -94,8 +95,10 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         score = []
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
-            if log["num_transitions"].shape[0] > 30:
-                score.append(np.interp(x_axis, log["num_transitions"], log["eval_perf"]))
+            if log["num_transitions"].shape[0] > 80:
+                data = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
+                # data = np.convolve(data, np.ones(avg_window) / avg_window, mode="same")
+                score.append(data)
 
         # stack along num_runs axis
         score = np.stack(score, axis=0)
@@ -110,7 +113,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         [metrics.aggregate_iqm(scores[..., frame]) for frame in range(scores.shape[-1])]
     )
     # compute confidence intervals
-    iqm_scores, iqm_cis = rly.get_interval_estimates(scores, iqm, reps=50000)
+    iqm_scores, iqm_cis = rly.get_interval_estimates(scores, iqm, reps=100000)
 
     # plot sample efficiency curve
     plot_utils.plot_sample_efficiency_curve(
@@ -158,14 +161,26 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
 
     plt.tight_layout()
     plt.savefig(f"resource/{title}.pdf", dpi=100)
-    plt.show()
+    # plt.show()
 
 
 if __name__ == "__main__":
     title = "Hopper-v4"
     sweep_uri_dict = {}
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/zgq81g05"
+    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/phevs4mc"
+    # sweep_uri_dict["CCGE_10"] = "jjshoots/CCGE2/5vzkut2a"
+    # sweep_uri_dict["CCGE_100"] = "jjshoots/CCGE2/ot1qxm41"
 
     baselines_dict = {}
-    # baselines_dict["Oracle 1"] = 1508.0
+    baselines_dict["Oracle 1"] = 810.0
+    process_sweeps(title, sweep_uri_dict, baselines_dict)
+
+    title = "Ant-v4"
+    sweep_uri_dict = {}
+    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/4uvx5qez"
+    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/dp4byhg8"
+
+    baselines_dict = {}
+    baselines_dict["Oracle 1"] = 810.0
     process_sweeps(title, sweep_uri_dict, baselines_dict)
