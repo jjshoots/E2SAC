@@ -143,7 +143,8 @@ def eval_display(wm: Wingman):
     if wm.cfg.display:
         env.display(cfg, net)
     elif wm.cfg.evaluate:
-        print(env.evaluate(cfg, net))
+        while True:
+            print(env.evaluate(cfg, net))
 
 
 def setup_env(wm: Wingman):
