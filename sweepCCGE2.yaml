@@ -1,0 +1,17 @@
+program: main.py
+method: random
+metric:
+  name: max_eval_perf
+  goal: maximize
+parameters:
+  env_name:
+    value: "Ant-v4"
+  target_performance:
+    value: 2000
+name: "CCGE2-1_Ant-v4"
+command:
+  - python3
+  - src/mainCCGE2.py
+  - "--train"
+  - "--wandb"
+  - "--wandb_name=CCGE2-1_Ant-v4"

@@ -1,4 +1,3 @@
-import time
 import warnings
 
 import gymnasium as gym
@@ -43,9 +42,9 @@ class Environment:
 
         # load suboptimal policy
         try:
-            path = f"./suboptimal_policies/{cfg.env_name}_{cfg.sub_size}.pth"
+            path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
             self.suboptimal_actor = Suboptimal_Actor(
-                act_size=self.act_size, obs_size=self.obs_size, sub_size=cfg.sub_size
+                act_size=self.act_size, obs_size=self.obs_size
             ).to(cfg.device)
             self.suboptimal_actor.load_state_dict(torch.load(path))
             print(f"Loaded {path}")
@@ -84,6 +83,10 @@ class Environment:
             self.ended = True
 
         return self.state, reward, term
+
+    def update_oracle_weights(self, weights: dict):
+        assert self.suboptimal_actor is not None, "Can't update None model."
+        self.suboptimal_actor.load_state_dict(weights)
 
     def get_label(self, obs):
         if self.suboptimal_actor is not None:

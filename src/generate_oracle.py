@@ -23,7 +23,7 @@ def train(wm: Wingman):
     wm.log["max_eval_perf"] = -math.inf
     next_eval_step = 0
 
-    while memory.count <= cfg.total_steps:
+    while wm.log["max_eval_perf"] < cfg.target_performance:
         wm.log["epoch"] += 1
 
         """EVAL RUN"""
@@ -126,6 +126,9 @@ def train(wm: Wingman):
                         },
                         optim_file,
                     )
+
+    path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
+    torch.save(net.actor.net.state_dict(), path)
 
 
 def eval_display(wm: Wingman):

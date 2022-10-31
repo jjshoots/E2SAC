@@ -5,8 +5,8 @@ import torch
 import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
+from CCGE.CCGE import CCGE
 from mujoco_env import Environment
-from SAC.SAC import SAC
 
 
 def train(wm: Wingman):
@@ -21,12 +21,13 @@ def train(wm: Wingman):
     wm.log["epoch"] = 0
     wm.log["eval_perf"] = -math.inf
     wm.log["max_eval_perf"] = -math.inf
+    wm.log["oracle_eval_perf"] = env.evaluate(cfg, None)
     next_eval_step = 0
 
     while memory.count <= cfg.total_steps:
         wm.log["epoch"] += 1
 
-        """EVAL RUN"""
+        """EVALUATE POLICY"""
         if memory.count >= next_eval_step:
             next_eval_step = (
                 int(memory.count / cfg.eval_steps_ratio) + 1
@@ -36,7 +37,12 @@ def train(wm: Wingman):
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )
 
-        """ENVIRONMENT INTERACTION"""
+        """UPDATE ORACLE"""
+        if wm.log["eval_perf"] > wm.log["oracle_eval_perf"]:
+            env.update_oracle_weights(net.actor.net.state_dict())
+            wm.log["oracle_eval_perf"] = wm.log["eval_perf"]
+
+        """ENVIRONMENT ROLLOUT"""
         env.reset()
         net.eval()
         net.zero_grad()
@@ -45,19 +51,31 @@ def train(wm: Wingman):
             while not env.ended:
                 # get the initial state and label
                 obs = env.state
+                lbl = env.get_label(obs)
 
                 if memory.count < cfg.exploration_steps:
-                    action = env.env.action_space.sample()
+                    act = env.env.action_space.sample()
                 else:
-                    output = net.actor(gpuize(obs, cfg.device).unsqueeze(0))
-                    action, _ = net.actor.sample(*output)
-                    action = cpuize(action).squeeze(0)
+                    # move observation to gpu
+                    t_obs = gpuize(obs, cfg.device)
+
+                    # get the action from policy
+                    output = net.actor(t_obs)
+                    t_act, _ = net.actor.sample(*output)
+                    t_act = t_act
+
+                    # move label to gpu
+                    t_lbl = gpuize(lbl, cfg.device)
+
+                    # figure out whether to follow policy or oracle
+                    sup_scale, *_ = net.calc_sup_scale(t_obs, t_act, t_lbl)
+                    act = lbl if sup_scale.squeeze(0) == 1.0 else cpuize(t_act)
 
                 # get the next state and other stuff
-                next_obs, rew, term = env.step(action)
+                next_obs, rew, term = env.step(act)
 
                 # store stuff in mem
-                memory.push((obs, action, rew, next_obs, term))
+                memory.push((obs, act, rew, next_obs, term, lbl))
 
             # for logging
             wm.log["total_reward"] = env.cumulative_reward
@@ -76,6 +94,7 @@ def train(wm: Wingman):
                 rewards = gpuize(stuff[2], cfg.device)
                 next_states = gpuize(stuff[3], cfg.device)
                 terms = gpuize(stuff[4], cfg.device)
+                labels = gpuize(stuff[5], cfg.device)
 
                 # train critic
                 for _ in range(cfg.critic_update_multiplier):
@@ -91,7 +110,7 @@ def train(wm: Wingman):
                 # train actor
                 for _ in range(cfg.actor_update_multiplier):
                     net.zero_grad()
-                    rnf_loss, log = net.calc_actor_loss(states, terms)
+                    rnf_loss, log = net.calc_actor_loss(states, terms, labels)
                     wm.log = {**wm.log, **log}
                     rnf_loss.backward()
                     optim_set["actor"].step()
@@ -157,12 +176,13 @@ def setup_nets(wm: Wingman):
     cfg = wm.cfg
 
     # set up networks and optimizers
-    net = SAC(
+    net = CCGE(
         act_size=cfg.act_size,
         obs_size=cfg.obs_size,
         entropy_tuning=cfg.use_entropy,
         target_entropy=cfg.target_entropy,
         discount_factor=cfg.discount_factor,
+        confidence_lambda=cfg.confidence_lambda,
     ).to(cfg.device)
     actor_optim = optim.AdamW(
         net.actor.parameters(), lr=cfg.learning_rate, amsgrad=True
@@ -189,14 +209,15 @@ def setup_nets(wm: Wingman):
         for opt_key in optim_set:
             optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
 
-        print(f"Lowest Running Loss for Net: {wm.lowest_loss}")
+    # torch.save(net.actor.net.state_dict(), f"./{set.env_name}_big.pth")
+    # exit()
 
     return net, optim_set
 
 
 if __name__ == "__main__":
     signal(SIGINT, shutdown_handler)
-    wm = Wingman(config_yaml="./src/settings.yaml")
+    wm = Wingman(config_yaml="./src/ccge_settings.yaml")
 
     """ SCRIPTS HERE """
 
