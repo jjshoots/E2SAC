@@ -169,18 +169,36 @@ if __name__ == "__main__":
     sweep_uri_dict = {}
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/zgq81g05"
     sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/phevs4mc"
-    # sweep_uri_dict["CCGE_10"] = "jjshoots/CCGE2/5vzkut2a"
-    # sweep_uri_dict["CCGE_100"] = "jjshoots/CCGE2/ot1qxm41"
+    sweep_uri_dict["CCGE_10"] = "jjshoots/CCGE2/5vzkut2a"
+    sweep_uri_dict["CCGE_100"] = "jjshoots/CCGE2/ot1qxm41"
 
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 810.0
     process_sweeps(title, sweep_uri_dict, baselines_dict)
 
-    title = "Ant-v4"
-    sweep_uri_dict = {}
-    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/4uvx5qez"
-    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/dp4byhg8"
+    # title = "Ant-v4"
+    # sweep_uri_dict = {}
+    # sweep_uri_dict["SAC"] = "jjshoots/CCGE2/4uvx5qez"
+    # sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/dp4byhg8"
 
-    baselines_dict = {}
-    baselines_dict["Oracle 1"] = 810.0
-    process_sweeps(title, sweep_uri_dict, baselines_dict)
+    # baselines_dict = {}
+    # baselines_dict["Oracle 1"] = 810.0
+    # process_sweeps(title, sweep_uri_dict, baselines_dict)
+
+    # title = "HalfCheetah-v4"
+    # sweep_uri_dict = {}
+    # sweep_uri_dict["SAC"] = "jjshoots/CCGE2/95qoyb9w"
+    # sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/o61ibecs"
+
+    # baselines_dict = {}
+    # baselines_dict["Oracle 1"] = 5240.0
+    # process_sweeps(title, sweep_uri_dict, baselines_dict)
+
+    # title = "Walker2d-v4"
+    # sweep_uri_dict = {}
+    # sweep_uri_dict["SAC"] = "jjshoots/CCGE2/aboikqup"
+    # sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/n6ufn853"
+
+    # baselines_dict = {}
+    # baselines_dict["Oracle 1"] = 2250.0
+    # process_sweeps(title, sweep_uri_dict, baselines_dict)

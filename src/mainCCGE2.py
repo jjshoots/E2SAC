@@ -18,6 +18,11 @@ def train(wm: Wingman):
     net, optim_set = setup_nets(wm)
     memory = ReplayBuffer(cfg.buffer_size)
 
+    # setup the oracle
+    if False:
+        env.update_oracle_weights(net.actor.net.state_dict())
+        print("Using from scratch oracle.")
+
     wm.log["epoch"] = 0
     wm.log["eval_perf"] = -math.inf
     wm.log["max_eval_perf"] = -math.inf
