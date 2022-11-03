@@ -19,7 +19,7 @@ def train(wm: Wingman):
     memory = ReplayBuffer(cfg.buffer_size)
 
     # setup the oracle
-    if False:
+    if not cfg.pretrained_oracle:
         env.update_oracle_weights(net.actor.net.state_dict())
         print("Using from scratch oracle.")
 
@@ -43,9 +43,11 @@ def train(wm: Wingman):
             )
 
         """UPDATE ORACLE"""
-        if wm.log["eval_perf"] > wm.log["oracle_eval_perf"]:
-            env.update_oracle_weights(net.actor.net.state_dict())
-            wm.log["oracle_eval_perf"] = wm.log["eval_perf"]
+        if cfg.update_oracle:
+            if wm.log["eval_perf"] > wm.log["oracle_eval_perf"]:
+                env.update_oracle_weights(net.actor.net.state_dict())
+                wm.log["oracle_eval_perf"] = wm.log["eval_perf"]
+                print("Found new best oracle, updating.")
 
         """ENVIRONMENT ROLLOUT"""
         env.reset()
@@ -222,7 +224,7 @@ def setup_nets(wm: Wingman):
 
 if __name__ == "__main__":
     signal(SIGINT, shutdown_handler)
-    wm = Wingman(config_yaml="./src/ccge_settings.yaml")
+    wm = Wingman(config_yaml="./src/settings.yaml")
 
     """ SCRIPTS HERE """
 

@@ -5,12 +5,14 @@ metric:
   goal: maximize
 parameters:
   env_name:
-    value: "Walker2d-v4"
-name: "CCGE-1_Walker2d-v4"
+    value: "Hopper-v4"
+  target_performance:
+    value: 2900.0
+name: "CCGE-2_Hopper-v4"
 command:
   - python3
   # - src/mainSAC.py
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=CCGE-1_Walker2d-v4"
+  - "--wandb_name=CCGE-2_Hopper-v4"
