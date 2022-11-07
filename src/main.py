@@ -18,15 +18,21 @@ def train(wm: Wingman):
     net, optim_set = setup_nets(wm)
     memory = ReplayBuffer(cfg.buffer_size)
 
+    # setup the oracle
+    if not cfg.pretrained_oracle:
+        env.update_oracle_weights(net.actor.net.state_dict())
+        print("Using from scratch oracle.")
+
     wm.log["epoch"] = 0
     wm.log["eval_perf"] = -math.inf
     wm.log["max_eval_perf"] = -math.inf
+    wm.log["oracle_eval_perf"] = env.evaluate(cfg, None)
     next_eval_step = 0
 
     while memory.count <= cfg.total_steps:
         wm.log["epoch"] += 1
 
-        """EVAL RUN"""
+        """EVALUATE POLICY"""
         if memory.count >= next_eval_step:
             next_eval_step = (
                 int(memory.count / cfg.eval_steps_ratio) + 1
@@ -36,7 +42,14 @@ def train(wm: Wingman):
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )
 
-        """ENVIRONMENT INTERACTION"""
+        """UPDATE ORACLE"""
+        if cfg.update_oracle:
+            if wm.log["eval_perf"] > wm.log["oracle_eval_perf"]:
+                env.update_oracle_weights(net.actor.net.state_dict())
+                wm.log["oracle_eval_perf"] = wm.log["eval_perf"]
+                print("Found new best oracle, updating.")
+
+        """ENVIRONMENT ROLLOUT"""
         env.reset()
         net.eval()
         net.zero_grad()

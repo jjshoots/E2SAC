@@ -165,40 +165,46 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
 
 
 if __name__ == "__main__":
-    title = "Hopper-v4"
-    sweep_uri_dict = {}
-    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/zgq81g05"
-    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/phevs4mc"
-    sweep_uri_dict["CCGE_10"] = "jjshoots/CCGE2/5vzkut2a"
-    sweep_uri_dict["CCGE_100"] = "jjshoots/CCGE2/ot1qxm41"
-
-    baselines_dict = {}
-    baselines_dict["Oracle 1"] = 810.0
-    process_sweeps(title, sweep_uri_dict, baselines_dict)
-
-    # title = "Ant-v4"
+    # title = "Hopper-v4"
     # sweep_uri_dict = {}
-    # sweep_uri_dict["SAC"] = "jjshoots/CCGE2/4uvx5qez"
-    # sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/dp4byhg8"
+    # sweep_uri_dict["SAC"] = "jjshoots/CCGE2/zgq81g05"
+    # sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/phevs4mc"
+    # sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/po10jfqp"
 
     # baselines_dict = {}
     # baselines_dict["Oracle 1"] = 810.0
+    # baselines_dict["Oracle 2"] = 2900.0
     # process_sweeps(title, sweep_uri_dict, baselines_dict)
 
-    # title = "HalfCheetah-v4"
-    # sweep_uri_dict = {}
-    # sweep_uri_dict["SAC"] = "jjshoots/CCGE2/95qoyb9w"
-    # sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/o61ibecs"
+    title = "Ant-v4"
+    sweep_uri_dict = {}
+    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/4uvx5qez"
+    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/dp4byhg8"
+    sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/b0r4xjqu"
 
-    # baselines_dict = {}
-    # baselines_dict["Oracle 1"] = 5240.0
-    # process_sweeps(title, sweep_uri_dict, baselines_dict)
+    baselines_dict = {}
+    baselines_dict["Oracle 1"] = 810.0
+    baselines_dict["Oracle 2"] = 2200.0
+    process_sweeps(title, sweep_uri_dict, baselines_dict)
 
-    # title = "Walker2d-v4"
-    # sweep_uri_dict = {}
-    # sweep_uri_dict["SAC"] = "jjshoots/CCGE2/aboikqup"
-    # sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/n6ufn853"
+    title = "HalfCheetah-v4"
+    sweep_uri_dict = {}
+    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/95qoyb9w"
+    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/o61ibecs"
+    sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/62jvni7q"
 
-    # baselines_dict = {}
-    # baselines_dict["Oracle 1"] = 2250.0
-    # process_sweeps(title, sweep_uri_dict, baselines_dict)
+    baselines_dict = {}
+    baselines_dict["Oracle 1"] = 5240.0
+    baselines_dict["Oracle 2"] = 6000.0
+    process_sweeps(title, sweep_uri_dict, baselines_dict)
+
+    title = "Walker2d-v4"
+    sweep_uri_dict = {}
+    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/aboikqup"
+    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/n6ufn853"
+    sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/s34yh4a6"
+
+    baselines_dict = {}
+    baselines_dict["Oracle 1"] = 2250.0
+    baselines_dict["Oracle 2"] = 2300.0
+    process_sweeps(title, sweep_uri_dict, baselines_dict)

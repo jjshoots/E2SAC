@@ -22,7 +22,7 @@ exploration_steps: 0
 
 # CCGE params
 pretrained_oracle: true
-update_oracle: false
+update_oracle: true
 confidence_lambda: 1.0
 
 # core SAC params
