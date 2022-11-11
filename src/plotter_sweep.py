@@ -165,16 +165,17 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
 
 
 if __name__ == "__main__":
-    # title = "Hopper-v4"
-    # sweep_uri_dict = {}
-    # sweep_uri_dict["SAC"] = "jjshoots/CCGE2/zgq81g05"
-    # sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/phevs4mc"
-    # sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/po10jfqp"
+    title = "Hopper-v4"
+    sweep_uri_dict = {}
+    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/zgq81g05"
+    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/phevs4mc"
+    sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/po10jfqp"
+    sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/fscr3ka0"
 
-    # baselines_dict = {}
-    # baselines_dict["Oracle 1"] = 810.0
-    # baselines_dict["Oracle 2"] = 2900.0
-    # process_sweeps(title, sweep_uri_dict, baselines_dict)
+    baselines_dict = {}
+    baselines_dict["Oracle 1"] = 810.0
+    baselines_dict["Oracle 2"] = 2900.0
+    process_sweeps(title, sweep_uri_dict, baselines_dict)
 
     title = "Ant-v4"
     sweep_uri_dict = {}
