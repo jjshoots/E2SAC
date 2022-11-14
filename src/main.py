@@ -69,7 +69,6 @@ def train(wm: Wingman):
                     # get the action from policy
                     output = net.actor(t_obs)
                     t_act, _ = net.actor.sample(*output)
-                    t_act = t_act
 
                     # move label to gpu
                     t_lbl = gpuize(lbl, cfg.device)
