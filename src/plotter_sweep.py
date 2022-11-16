@@ -1,41 +1,34 @@
-# rliable google
+import logging
+import warnings
+from multiprocessing import Pool
+
 import matplotlib.patches as patches
-
-# plotting styles
 import matplotlib.pyplot as plt
-
-# normal imports
 import numpy as np
 import seaborn as sns
 from matplotlib import rc, rcParams
 from rliable import library as rly
 from rliable import metrics, plot_utils
 
-# to import stuff from wandb
 import wandb
 
-sns.set_style("white")
-plt.rcParams["font.family"] = "serif"
-plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
-
 # See warnings only once
-import warnings
-
 warnings.filterwarnings("default")
 
 # The answer to life, universe and everything
 RAND_STATE = np.random.RandomState(42)
 
-import logging
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+rc("text", usetex=False)
 rcParams["legend.loc"] = "best"
 rcParams["pdf.fonttype"] = 42
 rcParams["ps.fonttype"] = 42
 
-rc("text", usetex=False)
+sns.set_style("white")
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
 
 
 def get_log_from_uri(uri, keys, api=None):
@@ -69,10 +62,11 @@ def get_log_from_run(run, keys):
 
 
 def process_sweeps(title, sweep_uri_dict, baselines_dict):
+    print(f"Processing run {title}")
+
     # parameters
     num_steps = 1000000
     num_intervals = 101
-    avg_window = 3
 
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
@@ -81,7 +75,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
     api = wandb.Api(timeout=30)
 
     # collect runs from sweeps
-    runs = {}
+    runs = dict()
     for key in sweep_uri_dict:
         runs[key] = api.sweep(sweep_uri_dict[key]).runs
 
@@ -90,14 +84,13 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
 
     # load scores as dictionary mapping algorithms to their scores
     # each score is of size (num_runs x num_games x num_recordings)
-    scores = {}
+    scores = dict()
     for algorithm in runs:
         score = []
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
             if log["num_transitions"].shape[0] > 80:
                 data = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
-                # data = np.convolve(data, np.ones(avg_window) / avg_window, mode="same")
                 score.append(data)
 
         # stack along num_runs axis
@@ -128,17 +121,22 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         figsize=(9, 9),
     )
 
+    color_palette = sns.color_palette("colorblind")
+
     # oracle policies
     for i, key in enumerate(baselines_dict):
-        plt.axhline(
+        line = plt.axhline(
             y=baselines_dict[key],
-            color=sns.color_palette("colorblind")[len(algorithms) + i],
-            linestyle="-",
+            color=color_palette[len(algorithms) + i],
+            # color="black",
+            linestyle="--",
         )
+        print(color_palette[len(algorithms) + i])
         algorithms.append(key)
 
     # form the legend
-    color_dict = dict(zip(algorithms, sns.color_palette("colorblind")))
+    color_dict = dict(zip(algorithms, color_palette))
+    print(color_dict)
     fake_patches = [
         patches.Patch(color=color_dict[alg], alpha=0.75) for alg in algorithms
     ]
@@ -158,54 +156,67 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         title,
         fontsize=30,
     )
-
     plt.tight_layout()
     plt.savefig(f"resource/{title}.pdf", dpi=100)
     # plt.show()
 
 
 if __name__ == "__main__":
+    # list of run arguments
+    sweep_objects = []
+
     title = "Hopper-v4"
     sweep_uri_dict = {}
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/zgq81g05"
     sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/phevs4mc"
     sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/po10jfqp"
+    sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/18p6t19p"
     sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/fscr3ka0"
 
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 810.0
     baselines_dict["Oracle 2"] = 2900.0
-    process_sweeps(title, sweep_uri_dict, baselines_dict)
+    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     title = "Ant-v4"
     sweep_uri_dict = {}
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/4uvx5qez"
     sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/dp4byhg8"
     sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/b0r4xjqu"
+    sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/f9sntmmm"
+    sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/5ydeyszy"
 
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 810.0
     baselines_dict["Oracle 2"] = 2200.0
-    process_sweeps(title, sweep_uri_dict, baselines_dict)
+    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     title = "HalfCheetah-v4"
     sweep_uri_dict = {}
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/95qoyb9w"
     sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/o61ibecs"
     sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/62jvni7q"
+    # sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/5e3vqsse"
+    sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/3rk3ayzb"
 
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 5240.0
     baselines_dict["Oracle 2"] = 6000.0
-    process_sweeps(title, sweep_uri_dict, baselines_dict)
+    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     title = "Walker2d-v4"
     sweep_uri_dict = {}
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/aboikqup"
     sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/n6ufn853"
     sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/s34yh4a6"
+    # sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/trgcinhi"
+    sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/4de8u2d3"
 
     baselines_dict = {}
     baselines_dict["Oracle 1"] = 2250.0
     baselines_dict["Oracle 2"] = 2300.0
-    process_sweeps(title, sweep_uri_dict, baselines_dict)
+    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
+
+    # process everything with multiprocessing
+    with Pool() as pool:
+        pool.starmap(process_sweeps, sweep_objects)

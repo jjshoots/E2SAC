@@ -157,12 +157,8 @@ class CCGE(nn.Module):
         #     )
         # ).detach()
         uncertainty = (
-            (
-                critic_output[0, 1, ...].max(dim=-1, keepdim=True)[0]
-            )
-            - (
-                critic_output[0, 0, ...].min(dim=-1, keepdim=True)[0]
-            )
+            (critic_output[0, 1, ...].max(dim=-1, keepdim=True)[0])
+            - (critic_output[0, 0, ...].min(dim=-1, keepdim=True)[0])
         ).detach()
 
         # normalize uncertainty
