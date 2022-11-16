@@ -3,3 +3,4 @@ gymnasium[mujoco]
 matplotlib
 seaborn
 git+https://github.com/jjshoots/rliable.git
+git+https://github.com/jjshoots/PyFlyt.git
