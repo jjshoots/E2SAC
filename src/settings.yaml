@@ -1,9 +1,5 @@
 # env params
-env_name: ''
-# env_name: 'Ant-v4'
-# env_name: 'HalfCheetah-v4'
-# env_name: 'Hopper-v4'
-# env_name: 'Walker2d-v4'
+env_name: 'PyFlyt/SimpleWaypointEnv-v0'
 
 # target_performance of oracle
 target_performance: 2000

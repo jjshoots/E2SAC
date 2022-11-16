@@ -1,16 +1,14 @@
-import warnings
+import math
 
 import gymnasium as gym
 import numpy as np
-import torch
+from PyFlyt.core.PID import PID
 from wingman import cpuize, gpuize
-
-from suboptimal_policy import Suboptimal_Actor
 
 
 class Environment:
     """
-    Wrapper for OpenAI gym environments that outputs suboptimal actions also
+    Wrapper for gymnasium environments that outputs suboptimal actions also
     """
 
     def __init__(self, cfg):
@@ -18,7 +16,11 @@ class Environment:
 
         # make the env
         self.env = gym.make(
-            cfg.env_name, render_mode=("human" if cfg.display else "rgb_array")
+            cfg.env_name,
+            render_mode=("human" if cfg.display else None),
+            angle_representation="euler",
+            use_yaw_targets=False,
+            num_targets=10,
         )
 
         # compute spaces
@@ -34,33 +36,77 @@ class Environment:
 
         # constants
         self.device = cfg.device
-        self.do_nothing = np.zeros((self.act_size))
         action_high = self.env.action_space.high
         action_low = self.env.action_space.low
         self._action_mid = (action_high + action_low) / 2.0
         self._action_scale = (action_high - action_low) / 2.0
 
-        # load suboptimal policy
-        try:
-            path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
-            self.suboptimal_actor = Suboptimal_Actor(
-                act_size=self.act_size, obs_size=self.obs_size
-            ).to(cfg.device)
-            self.suboptimal_actor.load_state_dict(torch.load(path))
-            print(f"Loaded {path}")
-        except FileNotFoundError:
-            warnings.warn("--------------------------------------------------")
-            warnings.warn(f"Failed to load suboptimal actor {path}, exiting.")
-            warnings.warn("--------------------------------------------------")
-            self.suboptimal_actor = None
+        self.setup_oracle()
 
-        self.reset()
+    def setup_oracle(self):
+        # control period of the underlying controller
+        self.ctrl_period = 1 / 48.0
+
+        # input: angular position command
+        # output: angular velocity
+        Kp_ang_pos = np.array([0.5, 0.5])
+        Ki_ang_pos = np.array([0.0, 0.0])
+        Kd_ang_pos = np.array([0.0, 0.0])
+        lim_ang_pos = np.array([3.0, 3.0])
+
+        # input: linear velocity command
+        # output: angular position
+        Kp_lin_vel = np.array([0.8, 0.8])
+        Ki_lin_vel = np.array([0.0, 0.0])
+        Kd_lin_vel = np.array([0.1, 0.1])
+        lim_lin_vel = np.array([0.3, 0.3])
+
+        ang_pos_PID = PID(
+            Kp_ang_pos,
+            Ki_ang_pos,
+            Kd_ang_pos,
+            lim_ang_pos,
+            self.ctrl_period,
+        )
+        lin_vel_PID = PID(
+            Kp_lin_vel,
+            Ki_lin_vel,
+            Kd_lin_vel,
+            lim_lin_vel,
+            self.ctrl_period,
+        )
+        self.PIDs = [ang_pos_PID, lin_vel_PID]
+
+        # height controllers
+        z_vel_PID = PID(0.2, 1.25, 0.0, 0.5, self.ctrl_period)
+        self.z_PIDs = [z_vel_PID]
+
+    def compute_PIDs(self):
+        ang_pos = self.state[3:6]
+        lin_vel = self.state[6:9]
+        setpoint = self.state[12:15]
+        setpoint = np.clip(setpoint, -0.5, 0.5)
+
+        output = self.PIDs[1].step(lin_vel[:2], setpoint[:2])
+        output = np.array([-output[1], output[0]])
+        output = self.PIDs[0].step(ang_pos[:2], output)
+
+        z_output = self.z_PIDs[0].step(lin_vel[-1], setpoint[-1])
+        z_output = np.clip(z_output - 1, -1, 1)
+
+        self.pid_output = np.array([*output, 0.0, z_output])
+
+    def get_label(self, obs):
+        return self.pid_output
 
     def reset(self):
         self.state, _ = self.env.reset()
 
         self.ended = False
         self.cumulative_reward = 0
+
+        self.setup_oracle()
+        self.compute_PIDs()
 
         return self.state
 
@@ -82,28 +128,16 @@ class Environment:
         if term or trunc:
             self.ended = True
 
+        # compute the pids so we don't have discontinuity
+        self.compute_PIDs()
+
         return self.state, reward, term
-
-    def update_oracle_weights(self, weights: dict):
-        assert self.suboptimal_actor is not None, "Can't update None model."
-        self.suboptimal_actor.load_state_dict(weights)
-
-    def get_label(self, obs):
-        if self.suboptimal_actor is not None:
-            action = self.suboptimal_actor(gpuize(obs, self.device))
-            action = torch.tanh(action[0])
-            action = cpuize(action)[0]
-            return action
-        else:
-            return self.do_nothing
 
     def evaluate(self, cfg, net=None):
         if net is not None:
             net.eval()
 
-        # make the env
-        self.env.close()
-        self.env = gym.make(cfg.env_name, render_mode="rgb_array")
+        # reset the env
         self.reset()
 
         # store the list of eval performances here
@@ -134,9 +168,7 @@ class Environment:
         if net is not None:
             net.eval()
 
-        # make the env
-        self.env.close()
-        self.env = gym.make(cfg.env_name, render_mode="human")
+        # reset the env
         self.reset()
 
         while True:
@@ -145,10 +177,13 @@ class Environment:
                 output = net.actor(gpuize(self.state, cfg.device).unsqueeze(0))
                 # action = cpuize(net.actor.sample(*output)[0][0])
                 action = cpuize(net.actor.infer(*output))
-                self.step(action)
             else:
-                self.step(self.get_label(self.state))
+                action = self.get_label(self.state)
+
+            self.step(action)
 
             if self.ended:
+                print("-----------------------------------------")
                 print(f"Total Reward: {self.cumulative_reward}")
+                print("-----------------------------------------")
                 self.reset()

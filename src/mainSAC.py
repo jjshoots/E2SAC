@@ -5,7 +5,7 @@ import torch
 import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
-from mujoco_env import Environment
+from pyflyt_env import Environment
 from SAC.SAC import SAC
 
 

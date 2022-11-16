@@ -6,7 +6,7 @@ import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
 from CCGE.CCGE import CCGE
-from mujoco_env import Environment
+from pyflyt_env import Environment
 
 
 def train(wm: Wingman):
@@ -17,11 +17,6 @@ def train(wm: Wingman):
     env = setup_env(wm)
     net, optim_set = setup_nets(wm)
     memory = ReplayBuffer(cfg.buffer_size)
-
-    # setup the oracle
-    if not cfg.pretrained_oracle:
-        env.update_oracle_weights(net.actor.net.state_dict())
-        print("Using from scratch oracle.")
 
     wm.log["epoch"] = 0
     wm.log["eval_perf"] = -math.inf
@@ -41,13 +36,6 @@ def train(wm: Wingman):
             wm.log["max_eval_perf"] = max(
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )
-
-        """UPDATE ORACLE"""
-        if cfg.update_oracle:
-            if wm.log["eval_perf"] > wm.log["oracle_eval_perf"]:
-                env.update_oracle_weights(net.actor.net.state_dict())
-                wm.log["oracle_eval_perf"] = wm.log["eval_perf"]
-                print("Found new best oracle, updating.")
 
         """ENVIRONMENT ROLLOUT"""
         env.reset()
@@ -166,7 +154,9 @@ def eval_display(wm: Wingman):
         env.display(cfg, net)
     elif wm.cfg.evaluate:
         while True:
+            print("---------------------------")
             print(env.evaluate(cfg, net))
+            print("---------------------------")
 
 
 def setup_env(wm: Wingman):
