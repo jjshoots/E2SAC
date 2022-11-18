@@ -196,7 +196,7 @@ if __name__ == "__main__":
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/95qoyb9w"
     sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/o61ibecs"
     sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/62jvni7q"
-    # sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/5e3vqsse"
+    sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/5e3vqsse"
     sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/3rk3ayzb"
 
     baselines_dict = {}
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/aboikqup"
     sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/n6ufn853"
     sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/s34yh4a6"
-    # sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/trgcinhi"
+    sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/trgcinhi"
     sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/4de8u2d3"
 
     baselines_dict = {}
