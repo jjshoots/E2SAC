@@ -3,11 +3,14 @@ method: random
 metric:
   name: max_eval_perf
   goal: maximize
-name: "CCGE-2-FO-NU_Walker2d-v4"
+name: "SAC-PyFlyt-Waypoints"
+parameters:
+  env_name:
+    value: "PyFlyt/SimpleWaypointEnv-v0"
 command:
   - python3
   # - src/mainSAC.py
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=CCGE-2-FO-NU_Walker2d-v4"
+  - "--wandb_name=SAC-PyFlyt-Waypoints"

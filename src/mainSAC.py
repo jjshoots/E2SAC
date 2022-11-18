@@ -26,7 +26,7 @@ def train(wm: Wingman):
     while memory.count <= cfg.total_steps:
         wm.log["epoch"] += 1
 
-        """EVAL RUN"""
+        """EVALUATE POLICY"""
         if memory.count >= next_eval_step:
             next_eval_step = (
                 int(memory.count / cfg.eval_steps_ratio) + 1
@@ -36,7 +36,7 @@ def train(wm: Wingman):
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )
 
-        """ENVIRONMENT INTERACTION"""
+        """ENVIRONMENT ROLLOUT"""
         env.reset()
         net.eval()
         net.zero_grad()
@@ -47,17 +47,17 @@ def train(wm: Wingman):
                 obs = env.state
 
                 if memory.count < cfg.exploration_steps:
-                    action = env.env.action_space.sample()
+                    act = env.env.action_space.sample()
                 else:
                     output = net.actor(gpuize(obs, cfg.device).unsqueeze(0))
-                    action, _ = net.actor.sample(*output)
-                    action = cpuize(action).squeeze(0)
+                    act, _ = net.actor.sample(*output)
+                    act = cpuize(act).squeeze(0)
 
                 # get the next state and other stuff
-                next_obs, rew, term = env.step(action)
+                next_obs, rew, term = env.step(act)
 
                 # store stuff in mem
-                memory.push((obs, action, rew, next_obs, term))
+                memory.push((obs, act, rew, next_obs, term))
 
             # for logging
             wm.log["total_reward"] = env.cumulative_reward
@@ -141,7 +141,9 @@ def eval_display(wm: Wingman):
         env.display(cfg, net)
     elif wm.cfg.evaluate:
         while True:
+            print("---------------------------")
             print(env.evaluate(cfg, net))
+            print("---------------------------")
 
 
 def setup_env(wm: Wingman):
@@ -189,7 +191,6 @@ def setup_nets(wm: Wingman):
         for opt_key in optim_set:
             optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
 
-        print(f"Lowest Running Loss for Net: {wm.lowest_loss}")
 
     return net, optim_set
 

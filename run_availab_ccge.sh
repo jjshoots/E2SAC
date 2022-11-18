@@ -4,67 +4,16 @@ source venv/bin/activate
 
 declare -a pids=()
 
-wandb agent jjshoots/CCGE2/18p6t19p --count 6 &
+wandb agent jjshoots/CCGE2/ncnzlpx5 --count 12 &
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2/18p6t19p --count 6 &
+wandb agent jjshoots/CCGE2/ncnzlpx5 --count 12 &
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2/18p6t19p --count 6 &
+wandb agent jjshoots/CCGE2/d0tfkuci --count 12 &
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2/18p6t19p --count 6 &
-pids+=($!)
-sleep 10
-
-for pid in ${pids[*]}; do
-    wait $pid
-done
-
-wandb agent jjshoots/CCGE2/f9sntmmm --count 6 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/f9sntmmm --count 6 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/f9sntmmm --count 6 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/f9sntmmm --count 6 &
-pids+=($!)
-sleep 10
-
-for pid in ${pids[*]}; do
-    wait $pid
-done
-
-wandb agent jjshoots/CCGE2/5e3vqsse --count 6 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/5e3vqsse --count 6 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/5e3vqsse --count 6 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/5e3vqsse --count 6 &
-pids+=($!)
-sleep 10
-
-for pid in ${pids[*]}; do
-    wait $pid
-done
-
-wandb agent jjshoots/CCGE2/trgcinhi --count 6 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/trgcinhi --count 6 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/trgcinhi --count 6 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/trgcinhi --count 6 &
+wandb agent jjshoots/CCGE2/d0tfkuci --count 12 &
 pids+=($!)
 sleep 10
 

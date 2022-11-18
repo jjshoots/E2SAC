@@ -1,9 +1,6 @@
 # env params
 env_name: 'PyFlyt/SimpleWaypointEnv-v0'
 
-# target_performance of oracle
-target_performance: 2000
-
 # learning params
 buffer_size: 300000
 buffer_size_debug: 100
