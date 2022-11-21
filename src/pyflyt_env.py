@@ -57,7 +57,7 @@ class Environment:
         Kp_lin_vel = np.array([1.0, 1.0])
         Ki_lin_vel = np.array([1.0, 1.0])
         Kd_lin_vel = np.array([1.0, 1.0])
-        lim_lin_vel = np.array([0.4, 0.4])
+        lim_lin_vel = np.array([1.0, 1.0])
 
         ang_pos_PID = PID(
             Kp_ang_pos,
