@@ -146,29 +146,24 @@ class CCGE(nn.Module):
 
         """ SUPERVISION SCALE DERIVATION """
         # uncertainty is upper bound difference between suboptimal and learned
-        # uncertainty = (
-        #     (
-        #         critic_output[0, 1, ...].mean(dim=-1, keepdim=True)
-        #         + critic_output[1, 1, ...].max(dim=-1, keepdim=True)[0]
-        #     )
-        #     - (
-        #         critic_output[0, 0, ...].mean(dim=-1, keepdim=True)
-        #         + critic_output[1, 0, ...].min(dim=-1, keepdim=True)[0]
-        #     )
-        # ).detach()
         uncertainty = (
-            (critic_output[0, 1, ...].max(dim=-1, keepdim=True)[0])
-            - (critic_output[0, 0, ...].min(dim=-1, keepdim=True)[0])
+            (
+                critic_output[0, 1, ...].mean(dim=-1, keepdim=True)
+                + critic_output[1, 1, ...].max(dim=-1, keepdim=True)[0]
+            )
+            - (
+                critic_output[0, 0, ...].mean(dim=-1, keepdim=True)
+                + critic_output[1, 0, ...].min(dim=-1, keepdim=True)[0]
+            )
         ).detach()
 
         # normalize uncertainty
         uncertainty = (
-            (uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs())
-            * self.confidence_lambda
+            uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs()
         ).detach()
 
         # supervision scale is a switch
-        sup_scale = (uncertainty > 0.5) * 1.0
+        sup_scale = (uncertainty > self.confidence_lambda) * 1.0
 
         log = dict()
         log["uncertainty"] = uncertainty.mean().detach()
@@ -242,7 +237,7 @@ class CCGE(nn.Module):
         actions, entropies = self.actor.sample(*output)
 
         # compute supervision scale and expected q for actions
-        sup_scale, expected_q, to_log = self.calc_sup_scale(states, actions, labels)
+        sup_scale, expected_q, sup_log = self.calc_sup_scale(states, actions, labels)
 
         """ REINFORCEMENT LOSS """
         # expectations of Q with clipped double Q
@@ -273,7 +268,7 @@ class CCGE(nn.Module):
 
         log = dict()
         log["sup_scale"] = sup_scale.mean().detach()
-        log = {**log, **log}
+        log = {**log, **log, **sup_log}
 
         return actor_loss, log
 

@@ -1,5 +1,3 @@
-import math
-
 import gymnasium as gym
 import numpy as np
 from PyFlyt.core.PID import PID
@@ -39,27 +37,27 @@ class Environment:
         action_high = self.env.action_space.high
         action_low = self.env.action_space.low
         self._action_mid = (action_high + action_low) / 2.0
-        self._action_scale = (action_high - action_low) / 2.0
+        self._action_range = (action_high - action_low)
 
         self.setup_oracle()
 
     def setup_oracle(self):
         # control period of the underlying controller
-        self.ctrl_period = 1 / 48.0
+        self.ctrl_period = 1.0 / 120.0
 
         # input: angular position command
         # output: angular velocity
-        Kp_ang_pos = np.array([0.5, 0.5])
+        Kp_ang_pos = np.array([3.0, 3.0])
         Ki_ang_pos = np.array([0.0, 0.0])
         Kd_ang_pos = np.array([0.0, 0.0])
-        lim_ang_pos = np.array([3.0, 3.0])
+        lim_ang_pos = np.array([1.0, 1.0])
 
         # input: linear velocity command
         # output: angular position
-        Kp_lin_vel = np.array([0.8, 0.8])
-        Ki_lin_vel = np.array([0.0, 0.0])
-        Kd_lin_vel = np.array([0.1, 0.1])
-        lim_lin_vel = np.array([0.3, 0.3])
+        Kp_lin_vel = np.array([1.0, 1.0])
+        Ki_lin_vel = np.array([1.0, 1.0])
+        Kd_lin_vel = np.array([1.0, 1.0])
+        lim_lin_vel = np.array([0.4, 0.4])
 
         ang_pos_PID = PID(
             Kp_ang_pos,
@@ -78,23 +76,24 @@ class Environment:
         self.PIDs = [ang_pos_PID, lin_vel_PID]
 
         # height controllers
-        z_vel_PID = PID(0.2, 1.25, 0.0, 0.5, self.ctrl_period)
-        self.z_PIDs = [z_vel_PID]
+        self.z_PID = PID(0.15, 1.0, 0.015, 0.3, self.ctrl_period)
 
     def compute_PIDs(self):
         ang_pos = self.state[3:6]
         lin_vel = self.state[6:9]
         setpoint = self.state[12:15]
-        setpoint = np.clip(setpoint, -0.5, 0.5)
 
         output = self.PIDs[1].step(lin_vel[:2], setpoint[:2])
         output = np.array([-output[1], output[0]])
         output = self.PIDs[0].step(ang_pos[:2], output)
 
-        z_output = self.z_PIDs[0].step(lin_vel[-1], setpoint[-1])
-        z_output = np.clip(z_output - 1, -1, 1)
+        z_output = self.z_PID.step(lin_vel[-1], setpoint[-1])
+        z_output = np.clip(z_output, 0.0, 1.0)
 
         self.pid_output = np.array([*output, 0.0, z_output])
+
+        # normalize
+        self.pid_output = (self.pid_output - self._action_mid) * self._action_range
 
     def get_label(self, obs):
         return self.pid_output
@@ -117,7 +116,7 @@ class Environment:
         ), f"Incorrect action sizes, expected {self.act_size}, got {action.shape[0]}"
 
         # denormalize the action
-        action = action * self._action_scale + self._action_mid
+        action = action / self._action_range + self._action_mid
 
         # step through the env
         self.state, reward, term, trunc, info = self.env.step(action)
@@ -153,7 +152,6 @@ class Environment:
             else:
                 action = self.get_label(self.state)
 
-            # get the next state and reward
             self.step(action)
 
             if self.ended:

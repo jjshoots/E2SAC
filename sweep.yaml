@@ -3,7 +3,7 @@ method: random
 metric:
   name: max_eval_perf
   goal: maximize
-name: "CCGE_2-PyFlyt-Waypoints"
+name: "CCGE-PyFlyt-Waypoints"
 parameters:
   env_name:
     value: "PyFlyt/SimpleWaypointEnv-v0"
@@ -13,4 +13,4 @@ command:
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=CCGE_2-PyFlyt-Waypoints"
+  - "--wandb_name=CCGE-PyFlyt-Waypoints"

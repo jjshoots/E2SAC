@@ -191,7 +191,6 @@ def setup_nets(wm: Wingman):
         for opt_key in optim_set:
             optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
 
-
     return net, optim_set
 
 
