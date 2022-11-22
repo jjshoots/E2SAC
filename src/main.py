@@ -44,31 +44,46 @@ def train(wm: Wingman):
         with torch.no_grad():
             while not env.ended:
                 # get the initial state and label
-                obs = env.state
-                lbl = env.get_label(obs)
+                obs_atti = env.state_atti
+                obs_targ = env.state_targ
+                lbl = env.get_label()
 
                 if memory.count < cfg.exploration_steps:
                     act = env.env.action_space.sample()
                 else:
                     # move observation to gpu
-                    t_obs = gpuize(obs, cfg.device)
+                    t_obs_atti = gpuize(obs_atti, cfg.device)
+                    t_obs_targ = gpuize(obs_targ, cfg.device)
 
                     # get the action from policy
-                    output = net.actor(t_obs)
+                    output = net.actor(t_obs_atti, t_obs_targ)
                     t_act, _ = net.actor.sample(*output)
 
                     # move label to gpu
                     t_lbl = gpuize(lbl, cfg.device)
 
                     # figure out whether to follow policy or oracle
-                    sup_scale, *_ = net.calc_sup_scale(t_obs, t_act, t_lbl)
+                    sup_scale, *_ = net.calc_sup_scale(
+                        t_obs_atti, t_obs_targ, t_act, t_lbl
+                    )
                     act = lbl if sup_scale.squeeze(0) == 1.0 else cpuize(t_act)
 
                 # get the next state and other stuff
-                next_obs, rew, term = env.step(act)
+                next_obs_atti, next_obs_targ, rew, term = env.step(act)
 
                 # store stuff in mem
-                memory.push((obs, act, rew, next_obs, term, lbl))
+                memory.push(
+                    (
+                        obs_atti,
+                        obs_targ,
+                        act,
+                        rew,
+                        next_obs_atti,
+                        next_obs_targ,
+                        term,
+                        lbl,
+                    )
+                )
 
             # for logging
             wm.log["total_reward"] = env.cumulative_reward
@@ -82,18 +97,26 @@ def train(wm: Wingman):
             for batch_num, stuff in enumerate(dataloader):
                 net.train()
 
-                states = gpuize(stuff[0], cfg.device)
-                actions = gpuize(stuff[1], cfg.device)
-                rewards = gpuize(stuff[2], cfg.device)
-                next_states = gpuize(stuff[3], cfg.device)
-                terms = gpuize(stuff[4], cfg.device)
-                labels = gpuize(stuff[5], cfg.device)
+                obs_atti = gpuize(stuff[0], cfg.device)
+                obs_targ = gpuize(stuff[1], cfg.device)
+                actions = gpuize(stuff[2], cfg.device)
+                rewards = gpuize(stuff[3], cfg.device)
+                next_obs_atti = gpuize(stuff[4], cfg.device)
+                next_obs_targ = gpuize(stuff[5], cfg.device)
+                terms = gpuize(stuff[6], cfg.device)
+                labels = gpuize(stuff[7], cfg.device)
 
                 # train critic
                 for _ in range(cfg.critic_update_multiplier):
                     net.zero_grad()
                     q_loss, log = net.calc_critic_loss(
-                        states, actions, rewards, next_states, terms
+                        obs_atti,
+                        obs_targ,
+                        actions,
+                        rewards,
+                        next_obs_atti,
+                        next_obs_targ,
+                        terms,
                     )
                     wm.log = {**wm.log, **log}
                     q_loss.backward()
@@ -103,7 +126,9 @@ def train(wm: Wingman):
                 # train actor
                 for _ in range(cfg.actor_update_multiplier):
                     net.zero_grad()
-                    rnf_loss, log = net.calc_actor_loss(states, terms, labels)
+                    rnf_loss, log = net.calc_actor_loss(
+                        obs_atti, obs_targ, terms, labels
+                    )
                     wm.log = {**wm.log, **log}
                     rnf_loss.backward()
                     optim_set["actor"].step()
@@ -111,7 +136,7 @@ def train(wm: Wingman):
                     # train entropy regularizer
                     if net.use_entropy:
                         net.zero_grad()
-                        ent_loss, log = net.calc_alpha_loss(states)
+                        ent_loss, log = net.calc_alpha_loss(obs_atti, obs_targ)
                         wm.log = {**wm.log, **log}
                         ent_loss.backward()
                         optim_set["alpha"].step()
@@ -161,7 +186,8 @@ def eval_display(wm: Wingman):
 def setup_env(wm: Wingman):
     cfg = wm.cfg
     env = Environment(cfg)
-    cfg.obs_size = env.obs_size
+    cfg.obs_atti_size = env.obs_atti_size
+    cfg.obs_targ_size = env.obs_targ_size
     cfg.act_size = env.act_size
 
     return env
@@ -173,7 +199,9 @@ def setup_nets(wm: Wingman):
     # set up networks and optimizers
     net = CCGE(
         act_size=cfg.act_size,
-        obs_size=cfg.obs_size,
+        obs_atti_size=cfg.obs_atti_size,
+        obs_targ_size=cfg.obs_targ_size,
+        max_targ_length=cfg.num_targets,
         entropy_tuning=cfg.use_entropy,
         target_entropy=cfg.target_entropy,
         discount_factor=cfg.discount_factor,

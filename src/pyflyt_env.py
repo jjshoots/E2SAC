@@ -12,32 +12,31 @@ class Environment:
     def __init__(self, cfg):
         super().__init__()
 
+        # environment params
+        self.num_targets = cfg.num_targets
+
         # make the env
         self.env = gym.make(
             cfg.env_name,
             render_mode=("human" if cfg.display else None),
             angle_representation="euler",
             use_yaw_targets=False,
-            num_targets=10,
+            num_targets=cfg.num_targets,
         )
 
         # compute spaces
-        if len(self.env.action_space.shape) == 1:
-            self.act_size = self.env.action_space.shape[0]
-        else:
-            raise NotImplementedError("Unsure how to deal with action space.")
-
-        if len(self.env.observation_space.shape) == 1:
-            self.obs_size = self.env.observation_space.shape[0]
-        else:
-            raise NotImplementedError("Unsure how to deal with observation space.")
+        self.act_size = self.env.action_space.shape[0]
+        self.obs_atti_size = self.env.observation_space["attitude"].shape[0]
+        self.obs_targ_size = self.env.observation_space[
+            "target_deltas"
+        ].node_space.shape[0]
 
         # constants
         self.device = cfg.device
         action_high = self.env.action_space.high
         action_low = self.env.action_space.low
         self._action_mid = (action_high + action_low) / 2.0
-        self._action_range = (action_high - action_low)
+        self._action_range = action_high - action_low
 
         self.setup_oracle()
 
@@ -79,9 +78,9 @@ class Environment:
         self.z_PID = PID(0.15, 1.0, 0.015, 0.3, self.ctrl_period)
 
     def compute_PIDs(self):
-        ang_pos = self.state[3:6]
-        lin_vel = self.state[6:9]
-        setpoint = self.state[12:15]
+        ang_pos = self.state_atti[3:6]
+        lin_vel = self.state_atti[6:9]
+        setpoint = self.state_targ[0]
 
         output = self.PIDs[1].step(lin_vel[:2], setpoint[:2])
         output = np.array([-output[1], output[0]])
@@ -95,11 +94,16 @@ class Environment:
         # normalize
         self.pid_output = (self.pid_output - self._action_mid) * self._action_range
 
-    def get_label(self, obs):
+    def get_label(self, *_):
         return self.pid_output
 
     def reset(self):
-        self.state, _ = self.env.reset()
+        obs, _ = self.env.reset()
+
+        # splice out the observation and mask the target deltas
+        self.state_atti = obs["attitude"]
+        self.state_targ = np.zeros((self.num_targets, 3))
+        self.state_targ[: len(obs["target_deltas"].nodes)] = obs["target_deltas"].nodes
 
         self.ended = False
         self.cumulative_reward = 0
@@ -107,7 +111,7 @@ class Environment:
         self.setup_oracle()
         self.compute_PIDs()
 
-        return self.state
+        return self.state_atti, self.state_targ
 
     def step(self, action):
         action = action.squeeze()
@@ -119,7 +123,12 @@ class Environment:
         action = action / self._action_range + self._action_mid
 
         # step through the env
-        self.state, reward, term, trunc, info = self.env.step(action)
+        obs, reward, term, trunc, info = self.env.step(action)
+
+        # splice out the observation and mask the target deltas
+        self.state_atti = obs["attitude"]
+        self.state_targ = np.zeros((self.num_targets, 3))
+        self.state_targ[: len(obs["target_deltas"].nodes)] = obs["target_deltas"].nodes
 
         # accumulate rewards
         self.cumulative_reward += reward
@@ -130,7 +139,7 @@ class Environment:
         # compute the pids so we don't have discontinuity
         self.compute_PIDs()
 
-        return self.state, reward, term
+        return self.state_atti, self.state_targ, reward, term
 
     def evaluate(self, cfg, net=None):
         if net is not None:
@@ -144,13 +153,16 @@ class Environment:
 
         while len(eval_perf) < cfg.eval_num_episodes:
 
+            state_atti = gpuize(self.state_atti, cfg.device).unsqueeze(0)
+            state_targ = gpuize(self.state_targ, cfg.device).unsqueeze(0)
+
             # get the action based on the state
             if net is not None:
-                output = net.actor(gpuize(self.state, cfg.device).unsqueeze(0))
+                output = net.actor(state_atti, state_targ)
                 action = net.actor.infer(*output)
                 action = cpuize(action)[0]
             else:
-                action = self.get_label(self.state)
+                action = self.get_label()
 
             self.step(action)
 
@@ -171,12 +183,15 @@ class Environment:
 
         while True:
 
+            state_atti = gpuize(self.state_atti, cfg.device).unsqueeze(0)
+            state_targ = gpuize(self.state_targ, cfg.device).unsqueeze(0)
+
             if net is not None:
-                output = net.actor(gpuize(self.state, cfg.device).unsqueeze(0))
+                output = net.actor(state_atti, state_targ)
                 # action = cpuize(net.actor.sample(*output)[0][0])
                 action = cpuize(net.actor.infer(*output))
             else:
-                action = self.get_label(self.state)
+                action = self.get_label()
 
             self.step(action)
 

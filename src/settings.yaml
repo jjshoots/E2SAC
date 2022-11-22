@@ -1,5 +1,6 @@
 # env params
 env_name: 'PyFlyt/SimpleWaypointEnv-v0'
+num_targets: 10
 
 # learning params
 buffer_size: 500000

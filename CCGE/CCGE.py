@@ -14,21 +14,26 @@ class Q_Ensemble(nn.Module):
     Q Network Ensembles with uncertainty estimates
     """
 
-    def __init__(self, act_size, obs_size, num_networks=2):
+    def __init__(
+        self, act_size, obs_atti_size, obs_targ_size, max_targ_length, num_networks=2
+    ):
         super().__init__()
 
-        networks = [CCGENet.Critic(act_size, obs_size) for _ in range(num_networks)]
+        networks = [
+            CCGENet.Critic(act_size, obs_atti_size, obs_targ_size, max_targ_length)
+            for _ in range(num_networks)
+        ]
         self.networks = nn.ModuleList(networks)
 
-    def forward(self, states, actions):
+    def forward(self, obs_atti, obs_targ, actions):
         """
-        states is of shape B x input_shape
+        obs_atti, obs_targ is of shape B x input_shape
         actions is of shape B x act_size
         output is a tuple of 2 x B x num_networks
         """
         output = []
         for network in self.networks:
-            output.append(network(states, actions))
+            output.append(network(obs_atti, obs_targ, actions))
 
         output = torch.cat(output, dim=-1)
 
@@ -40,12 +45,14 @@ class GaussianActor(nn.Module):
     Gaussian Actor
     """
 
-    def __init__(self, act_size, obs_size):
+    def __init__(self, act_size, obs_atti_size, obs_targ_size, max_targ_length):
         super().__init__()
-        self.net = CCGENet.Actor(act_size, obs_size)
+        self.net = CCGENet.Actor(
+            act_size, obs_atti_size, obs_targ_size, max_targ_length
+        )
 
-    def forward(self, states):
-        output = self.net(states)
+    def forward(self, obs_atti, obs_targ):
+        output = self.net(obs_atti, obs_targ)
         return output[0], output[1]
 
     @staticmethod
@@ -82,7 +89,9 @@ class CCGE(nn.Module):
     def __init__(
         self,
         act_size,
-        obs_size,
+        obs_atti_size,
+        obs_targ_size,
+        max_targ_length,
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.99,
@@ -90,18 +99,25 @@ class CCGE(nn.Module):
     ):
         super().__init__()
 
-        self.obs_size = obs_size
+        self.obs_atti_size = obs_atti_size
+        self.obs_targ_size = obs_targ_size
         self.act_size = act_size
         self.use_entropy = entropy_tuning
         self.gamma = discount_factor
         self.confidence_lambda = confidence_lambda
 
         # actor head
-        self.actor = GaussianActor(act_size, obs_size)
+        self.actor = GaussianActor(
+            act_size, obs_atti_size, obs_targ_size, max_targ_length
+        )
 
         # twin delayed Q networks
-        self.critic = Q_Ensemble(act_size, obs_size)
-        self.critic_target = Q_Ensemble(act_size, obs_size).eval()
+        self.critic = Q_Ensemble(
+            act_size, obs_atti_size, obs_targ_size, max_targ_length
+        )
+        self.critic_target = Q_Ensemble(
+            act_size, obs_atti_size, obs_targ_size, max_targ_length
+        ).eval()
 
         # copy weights and disable gradients for the target network
         self.critic_target.load_state_dict(self.critic.state_dict())
@@ -132,14 +148,14 @@ class CCGE(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_sup_scale(self, states, actions, labels):
+    def calc_sup_scale(self, obs_atti, obs_targ, actions, labels):
         # stack actions and labels to perform inference on both together
         actions_labels = torch.stack((actions, labels), dim=0)
 
         # put all actions and labels and states through critic
         # shape is 2 x 2 x B x num_networks,
         # value_uncertainty x actions_labels x batch x num_networks
-        critic_output = self.critic(states, actions_labels)
+        critic_output = self.critic(obs_atti, obs_targ, actions_labels)
 
         # splice the output to get q of actions
         expected_q = critic_output[0, 0, ...]
@@ -170,9 +186,11 @@ class CCGE(nn.Module):
 
         return sup_scale, expected_q, log
 
-    def calc_critic_loss(self, states, actions, rewards, next_states, terms):
+    def calc_critic_loss(
+        self, obs_atti, obs_targ, actions, rewards, next_obs_atti, next_obs_targ, terms
+    ):
         """
-        states is of shape B x input_shape
+        obs_atti, obs_targ is of shape B x input_shape
         actions is of shape B x act_size
         rewards is of shape B x 1
         terms is of shape B x 1
@@ -180,16 +198,18 @@ class CCGE(nn.Module):
         terms = 1.0 - terms
 
         # current predicted f and f
-        current_q, current_f = self.critic(states, actions)
+        current_q, current_f = self.critic(obs_atti, obs_targ, actions)
 
         # compute next q and next f and target_q
         with torch.no_grad():
             # sample the next actions based on the current policy
-            output = self.actor(next_states)
+            output = self.actor(next_obs_atti, next_obs_targ)
             next_actions, log_probs = self.actor.sample(*output)
 
             # get the next q and f lists and get the value, then...
-            next_q, next_f = self.critic_target(next_states, next_actions)
+            next_q, next_f = self.critic_target(
+                next_obs_atti, next_obs_targ, next_actions
+            )
 
             # ...take the min among ensembles
             next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
@@ -225,19 +245,21 @@ class CCGE(nn.Module):
 
         return critic_loss, log
 
-    def calc_actor_loss(self, states, terms, labels):
+    def calc_actor_loss(self, obs_atti, obs_targ, terms, labels):
         """
-        states is of shape B x input_shape
+        obs_atti, obs_targ is of shape B x input_shape
         terms is of shape B x 1
         """
         terms = 1.0 - terms
 
         # We re-sample actions to calculate expectations of Q.
-        output = self.actor(states)
+        output = self.actor(obs_atti, obs_targ)
         actions, entropies = self.actor.sample(*output)
 
         # compute supervision scale and expected q for actions
-        sup_scale, expected_q, sup_log = self.calc_sup_scale(states, actions, labels)
+        sup_scale, expected_q, sup_log = self.calc_sup_scale(
+            obs_atti, obs_targ, actions, labels
+        )
 
         """ REINFORCEMENT LOSS """
         # expectations of Q with clipped double Q
@@ -272,14 +294,14 @@ class CCGE(nn.Module):
 
         return actor_loss, log
 
-    def calc_alpha_loss(self, states):
+    def calc_alpha_loss(self, obs_atti, obs_targ):
         """
-        states is of shape B x input_shape
+        obs_atti, obs_targ is of shape B x input_shape
         """
         if not self.entropy_tuning:
             return torch.zeros(1)
 
-        output = self.actor(states)
+        output = self.actor(obs_atti, obs_targ)
         _, log_probs = self.actor.sample(*output)
 
         # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.
