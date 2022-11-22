@@ -48,6 +48,7 @@ class Actor(nn.Module):
     """
     Actor network
     """
+
     def __init__(self, act_size, obs_atti_size, obs_targ_size, max_targ_length):
         super().__init__()
 
@@ -126,4 +127,3 @@ class Critic(nn.Module):
         output = self.merge_net(output)
 
         return output
-

@@ -115,9 +115,7 @@ def train(wm: Wingman):
                 # train actor
                 for _ in range(cfg.actor_update_multiplier):
                     net.zero_grad()
-                    rnf_loss, log = net.calc_actor_loss(
-                        obs_atti, obs_targ, terms
-                    )
+                    rnf_loss, log = net.calc_actor_loss(obs_atti, obs_targ, terms)
                     wm.log = {**wm.log, **log}
                     rnf_loss.backward()
                     optim_set["actor"].step()

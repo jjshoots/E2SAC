@@ -19,7 +19,10 @@ class Q_Ensemble(nn.Module):
     ):
         super().__init__()
 
-        networks = [SACNet.Critic(act_size, obs_atti_size, obs_targ_size, max_targ_length) for _ in range(num_networks)]
+        networks = [
+            SACNet.Critic(act_size, obs_atti_size, obs_targ_size, max_targ_length)
+            for _ in range(num_networks)
+        ]
         self.networks = nn.ModuleList(networks)
 
     def forward(self, obs_atti, obs_targ, actions):
@@ -140,7 +143,9 @@ class SAC(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_critic_loss(self, obs_atti, obs_targ, actions, rewards, next_obs_atti, next_obs_targ, terms):
+    def calc_critic_loss(
+        self, obs_atti, obs_targ, actions, rewards, next_obs_atti, next_obs_targ, terms
+    ):
         """
         obs_atti, obs_targ is of shape B x input_shape
         actions is of shape B x act_size
