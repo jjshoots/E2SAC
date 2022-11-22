@@ -67,7 +67,6 @@ class GaussianActor(nn.Module):
 
         # sample from dist
         mu_samples = normals.rsample()
-
         actions = torch.tanh(mu_samples)
 
         # calculate log_probs

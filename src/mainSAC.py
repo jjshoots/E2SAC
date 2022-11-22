@@ -43,21 +43,37 @@ def train(wm: Wingman):
 
         with torch.no_grad():
             while not env.ended:
-                # get the initial state and label
-                obs = env.state
+                # get the initial state
+                obs_atti = env.state_atti
+                obs_targ = env.state_targ
 
                 if memory.count < cfg.exploration_steps:
                     act = env.env.action_space.sample()
                 else:
-                    output = net.actor(gpuize(obs, cfg.device).unsqueeze(0))
+                    # move observation to gpu
+                    t_obs_atti = gpuize(obs_atti, cfg.device)
+                    t_obs_targ = gpuize(obs_targ, cfg.device)
+
+                    # get the action from policy
+                    output = net.actor(t_obs_atti, t_obs_targ)
                     act, _ = net.actor.sample(*output)
-                    act = cpuize(act).squeeze(0)
+                    act = cpuize(act)
 
                 # get the next state and other stuff
-                next_obs, rew, term = env.step(act)
+                next_obs_atti, next_obs_targ, rew, term = env.step(act)
 
                 # store stuff in mem
-                memory.push((obs, act, rew, next_obs, term))
+                memory.push(
+                    (
+                        obs_atti,
+                        obs_targ,
+                        act,
+                        rew,
+                        next_obs_atti,
+                        next_obs_targ,
+                        term,
+                    )
+                )
 
             # for logging
             wm.log["total_reward"] = env.cumulative_reward
@@ -71,17 +87,25 @@ def train(wm: Wingman):
             for batch_num, stuff in enumerate(dataloader):
                 net.train()
 
-                states = gpuize(stuff[0], cfg.device)
-                actions = gpuize(stuff[1], cfg.device)
-                rewards = gpuize(stuff[2], cfg.device)
-                next_states = gpuize(stuff[3], cfg.device)
-                terms = gpuize(stuff[4], cfg.device)
+                obs_atti = gpuize(stuff[0], cfg.device)
+                obs_targ = gpuize(stuff[1], cfg.device)
+                actions = gpuize(stuff[2], cfg.device)
+                rewards = gpuize(stuff[3], cfg.device)
+                next_obs_atti = gpuize(stuff[4], cfg.device)
+                next_obs_targ = gpuize(stuff[5], cfg.device)
+                terms = gpuize(stuff[6], cfg.device)
 
                 # train critic
                 for _ in range(cfg.critic_update_multiplier):
                     net.zero_grad()
                     q_loss, log = net.calc_critic_loss(
-                        states, actions, rewards, next_states, terms
+                        obs_atti,
+                        obs_targ,
+                        actions,
+                        rewards,
+                        next_obs_atti,
+                        next_obs_targ,
+                        terms,
                     )
                     wm.log = {**wm.log, **log}
                     q_loss.backward()
@@ -91,7 +115,9 @@ def train(wm: Wingman):
                 # train actor
                 for _ in range(cfg.actor_update_multiplier):
                     net.zero_grad()
-                    rnf_loss, log = net.calc_actor_loss(states, terms)
+                    rnf_loss, log = net.calc_actor_loss(
+                        obs_atti, obs_targ, terms
+                    )
                     wm.log = {**wm.log, **log}
                     rnf_loss.backward()
                     optim_set["actor"].step()
@@ -99,7 +125,7 @@ def train(wm: Wingman):
                     # train entropy regularizer
                     if net.use_entropy:
                         net.zero_grad()
-                        ent_loss, log = net.calc_alpha_loss(states)
+                        ent_loss, log = net.calc_alpha_loss(obs_atti, obs_targ)
                         wm.log = {**wm.log, **log}
                         ent_loss.backward()
                         optim_set["alpha"].step()
@@ -132,7 +158,7 @@ def eval_display(wm: Wingman):
     cfg = wm.cfg
     env = setup_env(wm)
 
-    if False:
+    if not cfg.debug:
         net, _ = setup_nets(wm)
     else:
         net = None
@@ -149,7 +175,8 @@ def eval_display(wm: Wingman):
 def setup_env(wm: Wingman):
     cfg = wm.cfg
     env = Environment(cfg)
-    cfg.obs_size = env.obs_size
+    cfg.obs_atti_size = env.obs_atti_size
+    cfg.obs_targ_size = env.obs_targ_size
     cfg.act_size = env.act_size
 
     return env
@@ -161,7 +188,9 @@ def setup_nets(wm: Wingman):
     # set up networks and optimizers
     net = SAC(
         act_size=cfg.act_size,
-        obs_size=cfg.obs_size,
+        obs_atti_size=cfg.obs_atti_size,
+        obs_targ_size=cfg.obs_targ_size,
+        max_targ_length=cfg.num_targets,
         entropy_tuning=cfg.use_entropy,
         target_entropy=cfg.target_entropy,
         discount_factor=cfg.discount_factor,
