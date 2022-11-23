@@ -101,9 +101,16 @@ class Critic(nn.Module):
             embedding_size, obs_atti_size, obs_targ_size, max_targ_length
         )
 
+        # gets embeddings from actions
+        _features_description = [act_size, embedding_size]
+        _activation_description = ["relu"] * (len(_features_description) - 1)
+        self.action_net = NeuralBlocks.generate_linear_stack(
+            _features_description, _activation_description
+        )
+
         # outputs the action after all the compute before it
         _features_description = [
-            2 * embedding_size + act_size,
+            3 * embedding_size,
             embedding_size,
             2,
         ]
@@ -124,6 +131,10 @@ class Critic(nn.Module):
         # pass things through the backbone
         atti_output, targ_output = self.backbone_net(obs_atti, obs_targ)
 
+        # get the actions output
+        actions = self.action_net(actions)
+
+        # process everything
         output = torch.cat([atti_output, targ_output, actions], dim=-1)
         output = self.merge_net(output)
 
