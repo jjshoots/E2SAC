@@ -178,8 +178,7 @@ class CCGE(nn.Module):
         ).detach()
 
         # supervision scale is a switch
-        # sup_scale = (uncertainty > self.confidence_lambda) * 1.0
-        sup_scale = torch.ones_like(uncertainty)
+        sup_scale = (uncertainty > self.confidence_lambda) * 1.0
 
         log = dict()
         log["uncertainty"] = uncertainty.mean().detach()
@@ -257,7 +256,7 @@ class CCGE(nn.Module):
         actions, entropies = self.actor.sample(*output)
 
         # compute supervision scale and expected q for actions
-        sup_scale, expected_q, sup_log = self.calc_sup_scale(
+        sup_scale, expected_q, log2 = self.calc_sup_scale(
             obs_atti, obs_targ, actions, labels
         )
 
@@ -286,11 +285,12 @@ class CCGE(nn.Module):
         sup_loss = (sup_scale * sup_loss).mean()
 
         # sum the losses
-        actor_loss = rnf_loss + sup_loss + ent_loss
+        # actor_loss = rnf_loss + sup_loss + ent_loss
+        actor_loss = sup_loss
 
         log = dict()
         log["sup_scale"] = sup_scale.mean().detach()
-        log = {**log, **log, **sup_log}
+        log = {**log, **log2}
 
         return actor_loss, log
 
