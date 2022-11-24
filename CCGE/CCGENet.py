@@ -124,12 +124,13 @@ class Critic(nn.Module):
         self.register_buffer("uncertainty_bias", torch.rand(1) * 100.0, persistent=True)
 
     def forward(self, obs_atti, obs_targ, actions):
-        if actions.shape[0] != obs_atti.shape[0]:
-            obs_atti = torch.stack([obs_atti] * actions.shape[0], dim=0)
-            obs_targ = torch.stack([obs_targ] * actions.shape[0], dim=0)
-
         # pass things through the backbone
         atti_output, targ_output = self.backbone_net(obs_atti, obs_targ)
+
+        # if we have multiple actions, stack the observations
+        if len(actions.shape) != len(obs_atti.shape):
+            atti_output = torch.stack([atti_output] * actions.shape[0], dim=0)
+            targ_output = torch.stack([targ_output] * actions.shape[0], dim=0)
 
         # get the actions output
         actions = self.action_net(actions)

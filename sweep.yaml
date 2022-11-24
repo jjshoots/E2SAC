@@ -1,32 +1,32 @@
-program: mainSAC.py
-method: random
-metric:
-  name: max_eval_perf
-  goal: maximize
-name: "SAC-PyFlyt-Waypoints"
-parameters:
-  env_name:
-    value: "PyFlyt/SimpleWaypointEnv-v0"
-command:
-  - python3
-  - src/mainSAC.py
-  - "--train"
-  - "--wandb"
-  - "--wandb_name=SAC-PyFlyt-Waypoints"
-
-
-# program: main.py
+# program: mainSAC.py
 # method: random
 # metric:
 #   name: max_eval_perf
 #   goal: maximize
-# name: "CCGE-PyFlyt-Waypoints"
+# name: "SAC-PyFlyt-Waypoints"
 # parameters:
 #   env_name:
 #     value: "PyFlyt/SimpleWaypointEnv-v0"
 # command:
 #   - python3
-#   - src/main.py
+#   - src/mainSAC.py
 #   - "--train"
 #   - "--wandb"
-#   - "--wandb_name=CCGE-PyFlyt-Waypoints"
+#   - "--wandb_name=SAC-PyFlyt-Waypoints"
+
+
+program: main.py
+method: random
+metric:
+  name: max_eval_perf
+  goal: maximize
+name: "CCGE-PyFlyt-Waypoints"
+parameters:
+  env_name:
+    value: "PyFlyt/SimpleWaypointEnv-v0"
+command:
+  - python3
+  - src/main.py
+  - "--train"
+  - "--wandb"
+  - "--wandb_name=CCGE-PyFlyt-Waypoints"
