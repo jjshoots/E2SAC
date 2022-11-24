@@ -163,25 +163,23 @@ class CCGE(nn.Module):
         # uncertainty is upper bound difference between suboptimal and learned
         uncertainty = (
             (
-                # critic_output[0, 1, ...].mean(dim=-1, keepdim=True)
-                critic_output[0, 1, ...].max(dim=-1, keepdim=True)[0]
+                critic_output[0, 1, ...].mean(dim=-1, keepdim=True)
                 + critic_output[1, 1, ...].max(dim=-1, keepdim=True)[0]
             )
             - (
-                # critic_output[0, 0, ...].mean(dim=-1, keepdim=True)
-                critic_output[0, 0, ...].min(dim=-1, keepdim=True)[0]
+                critic_output[0, 0, ...].mean(dim=-1, keepdim=True)
                 + critic_output[1, 0, ...].min(dim=-1, keepdim=True)[0]
             )
         ).detach()
 
         # normalize uncertainty
         uncertainty = (
-            # uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs()
-            uncertainty / critic_output[0, 0, ...].min(dim=-1, keepdim=True)[0].abs()
+            uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs()
         ).detach()
 
         # supervision scale is a switch
-        sup_scale = (uncertainty > self.confidence_lambda) * 1.0
+        # sup_scale = (uncertainty > self.confidence_lambda) * 1.0
+        sup_scale = torch.ones_like(uncertainty)
 
         log = dict()
         log["uncertainty"] = uncertainty.mean().detach()
