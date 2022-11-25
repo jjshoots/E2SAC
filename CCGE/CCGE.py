@@ -279,14 +279,15 @@ class CCGE(nn.Module):
         else:
             ent_loss = 0.0
 
+        sup_scale = torch.ones_like(sup_scale)
+
         """ TOTAL LOSS DERIVATION"""
         # convex combo
         rnf_loss = ((1.0 - sup_scale) * rnf_loss).mean()
         sup_loss = (sup_scale * sup_loss).mean()
 
         # sum the losses
-        # actor_loss = rnf_loss + sup_loss + ent_loss
-        actor_loss = sup_loss
+        actor_loss = rnf_loss + sup_loss + ent_loss
 
         log = dict()
         log["sup_scale"] = sup_scale.mean().detach()
