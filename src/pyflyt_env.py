@@ -1,3 +1,4 @@
+import math
 import gymnasium as gym
 import numpy as np
 from PyFlyt.core.PID import PID
@@ -36,7 +37,7 @@ class Environment:
         action_high = self.env.action_space.high
         action_low = self.env.action_space.low
         self._action_mid = (action_high + action_low) / 2.0
-        self._action_range = action_high - action_low
+        self._action_range = (action_high - action_low) / 2.0
 
         self.setup_oracle()
 
@@ -49,7 +50,7 @@ class Environment:
         Kp_ang_pos = np.array([3.0, 3.0])
         Ki_ang_pos = np.array([0.0, 0.0])
         Kd_ang_pos = np.array([0.0, 0.0])
-        lim_ang_pos = np.array([1.0, 1.0])
+        lim_ang_pos = np.array([0.3 * math.pi, 0.3 * math.pi])
 
         # input: linear velocity command
         # output: angular position
@@ -87,12 +88,11 @@ class Environment:
         output = self.PIDs[0].step(ang_pos[:2], output)
 
         z_output = self.z_PID.step(lin_vel[-1], setpoint[-1])
-        z_output = np.clip(z_output, 0.0, 1.0)
 
         self.pid_output = np.array([*output, 0.0, z_output])
 
         # normalize
-        self.pid_output = (self.pid_output - self._action_mid) * self._action_range
+        self.pid_output = (self.pid_output - self._action_mid) / self._action_range
 
     def get_label(self, *_):
         return self.pid_output
@@ -120,7 +120,7 @@ class Environment:
         ), f"Incorrect action sizes, expected {self.act_size}, got {action.shape[0]}"
 
         # denormalize the action
-        action = action / self._action_range + self._action_mid
+        action = action * self._action_range + self._action_mid
 
         # step through the env
         obs, reward, term, trunc, info = self.env.step(action)
@@ -192,6 +192,8 @@ class Environment:
                 action = cpuize(net.actor.infer(*output))
             else:
                 action = self.get_label()
+
+            print(action, self.pid_output)
 
             self.step(action)
 
