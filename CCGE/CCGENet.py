@@ -39,7 +39,7 @@ class Backbone(nn.Module):
 
         # pass target through network, add positional encoding, then mask, then mean
         targ_output = self.target_net(obs_targ) + self.positional_encoding
-        targ_output[obs_targ.abs().sum(dim=-1) != 0] *= 0.0
+        targ_output[obs_targ.abs().sum(dim=-1) == 0] *= 0.0
         targ_output = targ_output.mean(dim=-2)
 
         return atti_output, targ_output

@@ -1,4 +1,3 @@
-import math
 import gymnasium as gym
 import numpy as np
 from PyFlyt.core.PID import PID
@@ -43,14 +42,17 @@ class Environment:
 
     def setup_oracle(self):
         # control period of the underlying controller
-        self.ctrl_period = 1.0 / 120.0
+        self.ctrl_period = 1.0 / 30.0
+
+        a_lim = self.env.action_space.high[0]
+        t_lim = self.env.action_space.high[-1]
 
         # input: angular position command
         # output: angular velocity
         Kp_ang_pos = np.array([3.0, 3.0])
         Ki_ang_pos = np.array([0.0, 0.0])
         Kd_ang_pos = np.array([0.0, 0.0])
-        lim_ang_pos = np.array([0.3 * math.pi, 0.3 * math.pi])
+        lim_ang_pos = np.array([a_lim, a_lim])
 
         # input: linear velocity command
         # output: angular position
@@ -76,7 +78,7 @@ class Environment:
         self.PIDs = [ang_pos_PID, lin_vel_PID]
 
         # height controllers
-        self.z_PID = PID(0.15, 1.0, 0.015, 0.3, self.ctrl_period)
+        self.z_PID = PID(0.15, 0.5, 0.0, t_lim, self.ctrl_period)
 
     def compute_PIDs(self):
         ang_pos = self.state_atti[3:6]
@@ -88,6 +90,7 @@ class Environment:
         output = self.PIDs[0].step(ang_pos[:2], output)
 
         z_output = self.z_PID.step(lin_vel[-1], setpoint[-1])
+        z_output = z_output.clip(min=0.0, max=self.z_PID.limits)
 
         self.pid_output = np.array([*output, 0.0, z_output])
 
@@ -122,8 +125,8 @@ class Environment:
         # denormalize the action
         action = action * self._action_range + self._action_mid
 
-        # step through the env
-        obs, reward, term, trunc, info = self.env.step(action)
+        # step through the env multiple times
+        obs, rew, term, trunc, info = self.env.step(action)
 
         # splice out the observation and mask the target deltas
         self.state_atti = obs["attitude"]
@@ -131,7 +134,7 @@ class Environment:
         self.state_targ[: len(obs["target_deltas"].nodes)] = obs["target_deltas"].nodes
 
         # accumulate rewards
-        self.cumulative_reward += reward
+        self.cumulative_reward += rew
 
         if term or trunc:
             self.ended = True
@@ -139,7 +142,7 @@ class Environment:
         # compute the pids so we don't have discontinuity
         self.compute_PIDs()
 
-        return self.state_atti, self.state_targ, reward, term
+        return self.state_atti, self.state_targ, rew, term
 
     def evaluate(self, cfg, net=None):
         if net is not None:
@@ -193,7 +196,7 @@ class Environment:
             else:
                 action = self.get_label()
 
-            print(action, self.pid_output)
+            # print(action, self.pid_output)
 
             self.step(action)
 

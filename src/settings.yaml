@@ -1,17 +1,17 @@
 # env params
 env_name: 'PyFlyt/SimpleWaypointEnv-v0'
-num_targets: 1
+num_targets: 10
 
 # learning params
 buffer_size: 500000
 buffer_size_debug: 100
 batch_size: 256
-total_steps: 5000000
+total_steps: 1000000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 discount_factor: 0.99
-learning_rate: 0.002
+learning_rate: 0.001
 exploration_steps: 0
 
 # CCGE params
