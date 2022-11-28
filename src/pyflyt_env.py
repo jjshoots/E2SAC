@@ -198,7 +198,6 @@ class Environment:
 
             # print(action, self.pid_output)
 
-            action = np.ones_like(action) * -1
             self.step(action)
 
             if self.ended:
