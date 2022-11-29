@@ -21,8 +21,15 @@ class Backbone(nn.Module):
             _features_description, _activation_description
         )
 
+        # compute embeddings from target deltas
+        _features_description = [obs_targ_size, int(embedding_size / 2)]
+        _activation_description = ["relu"] * (len(_features_description) - 1)
+        self.embedding_net = NeuralBlocks.generate_linear_stack(
+            _features_description, _activation_description
+        )
+
         # processes the target deltas
-        _features_description = [obs_targ_size, embedding_size]
+        _features_description = [embedding_size, embedding_size]
         _activation_description = ["relu"] * (len(_features_description) - 1)
         self.target_net = NeuralBlocks.generate_linear_stack(
             _features_description, _activation_description
@@ -30,16 +37,28 @@ class Backbone(nn.Module):
 
         # learned positional encoding
         self.positional_encoding = nn.Parameter(
-            torch.randn((max_targ_length, embedding_size), requires_grad=True)
+            torch.randn((max_targ_length, int(embedding_size / 2)), requires_grad=True)
         )
 
     def forward(self, obs_atti, obs_targ):
         # compute the drone attitude
         atti_output = self.attitude_net(obs_atti)
 
-        # pass target through network, add positional encoding, then mask, then mean
-        targ_output = self.target_net(obs_targ) + self.positional_encoding
-        targ_output[obs_targ.abs().sum(dim=-1) == 0] *= 0.0
+        # expand the positional encoding if needed
+        if len(obs_targ.shape) != len(self.positional_encoding):
+            pos_enc = torch.stack([self.positional_encoding] * len(obs_targ), dim=0)
+        else:
+            pos_enc = self.positional_encoding
+
+        # pass target through network, add positional encoding
+        targ_output = self.embedding_net(obs_targ)
+        targ_output = torch.cat((targ_output, pos_enc), dim=-1)
+        targ_output = self.target_net(targ_output)
+
+        # masking then take mean
+        mask = torch.ones_like(targ_output, requires_grad=False)
+        mask[obs_targ.abs().sum(dim=-1) == 0] = 0.0
+        targ_output = targ_output * mask
         targ_output = targ_output.mean(dim=-2)
 
         return atti_output, targ_output
