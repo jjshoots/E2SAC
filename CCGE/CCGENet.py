@@ -10,6 +10,8 @@ class Backbone(nn.Module):
     def __init__(self, embedding_size, obs_atti_size, obs_targ_size, max_targ_length):
         super().__init__()
 
+        self.obs_targ_size = obs_targ_size
+
         # processes the drone attitude
         _features_description = [
             obs_atti_size,
@@ -44,9 +46,12 @@ class Backbone(nn.Module):
         # compute the drone attitude
         atti_output = self.attitude_net(obs_atti)
 
+        # shorten the targets to only the context length
+        obs_targ = obs_targ[..., :self.obs_targ_size, :]
+
         # expand the positional encoding if needed
-        if len(obs_targ.shape) != len(self.positional_encoding):
-            pos_enc = torch.stack([self.positional_encoding] * len(obs_targ), dim=0)
+        if len(obs_targ.shape) != len(self.positional_encoding.shape):
+            pos_enc = torch.stack([self.positional_encoding] * obs_targ.shape[0], dim=0)
         else:
             pos_enc = self.positional_encoding
 

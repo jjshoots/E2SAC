@@ -1,6 +1,7 @@
 # env params
 env_name: 'PyFlyt/SimpleWaypointEnv-v0'
-num_targets: 2
+num_targets: 5
+context_len: 3
 
 # learning params
 buffer_size: 500000
@@ -17,7 +18,7 @@ exploration_steps: 0
 # CCGE params
 pretrained_oracle: true
 update_oracle: false
-confidence_lambda: 0.1
+confidence_lambda: 0.3
 
 # core SAC params
 use_entropy: true
