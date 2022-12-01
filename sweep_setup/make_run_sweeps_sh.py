@@ -15,6 +15,8 @@ with open("./sweep_setup/temp.out", "r") as f:
 
 top_lines = """#!/bin/bash
 
+# this file has been automatically generated, do not edit manually
+
 source venv/bin/activate
 pip3 install -r requirements.txt -U
 wingman-compress-weights

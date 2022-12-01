@@ -22,7 +22,7 @@ confidence_lambda: 0.3
 
 # core SAC params
 use_entropy: true
-target_entropy: null
+target_entropy: -8.0
 
 # eval settings
 eval_num_episodes: 50
