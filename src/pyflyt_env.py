@@ -46,7 +46,7 @@ class Environment:
         self.ctrl_period = 1.0 / 30.0
 
         # grab the limits from the environment and downscale them
-        a_lim = self.env.action_space.high[0] * 0.6
+        a_lim = self.env.action_space.high[0] * 0.4
         t_lim = self.env.action_space.high[-1] * 0.6
 
         # input: angular position command
