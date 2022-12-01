@@ -1,6 +1,7 @@
 import gymnasium as gym
 import numpy as np
-from PyFlyt.core.PID import PID
+from PyFlyt.core import PID
+import PyFlyt.gym_envs
 from wingman import cpuize, gpuize
 
 

@@ -12,17 +12,17 @@ repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 discount_factor: 0.99
-learning_rate: 0.001
+learning_rate: 0.0005
 exploration_steps: 0
 
 # CCGE params
 pretrained_oracle: true
 update_oracle: false
-confidence_lambda: 0.3
+confidence_lambda: 0.1
 
 # core SAC params
 use_entropy: true
-target_entropy: -8.0
+target_entropy: -12.0
 
 # eval settings
 eval_num_episodes: 50
