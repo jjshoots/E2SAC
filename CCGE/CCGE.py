@@ -15,12 +15,12 @@ class Q_Ensemble(nn.Module):
     """
 
     def __init__(
-        self, act_size, obs_atti_size, obs_targ_size, max_targ_length, num_networks=2
+        self, act_size, obs_atti_size, obs_targ_size, context_length, num_networks=2
     ):
         super().__init__()
 
         networks = [
-            CCGENet.Critic(act_size, obs_atti_size, obs_targ_size, max_targ_length)
+            CCGENet.Critic(act_size, obs_atti_size, obs_targ_size, context_length)
             for _ in range(num_networks)
         ]
         self.networks = nn.ModuleList(networks)
@@ -45,10 +45,10 @@ class GaussianActor(nn.Module):
     Gaussian Actor
     """
 
-    def __init__(self, act_size, obs_atti_size, obs_targ_size, max_targ_length):
+    def __init__(self, act_size, obs_atti_size, obs_targ_size, context_length):
         super().__init__()
         self.net = CCGENet.Actor(
-            act_size, obs_atti_size, obs_targ_size, max_targ_length
+            act_size, obs_atti_size, obs_targ_size, context_length
         )
 
     def forward(self, obs_atti, obs_targ):
@@ -90,7 +90,7 @@ class CCGE(nn.Module):
         act_size,
         obs_atti_size,
         obs_targ_size,
-        max_targ_length,
+        context_length,
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.99,
@@ -107,15 +107,15 @@ class CCGE(nn.Module):
 
         # actor head
         self.actor = GaussianActor(
-            act_size, obs_atti_size, obs_targ_size, max_targ_length
+            act_size, obs_atti_size, obs_targ_size, context_length
         )
 
         # twin delayed Q networks
         self.critic = Q_Ensemble(
-            act_size, obs_atti_size, obs_targ_size, max_targ_length
+            act_size, obs_atti_size, obs_targ_size, context_length
         )
         self.critic_target = Q_Ensemble(
-            act_size, obs_atti_size, obs_targ_size, max_targ_length
+            act_size, obs_atti_size, obs_targ_size, context_length
         ).eval()
 
         # copy weights and disable gradients for the target network

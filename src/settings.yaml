@@ -1,10 +1,10 @@
 # env params
 env_name: 'PyFlyt/SimpleWaypointEnv-v0'
 num_targets: 5
-context_len: 3
+context_length: 2
 
 # learning params
-buffer_size: 500000
+buffer_size: 300000
 buffer_size_debug: 100
 batch_size: 256
 total_steps: 1000000
@@ -22,7 +22,7 @@ confidence_lambda: 0.1
 
 # core SAC params
 use_entropy: true
-target_entropy: -12.0
+target_entropy: -10.0
 
 # eval settings
 eval_num_episodes: 50

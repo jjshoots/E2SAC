@@ -7,10 +7,10 @@ from wingman import NeuralBlocks
 class Backbone(nn.Module):
     """Backbone Network and logic"""
 
-    def __init__(self, embedding_size, obs_atti_size, obs_targ_size, max_targ_length):
+    def __init__(self, embedding_size, obs_atti_size, obs_targ_size, context_length):
         super().__init__()
 
-        self.obs_targ_size = obs_targ_size
+        self.context_length = context_length
 
         # processes the drone attitude
         _features_description = [
@@ -39,7 +39,7 @@ class Backbone(nn.Module):
 
         # learned positional encoding
         self.positional_encoding = nn.Parameter(
-            torch.randn((max_targ_length, int(embedding_size / 2)), requires_grad=True)
+            torch.randn((context_length, int(embedding_size / 2)), requires_grad=True)
         )
 
     def forward(self, obs_atti, obs_targ):
@@ -47,7 +47,7 @@ class Backbone(nn.Module):
         atti_output = self.attitude_net(obs_atti)
 
         # shorten the targets to only the context length
-        obs_targ = obs_targ[..., :self.obs_targ_size, :]
+        obs_targ = obs_targ[..., :self.context_length, :]
 
         # expand the positional encoding if needed
         if len(obs_targ.shape) != len(self.positional_encoding.shape):
@@ -74,14 +74,14 @@ class Actor(nn.Module):
     Actor network
     """
 
-    def __init__(self, act_size, obs_atti_size, obs_targ_size, max_targ_length):
+    def __init__(self, act_size, obs_atti_size, obs_targ_size, context_length):
         super().__init__()
 
         self.act_size = act_size
         embedding_size = 128
 
         self.backbone_net = Backbone(
-            embedding_size, obs_atti_size, obs_targ_size, max_targ_length
+            embedding_size, obs_atti_size, obs_targ_size, context_length
         )
 
         # outputs the action after all the compute before it
@@ -116,13 +116,13 @@ class Critic(nn.Module):
     Critic Network
     """
 
-    def __init__(self, act_size, obs_atti_size, obs_targ_size, max_targ_length):
+    def __init__(self, act_size, obs_atti_size, obs_targ_size, context_length):
         super().__init__()
 
         embedding_size = 256
 
         self.backbone_net = Backbone(
-            embedding_size, obs_atti_size, obs_targ_size, max_targ_length
+            embedding_size, obs_atti_size, obs_targ_size, context_length
         )
 
         # gets embeddings from actions

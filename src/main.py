@@ -201,7 +201,7 @@ def setup_nets(wm: Wingman):
         act_size=cfg.act_size,
         obs_atti_size=cfg.obs_atti_size,
         obs_targ_size=cfg.obs_targ_size,
-        max_targ_length=cfg.context_len,
+        context_length=cfg.context_length,
         entropy_tuning=cfg.use_entropy,
         target_entropy=cfg.target_entropy,
         discount_factor=cfg.discount_factor,
