@@ -1,7 +1,9 @@
 # env params
 env_name: 'PyFlyt/SimpleWaypointEnv-v0'
+agent_hz: 40
 num_targets: 5
 context_length: 2
+
 
 # learning params
 buffer_size: 300000
@@ -22,7 +24,7 @@ confidence_lambda: 0.1
 
 # core SAC params
 use_entropy: true
-target_entropy: -10.0
+target_entropy: null
 
 # eval settings
 eval_num_episodes: 50

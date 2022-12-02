@@ -23,6 +23,7 @@ class Environment:
             angle_representation="euler",
             use_yaw_targets=False,
             num_targets=cfg.num_targets,
+            agent_hz=cfg.agent_hz
         )
 
         # compute spaces
