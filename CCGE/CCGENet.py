@@ -47,7 +47,7 @@ class Backbone(nn.Module):
         atti_output = self.attitude_net(obs_atti)
 
         # shorten the targets to only the context length
-        obs_targ = obs_targ[..., :self.context_length, :]
+        obs_targ = obs_targ[..., : self.context_length, :]
 
         # expand the positional encoding if needed
         if len(obs_targ.shape) != len(self.positional_encoding.shape):

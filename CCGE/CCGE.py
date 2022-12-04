@@ -47,9 +47,7 @@ class GaussianActor(nn.Module):
 
     def __init__(self, act_size, obs_atti_size, obs_targ_size, context_length):
         super().__init__()
-        self.net = CCGENet.Actor(
-            act_size, obs_atti_size, obs_targ_size, context_length
-        )
+        self.net = CCGENet.Actor(act_size, obs_atti_size, obs_targ_size, context_length)
 
     def forward(self, obs_atti, obs_targ):
         output = self.net(obs_atti, obs_targ)
@@ -111,9 +109,7 @@ class CCGE(nn.Module):
         )
 
         # twin delayed Q networks
-        self.critic = Q_Ensemble(
-            act_size, obs_atti_size, obs_targ_size, context_length
-        )
+        self.critic = Q_Ensemble(act_size, obs_atti_size, obs_targ_size, context_length)
         self.critic_target = Q_Ensemble(
             act_size, obs_atti_size, obs_targ_size, context_length
         ).eval()

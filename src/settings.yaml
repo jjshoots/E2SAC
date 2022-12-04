@@ -20,11 +20,11 @@ exploration_steps: 0
 # CCGE params
 pretrained_oracle: true
 update_oracle: false
-confidence_lambda: 0.1
+confidence_lambda: 0.05
 
 # core SAC params
 use_entropy: true
-target_entropy: null
+target_entropy: -8
 
 # eval settings
 eval_num_episodes: 50
@@ -35,6 +35,7 @@ debug: false
 train: false
 display: false
 evaluate: false
+render_gif: false
 
 weights_directory: 'weights'
 version_number: null

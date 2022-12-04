@@ -1,7 +1,8 @@
 import gymnasium as gym
 import numpy as np
-from PyFlyt.core import PID
 import PyFlyt.gym_envs
+from PIL import Image
+from PyFlyt.core import PID
 from wingman import cpuize, gpuize
 
 
@@ -23,7 +24,7 @@ class Environment:
             angle_representation="euler",
             use_yaw_targets=False,
             num_targets=cfg.num_targets,
-            agent_hz=cfg.agent_hz
+            agent_hz=cfg.agent_hz,
         )
 
         # compute spaces
@@ -187,6 +188,10 @@ class Environment:
         # reset the env
         self.reset()
 
+        gifs_save_path = "./rendered_gifs"
+        total_gifs = 0
+        frames = []
+
         while True:
 
             state_atti = gpuize(self.state_atti, cfg.device).unsqueeze(0)
@@ -203,7 +208,26 @@ class Environment:
 
             self.step(action)
 
+            # this captures the camera image
+            if cfg.render_gif:
+                frames.append(self.env.render()[..., :3].astype(np.uint8))
+
             if self.ended:
+                if cfg.render_gif:
+                    print("-----------------------------------------")
+                    print(f"Saving gif...")
+                    print("-----------------------------------------")
+                    frames = [Image.fromarray(frame) for frame in frames]
+                    frames[0].save(
+                        f"{gifs_save_path}/gif{total_gifs}.gif",
+                        save_all=True,
+                        append_images=frames[1:],
+                        duration=33,
+                        loop=0,
+                    )
+                    frames = []
+                    total_gifs += 1
+
                 print("-----------------------------------------")
                 print(f"Total Reward: {self.cumulative_reward}")
                 print("-----------------------------------------")
