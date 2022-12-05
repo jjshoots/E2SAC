@@ -210,10 +210,10 @@ def setup_nets(wm: Wingman):
     has_weights, model_file, optim_file = wm.get_weight_files()
     if has_weights:
         # load the model
-        net.load_state_dict(torch.load(model_file))
+        net.load_state_dict(torch.load(model_file, map_location=torch.device(cfg.config)))
 
         # load the optimizer
-        checkpoint = torch.load(optim_file)
+        checkpoint = torch.load(optim_file, map_location=torch.device(cfg.config))
 
         for opt_key in optim_set:
             optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
