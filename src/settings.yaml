@@ -9,7 +9,7 @@ context_length: 2
 buffer_size: 300000
 buffer_size_debug: 100
 batch_size: 256
-total_steps: 1000000
+total_steps: 500000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
@@ -20,7 +20,7 @@ exploration_steps: 0
 # CCGE params
 pretrained_oracle: true
 update_oracle: false
-confidence_lambda: 0.05
+confidence_lambda: 0.1
 
 # core SAC params
 use_entropy: true
