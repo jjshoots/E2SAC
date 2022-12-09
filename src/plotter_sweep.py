@@ -65,7 +65,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
     print(f"Processing run {title}")
 
     # parameters
-    num_steps = 1000000
+    num_steps = 500000
     num_intervals = 101
 
     # x_axis values to plot against
@@ -89,7 +89,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         score = []
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
-            if log["num_transitions"].shape[0] > 80:
+            if log["num_transitions"].shape[0] > 40:
                 data = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
                 score.append(data)
 
@@ -157,7 +157,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         fontsize=30,
     )
     plt.tight_layout()
-    plt.savefig(f"resource/{title}.pdf", dpi=100)
+    plt.savefig(f"plots/{title}.pdf", dpi=100)
     # plt.show()
 
 
@@ -165,56 +165,12 @@ if __name__ == "__main__":
     # list of run arguments
     sweep_objects = []
 
-    title = "Hopper-v4"
+    title = "PyFlyt:SimpleWaypointEnv-v0"
     sweep_uri_dict = {}
-    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/zgq81g05"
-    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/phevs4mc"
-    sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/po10jfqp"
-    sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/18p6t19p"
-    sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/fscr3ka0"
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/8wyi0svm"
 
     baselines_dict = {}
-    baselines_dict["Oracle 1"] = 810.0
-    baselines_dict["Oracle 2"] = 2900.0
-    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
-
-    title = "Ant-v4"
-    sweep_uri_dict = {}
-    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/4uvx5qez"
-    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/dp4byhg8"
-    sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/b0r4xjqu"
-    sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/f9sntmmm"
-    sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/5ydeyszy"
-
-    baselines_dict = {}
-    baselines_dict["Oracle 1"] = 810.0
-    baselines_dict["Oracle 2"] = 2200.0
-    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
-
-    title = "HalfCheetah-v4"
-    sweep_uri_dict = {}
-    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/95qoyb9w"
-    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/o61ibecs"
-    sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/62jvni7q"
-    # sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/5e3vqsse"
-    sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/3rk3ayzb"
-
-    baselines_dict = {}
-    baselines_dict["Oracle 1"] = 5240.0
-    baselines_dict["Oracle 2"] = 6000.0
-    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
-
-    title = "Walker2d-v4"
-    sweep_uri_dict = {}
-    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/aboikqup"
-    sweep_uri_dict["CCGE_1"] = "jjshoots/CCGE2/n6ufn853"
-    sweep_uri_dict["CCGE_2"] = "jjshoots/CCGE2/s34yh4a6"
-    # sweep_uri_dict["CCGE_2_NU"] = "jjshoots/CCGE2/trgcinhi"
-    sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/4de8u2d3"
-
-    baselines_dict = {}
-    baselines_dict["Oracle 1"] = 2250.0
-    baselines_dict["Oracle 2"] = 2300.0
+    baselines_dict["Oracle"] = 150.0
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     # process everything with multiprocessing
