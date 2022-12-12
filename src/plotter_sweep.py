@@ -66,7 +66,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
 
     # parameters
     num_steps = 500000
-    num_intervals = 51
+    num_intervals = 50
 
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
@@ -89,7 +89,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         score = []
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
-            if log["num_transitions"].shape[0] > 49:
+            if log["num_transitions"].shape[0] > num_intervals - 1:
                 data = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
                 score.append(data)
 

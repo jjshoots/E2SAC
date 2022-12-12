@@ -15,18 +15,35 @@
 #   - "--wandb_name=SAC-PyFlyt-Waypoints"
 
 
-program: main.py
+# program: main.py
+# method: random
+# metric:
+#   name: max_eval_perf
+#   goal: maximize
+# name: "CCGE-PyFlyt-Waypoints"
+# parameters:
+#   env_name:
+#     value: "PyFlyt/SimpleWaypointEnv-v0"
+# command:
+#   - python3
+#   - src/main.py
+#   - "--train"
+#   - "--wandb"
+#   - "--wandb_name=CCGE-PyFlyt-Waypoints"
+
+
+program: mainJSRL.py
 method: random
 metric:
   name: max_eval_perf
   goal: maximize
-name: "CCGE-PyFlyt-Waypoints"
+name: "JSRLRandom-PyFlyt-Waypoints"
 parameters:
   env_name:
     value: "PyFlyt/SimpleWaypointEnv-v0"
 command:
   - python3
-  - src/main.py
+  - src/mainJSRL.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=CCGE-PyFlyt-Waypoints"
+  - "--wandb_name=JSRLRandom-PyFlyt-Waypoints"
