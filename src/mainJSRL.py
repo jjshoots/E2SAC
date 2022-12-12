@@ -46,47 +46,45 @@ def train(wm: Wingman):
 
             # decide number of steps to rollout oracle
             steps = 0
-            oracle_steps = np.random.randint(3000)
+            oracle_steps = np.random.randint(int(300 * 0.99))
 
             while not env.ended:
-                # get the initial state and label
-                obs_atti = env.state_atti
-                obs_targ = env.state_targ
-                lbl = env.get_label()
-
-                if memory.count < cfg.exploration_steps:
-                    act = env.env.action_space.sample()
+                # JSRL if needed
+                if steps < oracle_steps:
+                    lbl = env.get_label()
+                    _ = env.step(lbl)
                 else:
-                    if steps < oracle_steps:
-                        act = lbl
-                    else:
-                        # move observation to gpu
-                        t_obs_atti = gpuize(obs_atti, cfg.device)
-                        t_obs_targ = gpuize(obs_targ, cfg.device)
+                    # get the initial observation
+                    obs_atti = env.state_atti
+                    obs_targ = env.state_targ
 
-                        # get the action from policy
-                        output = net.actor(t_obs_atti, t_obs_targ)
-                        act, _ = net.actor.sample(*output)
-                        act = cpuize(act)
+                    # move observation to gpu
+                    t_obs_atti = gpuize(obs_atti, cfg.device)
+                    t_obs_targ = gpuize(obs_targ, cfg.device)
+
+                    # get the action from policy
+                    output = net.actor(t_obs_atti, t_obs_targ)
+                    act, _ = net.actor.sample(*output)
+                    act = cpuize(act)
+
+                    # get the next state and other stuff
+                    next_obs_atti, next_obs_targ, rew, term = env.step(act)
+
+                    # store stuff in mem
+                    memory.push(
+                        (
+                            obs_atti,
+                            obs_targ,
+                            act,
+                            rew,
+                            next_obs_atti,
+                            next_obs_targ,
+                            term,
+                        )
+                    )
 
                 # increment our step counter
                 steps += 1
-
-                # get the next state and other stuff
-                next_obs_atti, next_obs_targ, rew, term = env.step(act)
-
-                # store stuff in mem
-                memory.push(
-                    (
-                        obs_atti,
-                        obs_targ,
-                        act,
-                        rew,
-                        next_obs_atti,
-                        next_obs_targ,
-                        term,
-                    )
-                )
 
             # for logging
             wm.log["total_reward"] = env.cumulative_reward
