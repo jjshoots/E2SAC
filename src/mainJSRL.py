@@ -163,16 +163,16 @@ def eval_display(wm: Wingman):
     env = setup_env(wm)
 
     if not cfg.debug:
-        net, _ = setup_nets(wm)
+        model, _ = setup_nets(wm)
     else:
-        net = None
+        model = None
 
     if wm.cfg.display:
-        env.display(cfg, net)
+        env.display(cfg, model)
     elif wm.cfg.evaluate:
         while True:
             print("---------------------------")
-            print(env.evaluate(cfg, net))
+            print(env.evaluate(cfg, model))
             print("---------------------------")
 
 
