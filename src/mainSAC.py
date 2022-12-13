@@ -15,7 +15,7 @@ def train(wm: Wingman):
 
     # setup env, model, replaybuffer
     env = setup_env(wm)
-    net, optim_set = setup_nets(wm)
+    model, optims = setup_nets(wm)
     memory = ReplayBuffer(cfg.buffer_size)
 
     wm.log["epoch"] = 0
@@ -31,15 +31,15 @@ def train(wm: Wingman):
             next_eval_step = (
                 int(memory.count / cfg.eval_steps_ratio) + 1
             ) * cfg.eval_steps_ratio
-            wm.log["eval_perf"] = env.evaluate(cfg, net)
+            wm.log["eval_perf"] = env.evaluate(cfg, model)
             wm.log["max_eval_perf"] = max(
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )
 
         """ENVIRONMENT ROLLOUT"""
         env.reset()
-        net.eval()
-        net.zero_grad()
+        model.eval()
+        model.zero_grad()
 
         with torch.no_grad():
             while not env.ended:
@@ -55,8 +55,8 @@ def train(wm: Wingman):
                     t_obs_targ = gpuize(obs_targ, cfg.device)
 
                     # get the action from policy
-                    output = net.actor(t_obs_atti, t_obs_targ)
-                    act, _ = net.actor.sample(*output)
+                    output = model.actor(t_obs_atti, t_obs_targ)
+                    act, _ = model.actor.sample(*output)
                     act = cpuize(act)
 
                 # get the next state and other stuff
@@ -85,7 +85,7 @@ def train(wm: Wingman):
 
         for repeat_num in range(int(cfg.repeats_per_buffer)):
             for batch_num, stuff in enumerate(dataloader):
-                net.train()
+                model.train()
 
                 obs_atti = gpuize(stuff[0], cfg.device)
                 obs_targ = gpuize(stuff[1], cfg.device)
@@ -97,8 +97,8 @@ def train(wm: Wingman):
 
                 # train critic
                 for _ in range(cfg.critic_update_multiplier):
-                    net.zero_grad()
-                    q_loss, log = net.calc_critic_loss(
+                    model.zero_grad()
+                    q_loss, log = model.calc_critic_loss(
                         obs_atti,
                         obs_targ,
                         actions,
@@ -109,24 +109,24 @@ def train(wm: Wingman):
                     )
                     wm.log = {**wm.log, **log}
                     q_loss.backward()
-                    optim_set["critic"].step()
-                    net.update_q_target()
+                    optims["critic"].step()
+                    model.update_q_target()
 
                 # train actor
                 for _ in range(cfg.actor_update_multiplier):
-                    net.zero_grad()
-                    rnf_loss, log = net.calc_actor_loss(obs_atti, obs_targ, terms)
+                    model.zero_grad()
+                    rnf_loss, log = model.calc_actor_loss(obs_atti, obs_targ, terms)
                     wm.log = {**wm.log, **log}
                     rnf_loss.backward()
-                    optim_set["actor"].step()
+                    optims["actor"].step()
 
                     # train entropy regularizer
-                    if net.use_entropy:
-                        net.zero_grad()
-                        ent_loss, log = net.calc_alpha_loss(obs_atti, obs_targ)
+                    if model.use_entropy:
+                        model.zero_grad()
+                        ent_loss, log = model.calc_alpha_loss(obs_atti, obs_targ)
                         wm.log = {**wm.log, **log}
                         ent_loss.backward()
-                        optim_set["alpha"].step()
+                        optims["alpha"].step()
 
                 """WANDB"""
                 wm.log["num_transitions"] = memory.count
@@ -137,19 +137,12 @@ def train(wm: Wingman):
                     loss=-float(wm.log["eval_perf"]), step=wm.log["num_transitions"]
                 )
                 if to_update:
-                    torch.save(net.state_dict(), model_file)
+                    torch.save(model.state_dict(), model_file)
 
                     optim_dict = dict()
-                    for key in optim_set:
-                        optim_dict[key] = optim_set[key].state_dict()
-                    torch.save(
-                        {
-                            "optim": optim_dict,
-                            "lowest_running_loss": wm.lowest_loss,
-                            "epoch": wm.log["epoch"],
-                        },
-                        optim_file,
-                    )
+                    for key in optims:
+                        optim_dict[key] = optims[key].state_dict()
+                    torch.save(optim_dict, optim_file)
 
 
 def eval_display(wm: Wingman):
@@ -184,41 +177,41 @@ def setup_nets(wm: Wingman):
     cfg = wm.cfg
 
     # set up networks and optimizers
-    net = SAC(
+    model = SAC(
         act_size=cfg.act_size,
         obs_atti_size=cfg.obs_atti_size,
         obs_targ_size=cfg.obs_targ_size,
-        max_targ_length=cfg.num_targets,
+        context_length=cfg.context_length,
         entropy_tuning=cfg.use_entropy,
         target_entropy=cfg.target_entropy,
         discount_factor=cfg.discount_factor,
     ).to(cfg.device)
     actor_optim = optim.AdamW(
-        net.actor.parameters(), lr=cfg.learning_rate, amsgrad=True
+        model.actor.parameters(), lr=cfg.learning_rate, amsgrad=True
     )
     critic_optim = optim.AdamW(
-        net.critic.parameters(), lr=cfg.learning_rate, amsgrad=True
+        model.critic.parameters(), lr=cfg.learning_rate, amsgrad=True
     )
-    alpha_optim = optim.AdamW([net.log_alpha], lr=0.01, amsgrad=True)
+    alpha_optim = optim.AdamW([model.log_alpha], lr=0.01, amsgrad=True)
 
-    optim_set = dict()
-    optim_set["actor"] = actor_optim
-    optim_set["critic"] = critic_optim
-    optim_set["alpha"] = alpha_optim
+    optims = dict()
+    optims["actor"] = actor_optim
+    optims["critic"] = critic_optim
+    optims["alpha"] = alpha_optim
 
     # get latest weight files
     has_weights, model_file, optim_file = wm.get_weight_files()
     if has_weights:
         # load the model
-        net.load_state_dict(torch.load(model_file, map_location=torch.device(cfg.device)))
+        model.load_state_dict(torch.load(model_file, map_location=torch.device(cfg.device)))
 
         # load the optimizer
         checkpoint = torch.load(optim_file, map_location=torch.device(cfg.device))
 
-        for opt_key in optim_set:
-            optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
+        for opt_key in checkpoint:
+            optims[opt_key].load_state_dict(checkpoint[opt_key])
 
-    return net, optim_set
+    return model, optims
 
 
 if __name__ == "__main__":

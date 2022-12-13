@@ -15,35 +15,35 @@
 #   - "--wandb_name=SAC-PyFlyt-Waypoints"
 
 
-# program: main.py
-# method: random
-# metric:
-#   name: max_eval_perf
-#   goal: maximize
-# name: "CCGE-PyFlyt-Waypoints"
-# parameters:
-#   env_name:
-#     value: "PyFlyt/SimpleWaypointEnv-v0"
-# command:
-#   - python3
-#   - src/main.py
-#   - "--train"
-#   - "--wandb"
-#   - "--wandb_name=CCGE-PyFlyt-Waypoints"
-
-
-program: mainJSRL.py
+program: main.py
 method: random
 metric:
   name: max_eval_perf
   goal: maximize
-name: "JSRLRandom-PyFlyt-Waypoints"
+name: "CCGE-PyFlyt-Waypoints"
 parameters:
   env_name:
     value: "PyFlyt/SimpleWaypointEnv-v0"
 command:
   - python3
-  - src/mainJSRL.py
+  - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=JSRLRandom-PyFlyt-Waypoints"
+  - "--wandb_name=CCGE-PyFlyt-Waypoints"
+
+
+# program: mainJSRL.py
+# method: random
+# metric:
+#   name: max_eval_perf
+#   goal: maximize
+# name: "JSRLRandom-PyFlyt-Waypoints"
+# parameters:
+#   env_name:
+#     value: "PyFlyt/SimpleWaypointEnv-v0"
+# command:
+#   - python3
+#   - src/mainJSRL.py
+#   - "--train"
+#   - "--wandb"
+#   - "--wandb_name=JSRLRandom-PyFlyt-Waypoints"
