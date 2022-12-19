@@ -1,3 +1,5 @@
+from multiprocessing import Pool
+
 # rliable google
 from rliable import library as rly
 from rliable import metrics
@@ -132,14 +134,14 @@ def process_sweep(sweep_name, sweep_uri, num_steps, start_val, num_intervals=200
         uncer_cis,
         algorithms=None,
         xlabel=r"Timesteps (1e6)",
-        ylabel="Episodic Mean F-value",
+        ylabel="Episodic Mean Epistemic Uncertainty",
         labelsize=30,
         ticklabelsize=30,
         ax=ax2,
         custom_color=sns.color_palette("colorblind")[1:],
     )
     ax2.tick_params(axis="y", labelcolor=palette[1], labelsize=30)
-    ax2.set_ylabel("Episodic Mean F-value", color=palette[1], fontsize=30)
+    ax2.set_ylabel("Episodic Mean Epistemic Uncertainty", color=palette[1], fontsize=30)
     # ax2.set_ylim(top=2.0)
 
     plt.title(sweep_name, fontsize=30)
@@ -151,19 +153,20 @@ def process_sweep(sweep_name, sweep_uri, num_steps, start_val, num_intervals=200
 if __name__ == "__main__":
     # sweeps["LunarLander100k_long"] = ["jjshoots/DQN2/dotzndpe", 3e6, -200.0]
 
-    sweeps = {}
-    # sweeps["CartPole50k"] = ["jjshoots/DQN2/a0gjbznv", 0.25e6, 100.0]
-    # sweeps["CartPole100k"] = ["jjshoots/DQN2/u7k2k7qo", 0.25e6, 100.0]
-    # sweeps["CartPole200k"] = ["jjshoots/DQN2/emhvyijs", 0.25e6, 100.0]
-    # sweeps["Acrobot50k"] = ["jjshoots/DQN2/5bv1o5du", 0.25e6, -500.0]
-    # sweeps["Acrobot100k"] = ["jjshoots/DQN2/t3e9smkh", 0.25e6, -500.0]
-    # sweeps["Acrobot200k"] = ["jjshoots/DQN2/6ssn48ak", 0.25e6, -500.0]
-    sweeps["MountainCar100k"] = ["jjshoots/DQN2/xy1blq0i", 1e6, -200.0]
-    sweeps["MountainCar200k"] = ["jjshoots/DQN2/zlqur3uh", 1e6, -200.0]
-    sweeps["MountainCar400k"] = ["jjshoots/DQN2/4zjlky9u", 1e6, -200.0]
-    sweeps["LunarLander100k"] = ["jjshoots/DQN2/ns2i31ul", 1e6, -200.0]
-    sweeps["LunarLander200k"] = ["jjshoots/DQN2/146u4rcg", 1e6, -200.0]
-    sweeps["LunarLander400k"] = ["jjshoots/DQN2/0d1c22d0", 1e6, -200.0]
+    sweep_objects = []
+    sweep_objects.append(("CartPole50k", "jjshoots/DQN2/a0gjbznv", 0.25e6, 100.0))
+    sweep_objects.append(("CartPole100k", "jjshoots/DQN2/u7k2k7qo", 0.25e6, 100.0))
+    sweep_objects.append(("CartPole200k", "jjshoots/DQN2/emhvyijs", 0.25e6, 100.0))
+    sweep_objects.append(("Acrobot50k", "jjshoots/DQN2/5bv1o5du", 0.25e6, -500.0))
+    sweep_objects.append(("Acrobot100k", "jjshoots/DQN2/t3e9smkh", 0.25e6, -500.0))
+    sweep_objects.append(("Acrobot200k", "jjshoots/DQN2/6ssn48ak", 0.25e6, -500.0))
+    sweep_objects.append(("MountainCar100k", "jjshoots/DQN2/xy1blq0i", 1e6, -200.0))
+    sweep_objects.append(("MountainCar200k", "jjshoots/DQN2/zlqur3uh", 1e6, -200.0))
+    sweep_objects.append(("MountainCar400k", "jjshoots/DQN2/4zjlky9u", 1e6, -200.0))
+    sweep_objects.append(("LunarLander100k", "jjshoots/DQN2/ns2i31ul", 1e6, -200.0))
+    sweep_objects.append(("LunarLander200k", "jjshoots/DQN2/146u4rcg", 1e6, -200.0))
+    sweep_objects.append(("LunarLander400k", "jjshoots/DQN2/0d1c22d0", 1e6, -200.0))
 
-    for key in sweeps:
-        process_sweep(key, sweeps[key][0], sweeps[key][1], sweeps[key][2])
+
+    with Pool() as pool:
+        pool.starmap(process_sweep, sweep_objects)
