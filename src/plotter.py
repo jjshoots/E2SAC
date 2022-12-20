@@ -134,14 +134,14 @@ def process_sweep(sweep_name, sweep_uri, num_steps, start_val, num_intervals=200
         uncer_cis,
         algorithms=None,
         xlabel=r"Timesteps (1e6)",
-        ylabel="Episodic Mean Epistemic Uncertainty",
+        ylabel="Episodic Mean EU",
         labelsize=30,
         ticklabelsize=30,
         ax=ax2,
         custom_color=sns.color_palette("colorblind")[1:],
     )
     ax2.tick_params(axis="y", labelcolor=palette[1], labelsize=30)
-    ax2.set_ylabel("Episodic Mean Epistemic Uncertainty", color=palette[1], fontsize=30)
+    ax2.set_ylabel("Episodic Mean EU", color=palette[1], fontsize=30)
     # ax2.set_ylim(top=2.0)
 
     plt.title(sweep_name, fontsize=30)

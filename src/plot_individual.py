@@ -85,7 +85,7 @@ def process_run(run_name, env_name, run_uri, num_steps, start_val, num_intervals
     ax2.plot(x_axis / 1e6, uncer, color=palette[1])
 
     ax2.tick_params(axis="y", labelcolor=palette[1], labelsize=30, length=0)
-    ax2.set_ylabel("Episodic Mean Epistemic Uncertainty", color=palette[1], fontsize=30)
+    ax2.set_ylabel("Episodic Mean EU", color=palette[1], fontsize=30)
     # ax2.set_ylim(top=2.0)
 
     # remove the spines for top and right
