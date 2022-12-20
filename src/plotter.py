@@ -154,18 +154,24 @@ if __name__ == "__main__":
     # sweeps["LunarLander100k_long"] = ["jjshoots/DQN2/dotzndpe", 3e6, -200.0]
 
     sweep_objects = []
-    sweep_objects.append(("CartPole50k", "jjshoots/DQN2/a0gjbznv", 0.25e6, 100.0))
-    sweep_objects.append(("CartPole100k", "jjshoots/DQN2/u7k2k7qo", 0.25e6, 100.0))
-    sweep_objects.append(("CartPole200k", "jjshoots/DQN2/emhvyijs", 0.25e6, 100.0))
-    sweep_objects.append(("Acrobot50k", "jjshoots/DQN2/5bv1o5du", 0.25e6, -500.0))
-    sweep_objects.append(("Acrobot100k", "jjshoots/DQN2/t3e9smkh", 0.25e6, -500.0))
-    sweep_objects.append(("Acrobot200k", "jjshoots/DQN2/6ssn48ak", 0.25e6, -500.0))
-    sweep_objects.append(("MountainCar100k", "jjshoots/DQN2/xy1blq0i", 1e6, -200.0))
-    sweep_objects.append(("MountainCar200k", "jjshoots/DQN2/zlqur3uh", 1e6, -200.0))
-    sweep_objects.append(("MountainCar400k", "jjshoots/DQN2/4zjlky9u", 1e6, -200.0))
-    sweep_objects.append(("LunarLander100k", "jjshoots/DQN2/ns2i31ul", 1e6, -200.0))
-    sweep_objects.append(("LunarLander200k", "jjshoots/DQN2/146u4rcg", 1e6, -200.0))
-    sweep_objects.append(("LunarLander400k", "jjshoots/DQN2/0d1c22d0", 1e6, -200.0))
+    # sweep_objects.append(("CartPole50k", "jjshoots/DQN2/a0gjbznv", 0.25e6, 100.0))
+    # sweep_objects.append(("CartPole100k", "jjshoots/DQN2/u7k2k7qo", 0.25e6, 100.0))
+    # sweep_objects.append(("CartPole200k", "jjshoots/DQN2/emhvyijs", 0.25e6, 100.0))
+    # sweep_objects.append(("Acrobot50k", "jjshoots/DQN2/5bv1o5du", 0.25e6, -500.0))
+    # sweep_objects.append(("Acrobot100k", "jjshoots/DQN2/t3e9smkh", 0.25e6, -500.0))
+    # sweep_objects.append(("Acrobot200k", "jjshoots/DQN2/6ssn48ak", 0.25e6, -500.0))
+    # sweep_objects.append(("MountainCar100k", "jjshoots/DQN2/xy1blq0i", 1e6, -200.0))
+    # sweep_objects.append(("MountainCar200k", "jjshoots/DQN2/zlqur3uh", 1e6, -200.0))
+    # sweep_objects.append(("MountainCar400k", "jjshoots/DQN2/4zjlky9u", 1e6, -200.0))
+    # sweep_objects.append(("LunarLander100k", "jjshoots/DQN2/ns2i31ul", 1e6, -200.0))
+    # sweep_objects.append(("LunarLander200k", "jjshoots/DQN2/146u4rcg", 1e6, -200.0))
+    # sweep_objects.append(("LunarLander400k", "jjshoots/DQN2/0d1c22d0", 1e6, -200.0))
+
+    # these are the sweeps with 100k, 100k, 200k, 200k replay buffer sizes
+    sweep_objects.append(("CartPole", "jjshoots/DQN2/u7k2k7qo", 0.25e6, 100.0))
+    sweep_objects.append(("Acrobot", "jjshoots/DQN2/t3e9smkh", 0.25e6, -500.0))
+    sweep_objects.append(("MountainCar", "jjshoots/DQN2/zlqur3uh", 1e6, -200.0))
+    sweep_objects.append(("LunarLander", "jjshoots/DQN2/146u4rcg", 1e6, -200.0))
 
 
     with Pool() as pool:
