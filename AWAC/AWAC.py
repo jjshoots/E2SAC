@@ -53,7 +53,7 @@ class GaussianActor(nn.Module):
         """
         output:
             actions is of shape B x act_size
-            entropies is of shape B x 1
+            log_probs is of shape B x 1
         """
         # lower bound sigma and bias it
         normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
@@ -72,6 +72,24 @@ class GaussianActor(nn.Module):
     def infer(mu, sigma):
         return torch.tanh(mu)
 
+    @staticmethod
+    def get_log_probs(mu, sigma, actions):
+        """
+        output:
+            actions is of shape B x act_size
+            log_probs is of shape B x 1
+        """
+        # lower bound sigma and bias it
+        normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
+
+        # calculate log_probs
+        log_probs = normals.log_prob(torch.atanh(actions)) - torch.log(
+            1 - actions.pow(2) + 1e-6
+        )
+        log_probs = log_probs.sum(dim=-1, keepdim=True)
+
+        return log_probs
+
 
 class AWAC(nn.Module):
     """
@@ -86,6 +104,7 @@ class AWAC(nn.Module):
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.98,
+        lambda_parameter=0.3,
     ):
         super().__init__()
 
@@ -93,6 +112,7 @@ class AWAC(nn.Module):
         self.obs_size = obs_size
         self.use_entropy = entropy_tuning
         self.gamma = discount_factor
+        self.lambda_parameter = lambda_parameter
 
         # actor head
         self.actor = GaussianActor(act_size, obs_size)
@@ -171,16 +191,16 @@ class AWAC(nn.Module):
 
         return critic_loss, log
 
-    def calc_actor_loss(self, states, terms):
+    def calc_actor_loss(self, states, actions, terms):
         """
         states is of shape B x input_shape
         terms is of shape B x 1
         """
         terms = 1.0 - terms
 
-        # We re-sample actions to calculate expectations of Q.
+        # Get log probs of the actions we have
         output = self.actor(states)
-        actions, entropies = self.actor.sample(*output)
+        log_probs = self.actor.get_log_probs(output[0], output[1], actions)
 
         # expectations of Q with clipped double Q
         q = self.critic(states, actions)
@@ -188,11 +208,17 @@ class AWAC(nn.Module):
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         if self.use_entropy:
-            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * terms)
+            q = (q - self.log_alpha.exp().detach() * log_probs) * terms
         else:
-            rnf_loss = -(q * terms)
+            q = q * terms
 
-        actor_loss = rnf_loss.mean()
+        # normalize the q to prevent blowups
+        q = (q - q.mean()) / (q.max() - q.min())
+
+        # advantage weighting
+        weighting = torch.exp((1.0 / self.lambda_parameter) * q).detach()
+
+        actor_loss = -(log_probs * weighting).mean()
 
         log = dict()
 
