@@ -65,8 +65,8 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
     print(f"Processing run {title}")
 
     # parameters
-    num_steps = 500000
-    num_intervals = 50
+    num_steps = 1e6
+    num_intervals = 100
 
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
@@ -169,7 +169,7 @@ if __name__ == "__main__":
 
     title = "PyFlyt:SimpleWaypointEnv-v0"
     sweep_uri_dict = {}
-    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/8wyi0svm"
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/ecyxommv"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 150.0
