@@ -5,7 +5,7 @@ import torch
 import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
-from algorithms.SAC.SAC import SAC
+from algorithms import SAC
 from pyflyt_env import Environment
 
 
@@ -203,7 +203,9 @@ def setup_nets(wm: Wingman):
     has_weights, model_file, optim_file = wm.get_weight_files()
     if has_weights:
         # load the model
-        model.load_state_dict(torch.load(model_file, map_location=torch.device(cfg.device)))
+        model.load_state_dict(
+            torch.load(model_file, map_location=torch.device(cfg.device))
+        )
 
         # load the optimizer
         checkpoint = torch.load(optim_file, map_location=torch.device(cfg.device))

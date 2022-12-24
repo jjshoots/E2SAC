@@ -1,12 +1,12 @@
-import numpy as np
 import math
 from signal import SIGINT, signal
 
+import numpy as np
 import torch
 import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
-from algorithms.SAC.SAC import SAC
+from algorithms import SAC
 from pyflyt_env import Environment
 
 
@@ -126,9 +126,7 @@ def train(wm: Wingman):
                 # train actor
                 for _ in range(cfg.actor_update_multiplier):
                     model.zero_grad()
-                    rnf_loss, log = model.calc_actor_loss(
-                        obs_atti, obs_targ, terms
-                    )
+                    rnf_loss, log = model.calc_actor_loss(obs_atti, obs_targ, terms)
                     wm.log = {**wm.log, **log}
                     rnf_loss.backward()
                     optims["actor"].step()
@@ -216,7 +214,9 @@ def setup_nets(wm: Wingman):
     has_weights, model_file, optim_file = wm.get_weight_files()
     if has_weights:
         # load the model
-        model.load_state_dict(torch.load(model_file, map_location=torch.device(cfg.device)))
+        model.load_state_dict(
+            torch.load(model_file, map_location=torch.device(cfg.device))
+        )
 
         # load the optimizer
         checkpoint = torch.load(optim_file, map_location=torch.device(cfg.device))

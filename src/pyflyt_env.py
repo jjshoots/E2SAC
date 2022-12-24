@@ -222,7 +222,7 @@ class Environment:
                         f"{gifs_save_path}/gif{total_gifs}.gif",
                         save_all=True,
                         append_images=frames[1:],
-                        duration=1000/30,
+                        duration=1000 / 30,
                         loop=0,
                     )
                     frames = []
