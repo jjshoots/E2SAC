@@ -114,6 +114,7 @@ class AWAC(nn.Module):
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.99,
+        lambda_parameter=0.2,
     ):
         super().__init__()
 
@@ -122,6 +123,7 @@ class AWAC(nn.Module):
         self.act_size = act_size
         self.use_entropy = entropy_tuning
         self.gamma = discount_factor
+        self.lambda_parameter = lambda_parameter
 
         # actor head
         self.actor = GaussianActor(
