@@ -2,6 +2,7 @@ import math
 from signal import SIGINT, signal
 
 import torch
+import torch.nn as nn
 import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 

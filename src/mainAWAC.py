@@ -2,6 +2,7 @@ import math
 from signal import SIGINT, signal
 
 import torch
+import torch.nn as nn
 import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
@@ -305,7 +306,6 @@ def setup_nets(wm: Wingman):
 
 
 if __name__ == "__main__":
-    torch.set_anomaly_enabled(True)
     signal(SIGINT, shutdown_handler)
     wm = Wingman(config_yaml="./src/settings.yaml")
 

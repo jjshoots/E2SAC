@@ -194,7 +194,7 @@ class AWAC(nn.Module):
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
                 rewards
-                + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
+                # + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
                 * terms
             )
 
@@ -233,23 +233,16 @@ class AWAC(nn.Module):
         advantage = (q_old - q_new) * terms
 
         # advantage weighting
-        weighting = torch.exp(advantage / self.lambda_parameter).detach()
-
-        if not torch.isfinite(log_probs).all():
-            print("log_probs is nan")
-        if not torch.isfinite(advantage).all():
-            print("advantage is nan")
-        if not torch.isfinite(weighting).all():
-            print("weighting is nan")
+        weighting = func.softplus(advantage / self.lambda_parameter).detach()
 
         # get loss for q and entropy
         rnf_loss = -(log_probs * weighting).mean()
 
         # entropy bonus
-        ent_loss = (self.log_alpha.exp().detach() * new_log_probs * terms).mean()
+        # ent_loss = (self.log_alpha.exp().detach() * new_log_probs * terms).mean()
 
         # total loss
-        actor_loss = rnf_loss + ent_loss
+        actor_loss = rnf_loss
 
         log = dict()
         log["weighting"] = weighting.mean()
