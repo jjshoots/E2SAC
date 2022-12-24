@@ -5,7 +5,7 @@ import torch
 import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
-from AWAC.AWAC import AWAC
+from algorithms.AWAC.AWAC import AWAC
 from mujoco_env import Environment
 
 
@@ -189,10 +189,10 @@ def eval_display(wm: Wingman):
     cfg = wm.cfg
     env = setup_env(wm)
 
-    if False:
-        net, _ = setup_nets(wm)
-    else:
+    if cfg.debug:
         net = None
+    else:
+        net, _ = setup_nets(wm)
 
     if wm.cfg.display:
         env.display(cfg, net)
@@ -220,6 +220,7 @@ def setup_nets(wm: Wingman):
         entropy_tuning=cfg.use_entropy,
         target_entropy=cfg.target_entropy,
         discount_factor=cfg.discount_factor,
+        lambda_parameter=cfg.lambda_parameter,
     ).to(cfg.device)
     actor_optim = optim.AdamW(
         net.actor.parameters(), lr=cfg.learning_rate, amsgrad=True

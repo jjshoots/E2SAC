@@ -30,6 +30,7 @@ use_entropy: true
 target_entropy: null
 
 # AWAC params
+lambda_parameter: 0.1
 offline_epochs: 10
 offline_steps: 100000
 online_steps: 800000

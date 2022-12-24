@@ -6,7 +6,7 @@ import torch.distributions as dist
 import torch.nn as nn
 import torch.nn.functional as func
 
-import AWAC.AWACNet as AWACNet
+from .SACNet import Actor, Critic
 
 
 class Q_Ensemble(nn.Module):
@@ -17,7 +17,7 @@ class Q_Ensemble(nn.Module):
     def __init__(self, act_size, obs_size, num_networks=2):
         super().__init__()
 
-        networks = [AWACNet.Critic(act_size, obs_size) for _ in range(num_networks)]
+        networks = [Critic(act_size, obs_size) for _ in range(num_networks)]
         self.networks = nn.ModuleList(networks)
 
     def forward(self, states, actions):
@@ -42,7 +42,7 @@ class GaussianActor(nn.Module):
 
     def __init__(self, act_size, obs_size):
         super().__init__()
-        self.net = AWACNet.Actor(act_size, obs_size)
+        self.net = Actor(act_size, obs_size)
 
     def forward(self, states):
         output = self.net(states)
@@ -53,7 +53,7 @@ class GaussianActor(nn.Module):
         """
         output:
             actions is of shape B x act_size
-            log_probs is of shape B x 1
+            entropies is of shape B x 1
         """
         # lower bound sigma and bias it
         normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
@@ -72,32 +72,10 @@ class GaussianActor(nn.Module):
     def infer(mu, sigma):
         return torch.tanh(mu)
 
-    @staticmethod
-    def get_log_probs(mu, sigma, actions):
-        """
-        output:
-            actions is of shape B x act_size
-            log_probs is of shape B x 1
-        """
-        # clamp to prevent explosion
-        actions = actions.clamp(min=-0.99, max=0.99)
 
-        # lower bound sigma and bias it
-        normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
-
-        # calculate log_probs
-        log_probs = normals.log_prob(torch.atanh(actions)) - torch.log(
-            1 - actions.pow(2) + 1e-6
-        )
-        log_probs = log_probs.sum(dim=-1, keepdim=True)
-
-        return log_probs
-
-
-class AWAC(nn.Module):
+class SAC(nn.Module):
     """
-    Advantage Weighted Actor Critic
-    Largely inspired by https://github.com/Junyoungpark/Pytorch-AWAC/blob/main/src/Learner/AWAC.py
+    Soft Actor Critic
     """
 
     def __init__(
@@ -107,7 +85,6 @@ class AWAC(nn.Module):
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.98,
-        lambda_parameter=0.2,
     ):
         super().__init__()
 
@@ -115,7 +92,6 @@ class AWAC(nn.Module):
         self.obs_size = obs_size
         self.use_entropy = entropy_tuning
         self.gamma = discount_factor
-        self.lambda_parameter = lambda_parameter
 
         # actor head
         self.actor = GaussianActor(act_size, obs_size)
@@ -180,7 +156,7 @@ class AWAC(nn.Module):
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
                 rewards
-                # + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
+                + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
                 * terms
             )
 
@@ -194,55 +170,30 @@ class AWAC(nn.Module):
 
         return critic_loss, log
 
-    def calc_actor_loss(self, states, actions, terms):
+    def calc_actor_loss(self, states, terms):
         """
         states is of shape B x input_shape
         terms is of shape B x 1
         """
         terms = 1.0 - terms
 
-        if torch.isnan(states).any():
-            print("states is nan")
-            print(states)
-        if torch.isnan(actions).any():
-            print("actions is nan")
-            print(actions)
-
-        # Get log probs of the actions we have
+        # We re-sample actions to calculate expectations of Q.
         output = self.actor(states)
-        log_probs = self.actor.get_log_probs(output[0], output[1], actions)
+        actions, entropies = self.actor.sample(*output)
 
-        # expectations of Q with clipped double Q, old actions
-        q_old = self.critic(states, actions)
-        q_old, _ = torch.min(q_old, dim=-1, keepdim=True)
-
-        # expectations of Q with clipped double Q, new actions
-        new_actions, _ = self.actor.sample(*output)
-        q_new = self.critic(states, new_actions)
-        q_new, _ = torch.min(q_new, dim=-1, keepdim=True)
+        # expectations of Q with clipped double Q
+        q = self.critic(states, actions)
+        q, _ = torch.min(q, dim=-1, keepdim=True)
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
-        advantage = (q_old - q_new) * terms
+        if self.use_entropy:
+            rnf_loss = -((q - self.log_alpha.exp().detach() * entropies) * terms)
+        else:
+            rnf_loss = -(q * terms)
 
-        # advantage weighting
-        weighting = torch.exp(advantage / self.lambda_parameter).detach()
-
-        if torch.isnan(advantage).any():
-            print("advantage is nan")
-            print(advantage)
-        if torch.isnan(weighting).any():
-            print("weighting is nan")
-            print(weighting)
-        if torch.isnan(log_probs).any():
-            print("log_probs is nan")
-            print(log_probs)
-
-        # get loss for q and entropy
-        actor_loss = -(log_probs * weighting).mean()
+        actor_loss = rnf_loss.mean()
 
         log = dict()
-        log["weighting"] = weighting.mean()
-        log["actor_loss"] = actor_loss.mean()
 
         return actor_loss, log
 
