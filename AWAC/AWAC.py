@@ -79,6 +79,9 @@ class GaussianActor(nn.Module):
             actions is of shape B x act_size
             log_probs is of shape B x 1
         """
+        # clamp to prevent explosion
+        actions = actions.clamp(min=-0.99, max=0.99)
+
         # lower bound sigma and bias it
         normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
 
@@ -104,7 +107,7 @@ class AWAC(nn.Module):
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.98,
-        lambda_parameter=0.3,
+        lambda_parameter=0.1,
     ):
         super().__init__()
 
@@ -177,7 +180,7 @@ class AWAC(nn.Module):
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
                 rewards
-                + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
+                # + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
                 * terms
             )
 
@@ -198,29 +201,48 @@ class AWAC(nn.Module):
         """
         terms = 1.0 - terms
 
+        if torch.isnan(states).any():
+            print("states is nan")
+            print(states)
+        if torch.isnan(actions).any():
+            print("actions is nan")
+            print(actions)
+
         # Get log probs of the actions we have
         output = self.actor(states)
         log_probs = self.actor.get_log_probs(output[0], output[1], actions)
 
-        # expectations of Q with clipped double Q
-        q = self.critic(states, actions)
-        q, _ = torch.min(q, dim=-1, keepdim=True)
+        # expectations of Q with clipped double Q, old actions
+        q_old = self.critic(states, actions)
+        q_old, _ = torch.min(q_old, dim=-1, keepdim=True)
+
+        # expectations of Q with clipped double Q, new actions
+        new_actions, _ = self.actor.sample(*output)
+        q_new = self.critic(states, new_actions)
+        q_new, _ = torch.min(q_new, dim=-1, keepdim=True)
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
-        if self.use_entropy:
-            q = (q - self.log_alpha.exp().detach() * log_probs) * terms
-        else:
-            q = q * terms
-
-        # normalize the q to prevent blowups
-        q = (q - q.mean()) / (q.max() - q.min())
+        advantage = (q_old - q_new) * terms
 
         # advantage weighting
-        weighting = torch.exp((1.0 / self.lambda_parameter) * q).detach()
+        weighting = torch.exp(advantage / self.lambda_parameter).detach()
 
+        if torch.isnan(advantage).any():
+            print("advantage is nan")
+            print(advantage)
+        if torch.isnan(weighting).any():
+            print("weighting is nan")
+            print(weighting)
+        if torch.isnan(log_probs).any():
+            print("log_probs is nan")
+            print(log_probs)
+
+        # get loss for q and entropy
         actor_loss = -(log_probs * weighting).mean()
 
         log = dict()
+        log["weighting"] = weighting.mean()
+        log["actor_loss"] = actor_loss.mean()
 
         return actor_loss, log
 

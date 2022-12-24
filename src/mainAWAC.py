@@ -36,12 +36,8 @@ def train(wm: Wingman):
                 # store stuff in mem
                 memory.push((obs, lbl, rew, next_obs, term))
 
-            # for logging
-            wm.log["total_reward"] = env.cumulative_reward
-            wm.log["num_transitions"] = memory.count
-            wm.wandb_log()
-
     """OFFLINE TRAINING"""
+    print("TRAINING ON OFFLINE DATA...")
     dataloader = torch.utils.data.DataLoader(
         memory, batch_size=cfg.batch_size, shuffle=True, drop_last=False
     )
@@ -83,20 +79,23 @@ def train(wm: Wingman):
                     ent_loss.backward()
                     optim_set["alpha"].step()
 
-        # checkpointing
-        wm.log["offline_eval_perf"] = env.evaluate(cfg, net)
-        to_update, model_file, optim_file = wm.checkpoint(
-            loss=float(wm.log["offline_eval_perf"])
-        )
-        if to_update:
-            torch.save(net.state_dict(), model_file)
+    """OFFLINE EVALUATION"""
+    # checkpointing
+    wm.log["offline_eval_perf"] = env.evaluate(cfg, net)
+    to_update, model_file, optim_file = wm.checkpoint(
+        loss=-float(wm.log["offline_eval_perf"]),
+        step=cfg.offline_steps,
+    )
+    if to_update:
+        torch.save(net.state_dict(), model_file)
 
-            optim_dict = dict()
-            for key in optim_set:
-                optim_dict[key] = optim_set[key].state_dict()
-            torch.save(optim_dict, optim_file)
+        optim_dict = dict()
+        for key in optim_set:
+            optim_dict[key] = optim_set[key].state_dict()
+        torch.save(optim_dict, optim_file)
 
     """ONLINE TRAINING"""
+    print("FINETUNING...")
     # check if need to reset memory
     if cfg.reset_memory:
         memory = ReplayBuffer(cfg.buffer_size)
@@ -174,7 +173,8 @@ def train(wm: Wingman):
         # checkpointing
         wm.log["online_eval_perf"] = env.evaluate(cfg, net)
         to_update, model_file, optim_file = wm.checkpoint(
-            loss=float(wm.log["online_eval_perf"])
+            loss=-float(wm.log["online_eval_perf"]),
+            step=memory.count + cfg.reset_memory * cfg.offline_steps,
         )
         if to_update:
             torch.save(net.state_dict(), model_file)
@@ -249,6 +249,7 @@ def setup_nets(wm: Wingman):
 
 
 if __name__ == "__main__":
+    torch.set_anomaly_enabled(enabled=True)
     signal(SIGINT, shutdown_handler)
     wm = Wingman(config_yaml="./src/settings.yaml")
 

@@ -30,13 +30,13 @@ use_entropy: true
 target_entropy: null
 
 # AWAC params
-offline_epochs: 100
+offline_epochs: 10
 offline_steps: 100000
-online_steps: 200000
-reset_memory: true
+online_steps: 800000
+reset_memory: false
 
 # eval settings
-eval_num_episodes: 50
+eval_num_episodes: 5
 eval_steps_ratio: 10000
 
 # wingman required params
