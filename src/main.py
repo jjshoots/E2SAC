@@ -73,7 +73,7 @@ def train(wm: Wingman):
 
                 # store stuff in mem
                 memory.push(
-                    (
+                    [
                         obs_atti,
                         obs_targ,
                         act,
@@ -82,7 +82,7 @@ def train(wm: Wingman):
                         next_obs_targ,
                         term,
                         lbl,
-                    )
+                    ]
                 )
 
             # for logging

@@ -61,7 +61,7 @@ class GaussianActor(nn.Module):
             log_probs is of shape B x 1
         """
         # lower bound sigma and bias it
-        normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
+        normals = dist.Normal(mu, func.softplus(sigma) + 1e-6)
 
         # sample from dist
         mu_samples = normals.rsample()
@@ -88,7 +88,7 @@ class GaussianActor(nn.Module):
         actions = actions.clamp(min=-0.99, max=0.99)
 
         # lower bound sigma and bias it
-        normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
+        normals = dist.Normal(mu, func.softplus(sigma) + 1e-6)
 
         # calculate log_probs
         log_probs = normals.log_prob(torch.atanh(actions)) - torch.log(
@@ -225,12 +225,9 @@ class AWAC(nn.Module):
         q_old, _ = torch.min(q_old, dim=-1, keepdim=True)
 
         # expectations of Q with clipped double Q, new actions
-        new_actions, _ = self.actor.sample(*output)
+        new_actions, new_log_probs = self.actor.sample(*output)
         q_new = self.critic(obs_atti, obs_targ, new_actions)
         q_new, _ = torch.min(q_new, dim=-1, keepdim=True)
-
-        if torch.isnan(advantage).any():
-            print("advantage is 0")
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         advantage = (q_old - q_new) * terms
@@ -238,12 +235,25 @@ class AWAC(nn.Module):
         # advantage weighting
         weighting = torch.exp(advantage / self.lambda_parameter).detach()
 
+        if not torch.isfinite(log_probs).all():
+            print("log_probs is nan")
+        if not torch.isfinite(advantage).all():
+            print("advantage is nan")
+        if not torch.isfinite(weighting).all():
+            print("weighting is nan")
+
         # get loss for q and entropy
-        actor_loss = -(log_probs * weighting).mean()
+        rnf_loss = -(log_probs * weighting).mean()
+
+        # entropy bonus
+        ent_loss = (self.log_alpha.exp().detach() * new_log_probs * terms).mean()
+
+        # total loss
+        actor_loss = rnf_loss + ent_loss
 
         log = dict()
         log["weighting"] = weighting.mean()
-        log["actor_loss"] = actor_loss.mean()
+        log["actor_loss"] = rnf_loss.mean()
 
         return actor_loss, log
 

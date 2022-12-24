@@ -133,9 +133,14 @@ def train(wm: Wingman):
                 obs_atti = env.state_atti
                 obs_targ = env.state_targ
 
-                output = model.actor(gpuize(obs, cfg.device).unsqueeze(0))
+                # move observation to gpu
+                t_obs_atti = gpuize(obs_atti, cfg.device)
+                t_obs_targ = gpuize(obs_targ, cfg.device)
+
+                # get the action from policy
+                output = model.actor(t_obs_atti, t_obs_targ)
                 action, _ = model.actor.sample(*output)
-                action = cpuize(action).squeeze(0)
+                action = cpuize(action)
 
                 # get the next state and other stuff
                 next_obs_atti, next_obs_targ, reward, termination = env.step(action)
@@ -300,6 +305,7 @@ def setup_nets(wm: Wingman):
 
 
 if __name__ == "__main__":
+    torch.set_anomaly_enabled(True)
     signal(SIGINT, shutdown_handler)
     wm = Wingman(config_yaml="./src/settings.yaml")
 

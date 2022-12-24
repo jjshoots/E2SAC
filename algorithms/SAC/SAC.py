@@ -61,7 +61,7 @@ class GaussianActor(nn.Module):
             entropies is of shape B x 1
         """
         # lower bound sigma and bias it
-        normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
+        normals = dist.Normal(mu, func.softplus(sigma) + 1e-6)
 
         # sample from dist
         mu_samples = normals.rsample()
