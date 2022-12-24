@@ -263,6 +263,7 @@ def setup_nets(wm: Wingman):
         entropy_tuning=cfg.use_entropy,
         target_entropy=cfg.target_entropy,
         discount_factor=cfg.discount_factor,
+        lambda_parameter=cfg.lambda_parameter,
     ).to(cfg.device)
     actor_optim = optim.AdamW(
         model.actor.parameters(), lr=cfg.learning_rate, amsgrad=True
