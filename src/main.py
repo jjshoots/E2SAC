@@ -5,7 +5,7 @@ import torch
 import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
-from CCGE.CCGE import CCGE
+from algorithms.CCGE.CCGE import CCGE
 from pyflyt_env import Environment
 
 

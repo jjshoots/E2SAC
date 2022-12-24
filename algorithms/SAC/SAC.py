@@ -6,7 +6,7 @@ import torch.distributions as dist
 import torch.nn as nn
 import torch.nn.functional as func
 
-import SAC.SACNet as SACNet
+from .SACNet import Actor, Critic
 
 
 class Q_Ensemble(nn.Module):
@@ -20,7 +20,7 @@ class Q_Ensemble(nn.Module):
         super().__init__()
 
         networks = [
-            SACNet.Critic(act_size, obs_atti_size, obs_targ_size, context_length)
+            Critic(act_size, obs_atti_size, obs_targ_size, context_length)
             for _ in range(num_networks)
         ]
         self.networks = nn.ModuleList(networks)
@@ -47,7 +47,7 @@ class GaussianActor(nn.Module):
 
     def __init__(self, act_size, obs_atti_size, obs_targ_size, context_length):
         super().__init__()
-        self.net = SACNet.Actor(act_size, obs_atti_size, obs_targ_size, context_length)
+        self.net = Actor(act_size, obs_atti_size, obs_targ_size, context_length)
 
     def forward(self, obs_atti, obs_targ):
         output = self.net(obs_atti, obs_targ)
@@ -107,9 +107,7 @@ class SAC(nn.Module):
         )
 
         # twin delayed Q networks
-        self.critic = Q_Ensemble(
-            act_size, obs_atti_size, obs_targ_size, context_length
-        )
+        self.critic = Q_Ensemble(act_size, obs_atti_size, obs_targ_size, context_length)
         self.critic_target = Q_Ensemble(
             act_size, obs_atti_size, obs_targ_size, context_length
         ).eval()

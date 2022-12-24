@@ -6,7 +6,7 @@ import torch
 import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
-from SAC.SAC import SAC
+from algorithms.SAC.SAC import SAC
 from pyflyt_env import Environment
 
 
