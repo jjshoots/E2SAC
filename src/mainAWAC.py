@@ -85,7 +85,9 @@ def train(wm: Wingman):
             # train actor
             for _ in range(cfg.actor_update_multiplier):
                 model.zero_grad()
-                rnf_loss, log = model.calc_actor_loss(obs_atti, obs_targ, actions, terms)
+                rnf_loss, log = model.calc_actor_loss(
+                    obs_atti, obs_targ, actions, terms
+                )
                 wm.log = {**wm.log, **log}
                 rnf_loss.backward()
                 optims["actor"].step()
@@ -194,7 +196,9 @@ def train(wm: Wingman):
                 # train actor
                 for _ in range(cfg.actor_update_multiplier):
                     model.zero_grad()
-                    rnf_loss, log = model.calc_actor_loss(obs_atti, obs_targ, actions, terms)
+                    rnf_loss, log = model.calc_actor_loss(
+                        obs_atti, obs_targ, actions, terms
+                    )
                     wm.log = {**wm.log, **log}
                     rnf_loss.backward()
                     optims["actor"].step()
@@ -220,7 +224,6 @@ def train(wm: Wingman):
             for key in optims:
                 optim_dict[key] = optims[key].state_dict()
             torch.save(optim_dict, optim_file)
-
 
 
 def eval_display(wm: Wingman):
