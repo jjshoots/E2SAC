@@ -36,7 +36,7 @@ def train(wm: Wingman):
 
                 # store stuff in mem
                 memory.push(
-                    (
+                    [
                         obs_atti,
                         obs_targ,
                         label,
@@ -44,7 +44,7 @@ def train(wm: Wingman):
                         next_obs_atti,
                         next_obs_targ,
                         termination,
-                    )
+                    ]
                 )
 
     """OFFLINE TRAINING"""
@@ -142,7 +142,7 @@ def train(wm: Wingman):
 
                 # store stuff in mem
                 memory.push(
-                    (
+                    [
                         obs_atti,
                         obs_targ,
                         action,
@@ -150,7 +150,7 @@ def train(wm: Wingman):
                         next_obs_atti,
                         next_obs_targ,
                         termination,
-                    )
+                    ]
                 )
 
             # for logging

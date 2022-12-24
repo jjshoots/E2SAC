@@ -229,6 +229,9 @@ class AWAC(nn.Module):
         q_new = self.critic(obs_atti, obs_targ, new_actions)
         q_new, _ = torch.min(q_new, dim=-1, keepdim=True)
 
+        if torch.isnan(advantage).any():
+            print("advantage is 0")
+
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         advantage = (q_old - q_new) * terms
 

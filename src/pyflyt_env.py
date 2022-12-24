@@ -101,7 +101,7 @@ class Environment:
         # normalize
         self.pid_output = (self.pid_output - self._action_mid) / self._action_range
 
-    def get_label(self, *_):
+    def get_label(self, *_) -> np.ndarray:
         return self.pid_output
 
     def reset(self):
