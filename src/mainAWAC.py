@@ -130,7 +130,8 @@ def train(wm: Wingman):
         with torch.no_grad():
             while not env.ended:
                 # get the initial state
-                obs = env.state
+                obs_atti = env.state_atti
+                obs_targ = env.state_targ
 
                 output = model.actor(gpuize(obs, cfg.device).unsqueeze(0))
                 action, _ = model.actor.sample(*output)

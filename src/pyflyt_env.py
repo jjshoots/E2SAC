@@ -120,7 +120,7 @@ class Environment:
 
         return self.state_atti, self.state_targ
 
-    def step(self, action):
+    def step(self, action) -> tuple[np.ndarray, np.ndarray, float, bool]:
         action = action.squeeze()
         assert (
             action.shape[0] == self.act_size
