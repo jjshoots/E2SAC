@@ -132,7 +132,7 @@ class CCGE(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_sup_scale(self, states, actions, labels):
+    def calc_sup_scale(self, states, actions, labels, implicit=True):
         # stack actions and labels to perform inference on both together
         actions_labels = torch.stack((actions, labels), dim=0)
 
@@ -145,21 +145,23 @@ class CCGE(nn.Module):
         expected_q = critic_output[0, 0, ...]
 
         """ SUPERVISION SCALE DERIVATION """
-        # uncertainty is upper bound difference between suboptimal and learned
-        # uncertainty = (
-        #     (
-        #         critic_output[0, 1, ...].mean(dim=-1, keepdim=True)
-        #         + critic_output[1, 1, ...].max(dim=-1, keepdim=True)[0]
-        #     )
-        #     - (
-        #         critic_output[0, 0, ...].mean(dim=-1, keepdim=True)
-        #         + critic_output[1, 0, ...].min(dim=-1, keepdim=True)[0]
-        #     )
-        # ).detach()
-        uncertainty = (
-            (critic_output[0, 1, ...].max(dim=-1, keepdim=True)[0])
-            - (critic_output[0, 0, ...].min(dim=-1, keepdim=True)[0])
-        ).detach()
+        if implicit:
+            # uncertainty is upper bound difference between suboptimal and learned
+            uncertainty = (
+                (
+                    critic_output[0, 1, ...].mean(dim=-1, keepdim=True)
+                    + critic_output[1, 1, ...].max(dim=-1, keepdim=True)[0]
+                )
+                - (
+                    critic_output[0, 0, ...].mean(dim=-1, keepdim=True)
+                    + critic_output[1, 0, ...].min(dim=-1, keepdim=True)[0]
+                )
+            ).detach()
+        else:
+            uncertainty = (
+                (critic_output[0, 1, ...].max(dim=-1, keepdim=True)[0])
+                - (critic_output[0, 0, ...].min(dim=-1, keepdim=True)[0])
+            ).detach()
 
         # normalize uncertainty
         uncertainty = (

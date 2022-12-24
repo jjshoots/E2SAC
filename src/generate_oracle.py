@@ -3,10 +3,10 @@ from signal import SIGINT, signal
 
 import torch
 import torch.optim as optim
+from SAC.SAC import SAC
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
 from mujoco_env import Environment
-from SAC.SAC import SAC
 
 
 def train(wm: Wingman):

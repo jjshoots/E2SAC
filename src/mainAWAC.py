@@ -5,7 +5,7 @@ import torch
 import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
-from algorithms.AWAC.AWAC import AWAC
+from algorithms import AWAC
 from mujoco_env import Environment
 
 
