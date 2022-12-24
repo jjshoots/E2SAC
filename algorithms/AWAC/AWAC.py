@@ -233,7 +233,7 @@ class AWAC(nn.Module):
         advantage = (q_old - q_new) * terms
 
         # advantage weighting
-        weighting = func.softplus(advantage / self.lambda_parameter).detach()
+        weighting = torch.exp(advantage / self.lambda_parameter).detach()
 
         # get loss for q and entropy
         rnf_loss = -(log_probs * weighting).mean()
