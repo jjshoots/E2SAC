@@ -107,7 +107,7 @@ class AWAC(nn.Module):
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.98,
-        lambda_parameter=0.1,
+        lambda_parameter=0.3,
     ):
         super().__init__()
 
