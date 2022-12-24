@@ -231,6 +231,7 @@ class AWAC(nn.Module):
 
         # reinforcement target is maximization of (Q + alpha * entropy) * done
         advantage = (q_old - q_new) * terms
+        advantage = torch.clamp(advantage, -torch.inf, 5.0)
 
         # advantage weighting
         weighting = torch.exp(advantage / self.lambda_parameter).detach()
@@ -239,10 +240,10 @@ class AWAC(nn.Module):
         rnf_loss = -(log_probs * weighting).mean()
 
         # entropy bonus
-        # ent_loss = (self.log_alpha.exp().detach() * new_log_probs * terms).mean()
+        ent_loss = (self.log_alpha.exp().detach() * new_log_probs * terms).mean()
 
         # total loss
-        actor_loss = rnf_loss
+        actor_loss = rnf_loss + ent_loss
 
         log = dict()
         log["weighting"] = weighting.mean()
