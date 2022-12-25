@@ -32,8 +32,8 @@ target_entropy: null
 # AWAC params
 lambda_parameter: 0.05
 offline_epochs: 10
-offline_steps: 0
-online_steps: 800000
+offline_steps: 100000
+online_steps: 900000
 reset_memory: false
 
 # eval settings
