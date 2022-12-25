@@ -250,7 +250,6 @@ def setup_nets(wm: Wingman):
 
 
 if __name__ == "__main__":
-    torch.set_anomaly_enabled(enabled=True)
     signal(SIGINT, shutdown_handler)
     wm = Wingman(config_yaml="./src/settings.yaml")
 

@@ -56,7 +56,7 @@ class GaussianActor(nn.Module):
             log_probs is of shape B x 1
         """
         # lower bound sigma and bias it
-        normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
+        normals = dist.Normal(mu, func.softplus(sigma) + 1e-6)
 
         # sample from dist
         mu_samples = normals.rsample()
@@ -83,7 +83,7 @@ class GaussianActor(nn.Module):
         actions = actions.clamp(min=-0.99, max=0.99)
 
         # lower bound sigma and bias it
-        normals = dist.Normal(mu, func.softplus(sigma + 1) + 1e-6)
+        normals = dist.Normal(mu, func.softplus(sigma) + 1e-6)
 
         # calculate log_probs
         log_probs = normals.log_prob(torch.atanh(actions)) - torch.log(
@@ -180,7 +180,7 @@ class AWAC(nn.Module):
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
                 rewards
-                # + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
+                + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
                 * terms
             )
 
@@ -217,7 +217,7 @@ class AWAC(nn.Module):
         q_old, _ = torch.min(q_old, dim=-1, keepdim=True)
 
         # expectations of Q with clipped double Q, new actions
-        new_actions, _ = self.actor.sample(*output)
+        new_actions, new_log_probs = self.actor.sample(*output)
         q_new = self.critic(states, new_actions)
         q_new, _ = torch.min(q_new, dim=-1, keepdim=True)
 
@@ -225,20 +225,16 @@ class AWAC(nn.Module):
         advantage = (q_old - q_new) * terms
 
         # advantage weighting
-        weighting = torch.exp(advantage / self.lambda_parameter).detach()
+        weighting = func.softplus(advantage / self.lambda_parameter).detach()
 
-        if torch.isnan(advantage).any():
-            print("advantage is nan")
-            print(advantage)
-        if torch.isnan(weighting).any():
-            print("weighting is nan")
-            print(weighting)
-        if torch.isnan(log_probs).any():
-            print("log_probs is nan")
-            print(log_probs)
+        # get loss for q
+        rnf_loss = -(log_probs * weighting).mean()
 
-        # get loss for q and entropy
-        actor_loss = -(log_probs * weighting).mean()
+        # entropy bonus
+        ent_loss = (self.log_alpha.exp().detach() * new_log_probs * terms).mean()
+
+        # sum all losses
+        actor_loss = rnf_loss + ent_loss
 
         log = dict()
         log["weighting"] = weighting.mean()
