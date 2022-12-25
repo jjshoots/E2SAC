@@ -194,7 +194,7 @@ class AWAC(nn.Module):
             # TD learning, targetQ = R + dones * (gamma*nextQ + entropy)
             target_q = (
                 rewards
-                # + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
+                + (-self.log_alpha.exp().detach() * log_probs + self.gamma * next_q)
                 * terms
             )
 
@@ -234,7 +234,7 @@ class AWAC(nn.Module):
         advantage = torch.clamp(advantage, -torch.inf, 5.0)
 
         # advantage weighting
-        weighting = torch.exp(advantage / self.lambda_parameter).detach()
+        weighting = func.softplus(advantage / self.lambda_parameter).detach()
 
         # get loss for q and entropy
         rnf_loss = -(log_probs * weighting).mean()

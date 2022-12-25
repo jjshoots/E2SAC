@@ -47,3 +47,20 @@ command:
   - "--train"
   - "--wandb"
   - "--wandb_name=JSRLRandom-PyFlyt-Waypoints"
+
+
+# program: mainAWAC.py
+# method: random
+# metric:
+#   name: max_eval_perf
+#   goal: maximize
+# name: "AWAC-PyFlyt-Waypoints"
+# parameters:
+#   env_name:
+#     value: "PyFlyt/SimpleWaypointEnv-v0"
+# command:
+#   - python3
+#   - src/mainAWAC.py
+#   - "--train"
+#   - "--wandb"
+#   - "--wandb_name=AWAC-PyFlyt-Waypoints"
