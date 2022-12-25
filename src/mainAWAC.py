@@ -164,7 +164,6 @@ def train(wm: Wingman):
             wm.log["num_transitions"] = (
                 memory.count + cfg.offline_steps * cfg.reset_memory
             )
-            wm.wandb_log()
 
         # train on online data
         dataloader = torch.utils.data.DataLoader(
