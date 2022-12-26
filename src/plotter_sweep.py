@@ -170,6 +170,7 @@ if __name__ == "__main__":
     title = "PyFlyt:SimpleWaypointEnv-v0"
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/ecyxommv"
+    sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/qanjaxgs"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 150.0
