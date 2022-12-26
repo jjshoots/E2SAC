@@ -132,7 +132,7 @@ class CCGE(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_sup_scale(self, states, actions, labels, implicit=True):
+    def calc_sup_scale(self, states, actions, labels, explicit=True):
         # stack actions and labels to perform inference on both together
         actions_labels = torch.stack((actions, labels), dim=0)
 
@@ -145,7 +145,7 @@ class CCGE(nn.Module):
         expected_q = critic_output[0, 0, ...]
 
         """ SUPERVISION SCALE DERIVATION """
-        if implicit:
+        if explicit:
             # uncertainty is upper bound difference between suboptimal and learned
             uncertainty = (
                 (

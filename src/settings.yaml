@@ -1,12 +1,12 @@
 # env params
 env_name: ''
-env_name: 'Ant-v4'
+# env_name: 'Ant-v4'
 # env_name: 'HalfCheetah-v4'
 # env_name: 'Hopper-v4'
-# env_name: 'Walker2d-v4'
+env_name: 'Walker2d-v4'
 
 # target_performance of oracle
-target_performance: 2200
+target_performance: 3000
 
 # learning params
 buffer_size: 300000
