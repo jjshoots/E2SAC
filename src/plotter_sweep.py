@@ -168,9 +168,10 @@ if __name__ == "__main__":
     title = "Hopper-v4"
     sweep_uri_dict = {}
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/zgq81g05"
+    sweep_uri_dict["CCGE_1_Im"] = "jjshoots/CCGE2/8tex48bv"
     sweep_uri_dict["CCGE_1_Ex"] = "jjshoots/CCGE2/phevs4mc"
-    sweep_uri_dict["CCGE_2_Ex"] = "jjshoots/CCGE2/po10jfqp"
     sweep_uri_dict["CCGE_2_Im"] = "jjshoots/CCGE2/18p6t19p"
+    sweep_uri_dict["CCGE_2_Ex"] = "jjshoots/CCGE2/po10jfqp"
     # sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/fscr3ka0"
 
     baselines_dict = {}
