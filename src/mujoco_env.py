@@ -43,10 +43,19 @@ class Environment:
         # load suboptimal policy
         try:
             path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
+
+            # hacky way to get number of neurons per layer because I fked up with oracle training
+            weights = torch.load(path)
+            neurons_per_layer = weights["net.0.0.weight"].shape[0]
+
+            # load the oracle
             self.suboptimal_actor = Suboptimal_Actor(
-                act_size=self.act_size, obs_size=self.obs_size
+                act_size=self.act_size,
+                obs_size=self.obs_size,
+                neurons_per_layer=neurons_per_layer,
             ).to(cfg.device)
-            self.suboptimal_actor.load_state_dict(torch.load(path))
+            self.suboptimal_actor.load_state_dict(weights)
+
             print(f"Loaded {path}")
         except FileNotFoundError:
             warnings.warn("--------------------------------------------------")

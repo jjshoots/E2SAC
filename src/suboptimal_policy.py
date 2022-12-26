@@ -7,12 +7,17 @@ class Suboptimal_Actor(nn.Module):
     Actor network
     """
 
-    def __init__(self, act_size, obs_size):
+    def __init__(self, act_size, obs_size, neurons_per_layer):
         super().__init__()
         self.act_size = act_size
         self.obs_size = obs_size
 
-        _features_description = [obs_size, 256, 256, act_size * 2]
+        _features_description = [
+            obs_size,
+            neurons_per_layer,
+            neurons_per_layer,
+            act_size * 2,
+        ]
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]

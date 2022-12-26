@@ -132,7 +132,7 @@ def eval_display(wm: Wingman):
     cfg = wm.cfg
     env = setup_env(wm)
 
-    if False:
+    if not cfg.debug:
         net, _ = setup_nets(wm)
     else:
         net = None

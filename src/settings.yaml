@@ -37,7 +37,7 @@ online_steps: 900000
 reset_memory: false
 
 # eval settings
-eval_num_episodes: 5
+eval_num_episodes: 100
 eval_steps_ratio: 10000
 
 # wingman required params
