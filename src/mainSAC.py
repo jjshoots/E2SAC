@@ -6,7 +6,7 @@ import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
 from algorithms import SAC
-from mujoco_env import Environment
+from d4rl_env import Environment
 
 
 def train(wm: Wingman):

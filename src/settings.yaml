@@ -1,9 +1,9 @@
 # env params
-env_name: ''
-# env_name: 'Ant-v4'
-# env_name: 'HalfCheetah-v4'
-# env_name: 'Hopper-v4'
-env_name: 'Walker2d-v4'
+sparse: True
+env_name: 'AdroitHandDoor-v0'
+# env_name: 'AdroitHandPen-v0'
+# env_name: 'AdroitHandHammer-v0'
+# env_name: 'AdroitHandRelocate-v0'
 
 # target_performance of oracle
 target_performance: 3000

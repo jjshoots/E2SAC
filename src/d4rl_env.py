@@ -7,19 +7,28 @@ from wingman import cpuize, gpuize
 
 from suboptimal_policy import Suboptimal_Actor
 
+from gymnasium.spaces.utils import flatten
+from gymnasium.spaces import Dict
 
 class Environment:
     """
-    Wrapper for OpenAI gym environments that outputs suboptimal actions also
+    Wrapper for D4RL Environments with suboptimal actions
     """
 
     def __init__(self, cfg):
         super().__init__()
 
+        env_name = cfg.env_name.split("-")
+        self.env_name = env_name[0] + ("Sparse-" if cfg.sparse else "-") + env_name[1]
+
         # make the env
         self.env = gym.make(
-            cfg.env_name, render_mode=("human" if cfg.display else "rgb_array")
+            self.env_name, render_mode=("human" if cfg.display else "rgb_array")
         )
+
+        # flatten the space if needed
+        if isinstance(self.env.observation_space, Dict):
+            self.env = gym.wrappers.FlattenObservation(self.env)
 
         # compute spaces
         if len(self.env.action_space.shape) == 1:
@@ -41,11 +50,10 @@ class Environment:
         self._action_scale = (action_high - action_low) / 2.0
 
         # load suboptimal policy
+        suboptimal_path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
         try:
-            path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
-
             # hacky way to get number of neurons per layer because I fked up with oracle training
-            weights = torch.load(path)
+            weights = torch.load(suboptimal_path)
             neurons_per_layer = weights["net.0.0.weight"].shape[0]
 
             # load the oracle
@@ -56,10 +64,10 @@ class Environment:
             ).to(cfg.device)
             self.suboptimal_actor.load_state_dict(weights)
 
-            print(f"Loaded {path}")
+            print(f"Loaded {suboptimal_path}")
         except FileNotFoundError:
             warnings.warn("--------------------------------------------------")
-            warnings.warn(f"Failed to load suboptimal actor {path}, exiting.")
+            warnings.warn(f"Failed to load suboptimal actor {suboptimal_path}, exiting.")
             warnings.warn("--------------------------------------------------")
             self.suboptimal_actor = None
 
@@ -112,7 +120,7 @@ class Environment:
 
         # make the env
         self.env.close()
-        self.env = gym.make(cfg.env_name, render_mode="rgb_array")
+        self.env = gym.make(self.env_name, render_mode="rgb_array")
         self.reset()
 
         # store the list of eval performances here
@@ -145,7 +153,7 @@ class Environment:
 
         # make the env
         self.env.close()
-        self.env = gym.make(cfg.env_name, render_mode="human")
+        self.env = gym.make(self.env_name, render_mode="human")
         self.reset()
 
         while True:

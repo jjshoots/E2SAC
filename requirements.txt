@@ -1,7 +1,8 @@
 torch
 numpy
 jj-wingman
-gymnasium[mujoco]
+gymnasium
 matplotlib
 seaborn
 git+https://github.com/jjshoots/rliable.git
+git+https://github.com/jjshoots/Gymnasium-Robotics.git@jjshoots-d4rl-2
