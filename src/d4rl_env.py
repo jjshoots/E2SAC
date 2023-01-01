@@ -1,5 +1,3 @@
-import warnings
-
 import gymnasium as gym
 import numpy as np
 import torch
@@ -7,7 +5,6 @@ from wingman import cpuize, gpuize
 
 from suboptimal_policy import Suboptimal_Actor
 
-from gymnasium.spaces.utils import flatten
 from gymnasium.spaces import Dict
 
 class Environment:
@@ -20,6 +17,10 @@ class Environment:
 
         env_name = cfg.env_name.split("-")
         self.env_name = env_name[0] + ("Sparse-" if cfg.sparse else "-") + env_name[1]
+
+        print("--------------------------------------------------")
+        print(f"Using env {self.env_name}.")
+        print("--------------------------------------------------")
 
         # make the env
         self.env = gym.make(
@@ -66,9 +67,9 @@ class Environment:
 
             print(f"Loaded {suboptimal_path}")
         except FileNotFoundError:
-            warnings.warn("--------------------------------------------------")
-            warnings.warn(f"Failed to load suboptimal actor {suboptimal_path}, exiting.")
-            warnings.warn("--------------------------------------------------")
+            print("--------------------------------------------------")
+            print(f"Failed to load suboptimal actor {suboptimal_path}, exiting.")
+            print("--------------------------------------------------")
             self.suboptimal_actor = None
 
         self.reset()
@@ -77,7 +78,8 @@ class Environment:
         self.state, _ = self.env.reset()
 
         self.ended = False
-        self.cumulative_reward = 0
+        self.success = False
+        self.cumulative_reward = 0.0
 
         return self.state
 
@@ -92,6 +94,9 @@ class Environment:
 
         # step through the env
         self.state, reward, term, trunc, info = self.env.step(action)
+
+        # special check for if success
+        self.success = self.success and info["success"]
 
         # accumulate rewards
         self.cumulative_reward += reward
@@ -124,9 +129,9 @@ class Environment:
         self.reset()
 
         # store the list of eval performances here
-        eval_perf = []
+        successes = []
 
-        while len(eval_perf) < cfg.eval_num_episodes:
+        while len(successes) < cfg.eval_num_episodes:
 
             # get the action based on the state
             if net is not None:
@@ -140,10 +145,10 @@ class Environment:
             self.step(action)
 
             if self.ended:
-                eval_perf.append(self.cumulative_reward)
+                successes.append(1.0 * self.success)
                 self.reset()
 
-        eval_perf = np.mean(np.array(eval_perf))
+        eval_perf = np.mean(np.array(successes))
         return eval_perf
 
     def display(self, cfg, net=None):

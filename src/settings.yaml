@@ -1,5 +1,5 @@
 # env params
-sparse: True
+sparse: False
 env_name: 'AdroitHandDoor-v0'
 # env_name: 'AdroitHandPen-v0'
 # env_name: 'AdroitHandHammer-v0'

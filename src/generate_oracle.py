@@ -6,7 +6,7 @@ import torch.optim as optim
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
 from algorithms import SAC
-from mujoco_env import Environment
+from d4rl_env import Environment
 
 
 def train(wm: Wingman):
@@ -57,7 +57,7 @@ def train(wm: Wingman):
                 next_obs, rew, term = env.step(action)
 
                 # store stuff in mem
-                memory.push((obs, action, rew, next_obs, term))
+                memory.push([obs, action, rew, next_obs, term])
 
             # for logging
             wm.log["total_reward"] = env.cumulative_reward
@@ -135,10 +135,10 @@ def eval_display(wm: Wingman):
     cfg = wm.cfg
     env = setup_env(wm)
 
-    if False:
-        net, _ = setup_nets(wm)
-    else:
+    if cfg.debug:
         net = None
+    else:
+        net, _ = setup_nets(wm)
 
     if wm.cfg.display:
         env.display(cfg, net)
