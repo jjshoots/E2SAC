@@ -59,9 +59,6 @@ def train(wm: Wingman):
                 # store stuff in mem
                 memory.push([obs, action, rew, next_obs, term])
 
-            # for logging
-            wm.log["total_reward"] = env.cumulative_reward
-
         """TRAINING RUN"""
         dataloader = torch.utils.data.DataLoader(
             memory, batch_size=cfg.batch_size, shuffle=True, drop_last=False

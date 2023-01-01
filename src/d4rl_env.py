@@ -79,7 +79,6 @@ class Environment:
 
         self.ended = False
         self.success = False
-        self.cumulative_reward = 0.0
 
         return self.state
 
@@ -98,9 +97,7 @@ class Environment:
         # special check for if success
         self.success = self.success and info["success"]
 
-        # accumulate rewards
-        self.cumulative_reward += reward
-
+        print(term, trunc)
         if term or trunc:
             self.ended = True
 
@@ -132,7 +129,6 @@ class Environment:
         successes = []
 
         while len(successes) < cfg.eval_num_episodes:
-
             # get the action based on the state
             if net is not None:
                 output = net.actor(gpuize(self.state, cfg.device).unsqueeze(0))
@@ -172,5 +168,5 @@ class Environment:
                 self.step(self.get_label(self.state))
 
             if self.ended:
-                print(f"Total Reward: {self.cumulative_reward}")
+                print(f"Success: {self.success}.")
                 self.reset()

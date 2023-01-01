@@ -119,10 +119,9 @@ def train(wm: Wingman):
                 next_obs, rew, term = env.step(action)
 
                 # store stuff in mem
-                memory.push((obs, action, rew, next_obs, term))
+                memory.push([obs, action, rew, next_obs, term])
 
             # for logging
-            wm.log["total_reward"] = env.cumulative_reward
             wm.log["num_transitions"] = (
                 memory.count + cfg.offline_steps * cfg.reset_memory
             )
