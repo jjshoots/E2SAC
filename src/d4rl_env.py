@@ -97,7 +97,6 @@ class Environment:
         # special check for if success
         self.success = self.success and info["success"]
 
-        print(term, trunc)
         if term or trunc:
             self.ended = True
 
