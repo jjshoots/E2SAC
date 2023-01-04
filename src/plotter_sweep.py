@@ -182,6 +182,7 @@ if __name__ == "__main__":
     title = "Ant-v4"
     sweep_uri_dict = {}
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/4uvx5qez"
+    sweep_uri_dict["CCGE_1_Im"] = "jjshoots/CCGE2/d74a6t1w"
     sweep_uri_dict["CCGE_1_Ex"] = "jjshoots/CCGE2/dp4byhg8"
     sweep_uri_dict["CCGE_2_Ex"] = "jjshoots/CCGE2/b0r4xjqu"
     sweep_uri_dict["CCGE_2_Im"] = "jjshoots/CCGE2/f9sntmmm"
@@ -195,6 +196,7 @@ if __name__ == "__main__":
     title = "HalfCheetah-v4"
     sweep_uri_dict = {}
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/95qoyb9w"
+    sweep_uri_dict["CCGE_1_Im"] = "jjshoots/CCGE2/i9cg5mqw"
     sweep_uri_dict["CCGE_1_Ex"] = "jjshoots/CCGE2/o61ibecs"
     sweep_uri_dict["CCGE_2_Ex"] = "jjshoots/CCGE2/62jvni7q"
     sweep_uri_dict["CCGE_2_Im"] = "jjshoots/CCGE2/5e3vqsse"
