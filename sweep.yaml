@@ -5,14 +5,12 @@ metric:
   goal: maximize
 parameters:
   env_name:
-    value: "Hopper-v4"
-  target_performance:
-    value: 850
-name: "CCGE_1_Im_Hopper"
+    value: "AdroitHandDoor-v0"
+name: "SAC_AdroitHandDoor-v0"
 command:
   - python3
-  # - src/mainSAC.py
-  - src/main.py
+  - src/mainSAC.py
+  # - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=CCGE_1_Im_Hopper"
+  - "--wandb_name=SAC_AdroitHandDoor-v0"

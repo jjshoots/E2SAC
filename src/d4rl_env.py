@@ -79,6 +79,7 @@ class Environment:
 
         self.ended = False
         self.success = False
+        self.cumulative_reward = 0.0
 
         return self.state
 
@@ -93,6 +94,9 @@ class Environment:
 
         # step through the env
         self.state, reward, term, trunc, info = self.env.step(action)
+
+        # accumulate reward
+        self.cumulative_reward += reward
 
         # special check for if success
         self.success = self.success and info["success"]
@@ -126,6 +130,7 @@ class Environment:
 
         # store the list of eval performances here
         successes = []
+        evaluation = []
 
         while len(successes) < cfg.eval_num_episodes:
             # get the action based on the state
@@ -141,10 +146,12 @@ class Environment:
 
             if self.ended:
                 successes.append(1.0 * self.success)
+                evaluation.append(self.cumulative_reward)
                 self.reset()
 
-        eval_perf = np.mean(np.array(successes))
-        return eval_perf
+        success_rate = np.mean(np.array(successes))
+        evaluation_score = np.mean(np.array(evaluation))
+        return success_rate, evaluation_score
 
     def display(self, cfg, net=None):
 

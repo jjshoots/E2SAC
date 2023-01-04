@@ -1,6 +1,7 @@
 # env params
 sparse: False
-env_name: 'AdroitHandDoor-v0'
+env_name: ''
+# env_name: 'AdroitHandDoor-v0'
 # env_name: 'AdroitHandPen-v0'
 # env_name: 'AdroitHandHammer-v0'
 # env_name: 'AdroitHandRelocate-v0'
