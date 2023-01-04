@@ -68,7 +68,7 @@ class Environment:
             print(f"Loaded {suboptimal_path}")
         except FileNotFoundError:
             print("--------------------------------------------------")
-            print(f"Failed to load suboptimal actor {suboptimal_path}, exiting.")
+            print(f"Failed to load suboptimal actor {suboptimal_path}, ignoring.")
             print("--------------------------------------------------")
             self.suboptimal_actor = None
 

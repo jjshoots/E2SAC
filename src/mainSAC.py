@@ -31,7 +31,7 @@ def train(wm: Wingman):
             next_eval_step = (
                 int(memory.count / cfg.eval_steps_ratio) + 1
             ) * cfg.eval_steps_ratio
-            wm.log["eval_perf"], wm.log["eval_score"] = env.evaluate(cfg, net)
+            wm.log["success_rate"], wm.log["eval_perf"] = env.evaluate(cfg, net)
             wm.log["max_eval_perf"] = max(
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )
@@ -178,10 +178,10 @@ def setup_nets(wm: Wingman):
     has_weights, model_file, optim_file = wm.get_weight_files()
     if has_weights:
         # load the model
-        net.load_state_dict(torch.load(model_file))
+        net.load_state_dict(torch.load(model_file, map_location=torch.device("cpu")))
 
         # load the optimizer
-        checkpoint = torch.load(optim_file)
+        checkpoint = torch.load(optim_file, map_location=torch.device("cpu"))
 
         for opt_key in optim_set:
             optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
