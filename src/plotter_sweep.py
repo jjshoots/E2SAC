@@ -67,6 +67,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
     # parameters
     num_steps = 1000000
     num_intervals = 101
+    color_palette = sns.color_palette("colorblind")
 
     # x_axis values to plot against
     x_axis = np.linspace(0, num_steps, num_intervals)
@@ -113,6 +114,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         x_axis / 1e4,
         iqm_scores,
         iqm_cis,
+        colors=color_palette,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e4)",
         ylabel="Evaluation IQM",
@@ -120,8 +122,6 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         ticklabelsize=30,
         figsize=(9, 9),
     )
-
-    color_palette = sns.color_palette("colorblind")
 
     # oracle policies
     for i, key in enumerate(baselines_dict):
@@ -131,14 +131,11 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
             # color="black",
             linestyle="--",
         )
-        print(color_palette[len(algorithms) + i])
         algorithms.append(key)
 
     # form the legend
-    color_dict = dict(zip(algorithms, color_palette))
-    print(color_dict)
     fake_patches = [
-        patches.Patch(color=color_dict[alg], alpha=0.75) for alg in algorithms
+        patches.Patch(color=color, alpha=0.75) for color in color_palette
     ]
     legend = plt.legend(
         fake_patches,
