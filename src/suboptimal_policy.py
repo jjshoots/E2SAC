@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 from wingman import NeuralBlocks
 
@@ -28,4 +29,4 @@ class Suboptimal_Actor(nn.Module):
     def forward(self, states):
         output = self.net(states).reshape(-1, 2, self.act_size).permute(1, 0, 2)
 
-        return output[0], output[1]
+        return torch.tanh(output[0])

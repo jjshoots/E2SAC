@@ -113,7 +113,6 @@ class Environment:
     def get_label(self, obs):
         if self.suboptimal_actor is not None:
             action = self.suboptimal_actor(gpuize(obs, self.device))
-            action = torch.tanh(action[0])
             action = cpuize(action)[0]
             return action
         else:
@@ -169,6 +168,8 @@ class Environment:
                 output = net.actor(gpuize(self.state, cfg.device).unsqueeze(0))
                 # action = cpuize(net.actor.sample(*output)[0][0])
                 action = cpuize(net.actor.infer(*output))
+                print(action)
+                print(self.get_label(self.state))
                 self.step(action)
             else:
                 self.step(self.get_label(self.state))
