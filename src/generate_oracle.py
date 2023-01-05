@@ -21,9 +21,10 @@ def train(wm: Wingman):
     wm.log["epoch"] = 0
     wm.log["eval_perf"] = -math.inf
     wm.log["max_eval_perf"] = -math.inf
+    wm.log["success_rate"] = 0.0
     next_eval_step = 0
 
-    while wm.log["max_eval_perf"] < cfg.target_performance:
+    while wm.log["success_rate"] < cfg.target_performance:
         wm.log["epoch"] += 1
 
         """EVAL RUN"""
@@ -31,7 +32,7 @@ def train(wm: Wingman):
             next_eval_step = (
                 int(memory.count / cfg.eval_steps_ratio) + 1
             ) * cfg.eval_steps_ratio
-            wm.log["eval_perf"] = env.evaluate(cfg, net)
+            wm.log["success_rate"], wm.log["eval_perf"] = env.evaluate(cfg, net)
             wm.log["max_eval_perf"] = max(
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )
@@ -128,22 +129,6 @@ def train(wm: Wingman):
     torch.save(net.actor.net.state_dict(), path)
 
 
-def eval_display(wm: Wingman):
-    cfg = wm.cfg
-    env = setup_env(wm)
-
-    if cfg.debug:
-        net = None
-    else:
-        net, _ = setup_nets(wm)
-
-    if wm.cfg.display:
-        env.display(cfg, net)
-    elif wm.cfg.evaluate:
-        while True:
-            print(env.evaluate(cfg, net))
-
-
 def setup_env(wm: Wingman):
     cfg = wm.cfg
     env = Environment(cfg)
@@ -202,7 +187,5 @@ if __name__ == "__main__":
 
     if wm.cfg.train:
         train(wm)
-    elif wm.cfg.display or wm.cfg.evaluate:
-        eval_display(wm)
     else:
         print("Guess this is life now.")

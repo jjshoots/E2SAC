@@ -7,7 +7,7 @@ env_name: ''
 # env_name: 'AdroitHandRelocate-v0'
 
 # target_performance of oracle
-target_performance: 3000
+target_performance: 0.5
 
 # learning params
 buffer_size: 300000
@@ -61,4 +61,5 @@ wandb_name: ''
 wandb_notes: ''
 wandb_id: ''
 wandb_entity: 'jjshoots'
-wandb_project: 'CCGE2'
+# wandb_project: 'CCGE2'
+wandb_project: 'CCGE2_oracle_search'

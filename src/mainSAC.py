@@ -129,10 +129,10 @@ def eval_display(wm: Wingman):
     cfg = wm.cfg
     env = setup_env(wm)
 
-    if not cfg.debug:
-        net, _ = setup_nets(wm)
-    else:
+    if cfg.debug:
         net = None
+    else:
+        net, _ = setup_nets(wm)
 
     if wm.cfg.display:
         env.display(cfg, net)
@@ -187,6 +187,10 @@ def setup_nets(wm: Wingman):
             optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
 
         print(f"Lowest Running Loss for Net: {wm.lowest_loss}")
+
+    # path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
+    # torch.save(net.actor.net.state_dict(), path)
+    # exit()
 
     return net, optim_set
 

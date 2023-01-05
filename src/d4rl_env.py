@@ -99,9 +99,9 @@ class Environment:
         self.cumulative_reward += reward
 
         # special check for if success
-        self.success = self.success and info["success"]
+        self.success = self.success or info["success"]
 
-        if term or trunc:
+        if term or trunc or self.success:
             self.ended = True
 
         return self.state, reward, term
