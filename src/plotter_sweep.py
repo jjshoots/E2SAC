@@ -33,7 +33,7 @@ plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
 
 def get_log_from_uri(uri, keys, api=None):
     assert isinstance(keys, list), "keys must be a list."
-    api = wandb.Api(timeout=30) if api is None else api
+    api = wandb.Api(timeout=60) if api is None else api
     run = api.run(uri)
     history = run.scan_history(keys=keys)
 
@@ -114,7 +114,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         x_axis / 1e4,
         iqm_scores,
         iqm_cis,
-        colors=color_palette,
+        custom_colors=color_palette,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e4)",
         ylabel="Evaluation IQM",
@@ -124,21 +124,22 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
     )
 
     # oracle policies
+    offset = len(algorithms)
     for i, key in enumerate(baselines_dict):
-        line = plt.axhline(
+        plt.axhline(
             y=baselines_dict[key],
-            color=color_palette[len(algorithms) + i],
+            color=color_palette[offset + i],
             # color="black",
             linestyle="--",
         )
         algorithms.append(key)
 
     # form the legend
-    fake_patches = [
+    legend_patches = [
         patches.Patch(color=color, alpha=0.75) for color in color_palette
     ]
-    legend = plt.legend(
-        fake_patches,
+    plt.legend(
+        legend_patches,
         algorithms,
         loc="lower right",
         fancybox=True,
