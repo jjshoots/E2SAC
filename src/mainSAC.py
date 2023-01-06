@@ -115,14 +115,7 @@ def train(wm: Wingman):
                     optim_dict = dict()
                     for key in optim_set:
                         optim_dict[key] = optim_set[key].state_dict()
-                    torch.save(
-                        {
-                            "optim": optim_dict,
-                            "lowest_running_loss": wm.lowest_loss,
-                            "epoch": wm.log["epoch"],
-                        },
-                        optim_file,
-                    )
+                    torch.save(opt_dict, optim_file)
 
 
 def eval_display(wm: Wingman):
@@ -181,12 +174,9 @@ def setup_nets(wm: Wingman):
         net.load_state_dict(torch.load(model_file, map_location=torch.device("cpu")))
 
         # load the optimizer
-        checkpoint = torch.load(optim_file, map_location=torch.device("cpu"))
-
-        for opt_key in optim_set:
-            optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
-
-        print(f"Lowest Running Loss for Net: {wm.lowest_loss}")
+        # opt_dict = torch.load(optim_file, map_location=torch.device("cpu"))
+        # for opt_key in opt_dict:
+        #     optim_set[opt_key].load_state_dict(opt_dict[opt_key])
 
     # path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
     # torch.save(net.actor.net.state_dict(), path)

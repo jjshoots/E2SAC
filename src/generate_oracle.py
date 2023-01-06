@@ -108,7 +108,7 @@ def train(wm: Wingman):
 
                 """WEIGHTS SAVING"""
                 to_update, model_file, optim_file = wm.checkpoint(
-                    loss=-float(wm.log["eval_perf"]), step=wm.log["num_transitions"]
+                    loss=-float(wm.log["success_rate"]), step=wm.log["num_transitions"]
                 )
                 if to_update:
                     torch.save(net.state_dict(), model_file)
@@ -116,14 +116,7 @@ def train(wm: Wingman):
                     optim_dict = dict()
                     for key in optim_set:
                         optim_dict[key] = optim_set[key].state_dict()
-                    torch.save(
-                        {
-                            "optim": optim_dict,
-                            "lowest_running_loss": wm.lowest_loss,
-                            "epoch": wm.log["epoch"],
-                        },
-                        optim_file,
-                    )
+                    torch.save(optim_dict, optim_file)
 
     path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
     torch.save(net.actor.net.state_dict(), path)
@@ -169,10 +162,10 @@ def setup_nets(wm: Wingman):
         net.load_state_dict(torch.load(model_file))
 
         # load the optimizer
-        checkpoint = torch.load(optim_file)
+        optim_dict = torch.load(optim_file)
 
-        for opt_key in optim_set:
-            optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
+        for opt_key in optim_dict:
+            optim_set[opt_key].load_state_dict(optim_dict[opt_key])
 
         print(f"Lowest Running Loss for Net: {wm.lowest_loss}")
 

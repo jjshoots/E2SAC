@@ -168,9 +168,9 @@ class Environment:
                 output = net.actor(gpuize(self.state, cfg.device).unsqueeze(0))
                 # action = cpuize(net.actor.sample(*output)[0][0])
                 action = cpuize(net.actor.infer(*output))
-                print(action)
-                print(self.get_label(self.state))
                 self.step(action)
+                import time
+                time.sleep(0.1)
             else:
                 self.step(self.get_label(self.state))
 

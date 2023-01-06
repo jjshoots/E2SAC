@@ -7,7 +7,7 @@ env_name: ''
 # env_name: 'AdroitHandRelocate-v0'
 
 # target_performance of oracle
-target_performance: 0.5
+target_performance: 0.6
 
 # learning params
 buffer_size: 300000

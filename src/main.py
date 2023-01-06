@@ -140,14 +140,7 @@ def train(wm: Wingman):
                     optim_dict = dict()
                     for key in optim_set:
                         optim_dict[key] = optim_set[key].state_dict()
-                    torch.save(
-                        {
-                            "optim": optim_dict,
-                            "lowest_running_loss": wm.lowest_loss,
-                            "epoch": wm.log["epoch"],
-                        },
-                        optim_file,
-                    )
+                    torch.save(opt_dict, optim_file)
 
 
 def eval_display(wm: Wingman):
@@ -207,10 +200,9 @@ def setup_nets(wm: Wingman):
         net.load_state_dict(torch.load(model_file))
 
         # load the optimizer
-        checkpoint = torch.load(optim_file)
-
-        for opt_key in optim_set:
-            optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
+        opt_dict = torch.load(optim_file)
+        for opt_key in opt_dict:
+            optim_set[opt_key].load_state_dict(opt_dict[opt_key])
 
     # torch.save(net.actor.net.state_dict(), f"./{set.env_name}_big.pth")
     # exit()
