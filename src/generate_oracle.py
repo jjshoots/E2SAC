@@ -37,6 +37,22 @@ def train(wm: Wingman):
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )
 
+        """WANDB"""
+        wm.log["num_transitions"] = memory.count
+        wm.log["buffer_size"] = memory.__len__()
+
+        """WEIGHTS SAVING"""
+        to_update, model_file, optim_file = wm.checkpoint(
+            loss=-float(wm.log["success_rate"]), step=wm.log["num_transitions"]
+        )
+        if to_update:
+            torch.save(net.state_dict(), model_file)
+
+            optim_dict = dict()
+            for key in optim_set:
+                optim_dict[key] = optim_set[key].state_dict()
+            torch.save(optim_dict, optim_file)
+
         """ENVIRONMENT INTERACTION"""
         env.reset()
         net.eval()
@@ -101,22 +117,6 @@ def train(wm: Wingman):
                         wm.log = {**wm.log, **log}
                         ent_loss.backward()
                         optim_set["alpha"].step()
-
-                """WANDB"""
-                wm.log["num_transitions"] = memory.count
-                wm.log["buffer_size"] = memory.__len__()
-
-                """WEIGHTS SAVING"""
-                to_update, model_file, optim_file = wm.checkpoint(
-                    loss=-float(wm.log["success_rate"]), step=wm.log["num_transitions"]
-                )
-                if to_update:
-                    torch.save(net.state_dict(), model_file)
-
-                    optim_dict = dict()
-                    for key in optim_set:
-                        optim_dict[key] = optim_set[key].state_dict()
-                    torch.save(optim_dict, optim_file)
 
     path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
     torch.save(net.actor.net.state_dict(), path)
