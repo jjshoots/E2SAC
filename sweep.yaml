@@ -6,11 +6,11 @@ metric:
 parameters:
   env_name:
     value: "AdroitHandDoor-v0"
-name: "SAC_AdroitHandDoor-v0"
+name: "CCGE_AdroitHandDoor-v0"
 command:
   - python3
-  - src/mainSAC.py
-  # - src/main.py
+  # - src/mainSAC.py
+  - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=SAC_AdroitHandDoor-v0"
+  - "--wandb_name=CCGE_AdroitHandDoor-v1"

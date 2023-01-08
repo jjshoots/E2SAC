@@ -1,13 +1,13 @@
 # env params
 sparse: False
 env_name: ''
-# env_name: 'AdroitHandDoor-v0'
-# env_name: 'AdroitHandPen-v0'
-# env_name: 'AdroitHandHammer-v0'
-# env_name: 'AdroitHandRelocate-v0'
+# env_name: 'AdroitHandDoor-v1'
+# env_name: 'AdroitHandPen-v1'
+# env_name: 'AdroitHandHammer-v1'
+# env_name: 'AdroitHandRelocate-v1'
 
 # target_performance of oracle
-target_performance: 0.6
+target_performance: 0.98
 
 # learning params
 buffer_size: 300000

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if false; then
+if true; then
 
   # setup the sweep
   echo "Generating sweep..."

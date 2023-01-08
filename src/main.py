@@ -26,7 +26,6 @@ def train(wm: Wingman):
     wm.log["epoch"] = 0
     wm.log["eval_perf"] = -math.inf
     wm.log["max_eval_perf"] = -math.inf
-    wm.log["oracle_eval_perf"] = env.evaluate(cfg, None)
     next_eval_step = 0
 
     while memory.count <= cfg.total_steps:
@@ -37,7 +36,7 @@ def train(wm: Wingman):
             next_eval_step = (
                 int(memory.count / cfg.eval_steps_ratio) + 1
             ) * cfg.eval_steps_ratio
-            wm.log["eval_perf"] = env.evaluate(cfg, net)
+            wm.log["success_rate"], wm.log["eval_perf"] = env.evaluate(cfg, net)
             wm.log["max_eval_perf"] = max(
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )
