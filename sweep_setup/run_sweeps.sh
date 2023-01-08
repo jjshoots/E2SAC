@@ -4,20 +4,21 @@
 
 source venv/bin/activate
 pip3 install -e .
+pip3 uninstall gymnasium-robotics -y
 pip3 install -r requirements.txt -U
 wingman-compress-weights
 
 declare -a pids=()
-wandb agent jjshoots/CCGE2/1z2eoxs2 --count 3 & 
+wandb agent jjshoots/CCGE2_oracle_search/sc7njz4m --count 1 & 
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2/1z2eoxs2 --count 3 & 
+wandb agent jjshoots/CCGE2_oracle_search/sc7njz4m --count 1 & 
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2/1z2eoxs2 --count 3 & 
+wandb agent jjshoots/CCGE2_oracle_search/sc7njz4m --count 1 & 
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2/1z2eoxs2 --count 3 & 
+wandb agent jjshoots/CCGE2_oracle_search/sc7njz4m --count 1 & 
 pids+=($!)
 sleep 10
 

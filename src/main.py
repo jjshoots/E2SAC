@@ -139,17 +139,17 @@ def train(wm: Wingman):
                     optim_dict = dict()
                     for key in optim_set:
                         optim_dict[key] = optim_set[key].state_dict()
-                    torch.save(opt_dict, optim_file)
+                    torch.save(optim_dict, optim_file)
 
 
 def eval_display(wm: Wingman):
     cfg = wm.cfg
     env = setup_env(wm)
 
-    if False:
-        net, _ = setup_nets(wm)
-    else:
+    if cfg.debug:
         net = None
+    else:
+        net, _ = setup_nets(wm)
 
     if wm.cfg.display:
         env.display(cfg, net)

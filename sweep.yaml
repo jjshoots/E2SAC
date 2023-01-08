@@ -5,8 +5,8 @@ metric:
   goal: maximize
 parameters:
   env_name:
-    value: "AdroitHandDoor-v0"
-name: "CCGE_AdroitHandDoor-v0"
+    value: "AdroitHandDoor-v1"
+name: "CCGE_AdroitHandDoor-v1"
 command:
   - python3
   # - src/mainSAC.py

@@ -19,13 +19,14 @@ top_lines = """#!/bin/bash
 
 source venv/bin/activate
 pip3 install -e .
+pip3 uninstall gymnasium-robotics -y
 pip3 install -r requirements.txt -U
 wingman-compress-weights
 
 declare -a pids=()
 """
 
-run_line = f"wandb agent jjshoots/CCGE2/{sweep_id} --count 3 & "
+run_line = f"wandb agent jjshoots/CCGE2_oracle_search/{sweep_id} --count 1 & "
 
 joining_lines = """
 pids+=($!)
