@@ -59,9 +59,15 @@ class Environment:
             print(f"Loaded {path}")
         except FileNotFoundError:
             warnings.warn("--------------------------------------------------")
-            warnings.warn(f"Failed to load suboptimal actor {path}, exiting.")
+            warnings.warn(f"Failed to load suboptimal actor {path}, ignoring.")
             warnings.warn("--------------------------------------------------")
-            self.suboptimal_actor = None
+
+            # load the oracle
+            self.suboptimal_actor = Suboptimal_Actor(
+                act_size=self.act_size,
+                obs_size=self.obs_size,
+                neurons_per_layer=256,
+            ).to(cfg.device)
 
         self.reset()
 

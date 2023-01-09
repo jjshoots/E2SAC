@@ -6,13 +6,11 @@ metric:
 parameters:
   env_name:
     value: "Walker2d-v4"
-  target_performance:
-    value: 3100
-name: "CCGE_2_Im_Walker2d"
+name: "CCGE_B_Ex_Walker2d"
 command:
   - python3
   # - src/mainSAC.py
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=CCGE_2_Im_Walker2d"
+  - "--wandb_name=CCGE_B_Ex_Walker2d"
