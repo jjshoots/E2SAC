@@ -21,7 +21,7 @@ learning_rate: 0.0004
 exploration_steps: 0
 
 # CCGE params
-pretrained_oracle: false
+pretrained_oracle: true
 update_oracle: true
 confidence_lambda: 1.0
 
