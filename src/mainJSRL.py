@@ -59,7 +59,7 @@ def train(wm: Wingman):
                     # get the action from policy
                     output = net.actor(gpuize(obs, cfg.device).unsqueeze(0))
                     act, _ = net.actor.sample(*output)
-                    act = cpuize(act)
+                    act = cpuize(act).squeeze(0)
 
                     # get the next state and other stuff
                     next_obs, rew, term = env.step(act)
@@ -77,6 +77,10 @@ def train(wm: Wingman):
 
                 # increment our step counter
                 steps += 1
+
+        # check that the memory actually has something
+        if memory.count == 0:
+            continue
 
         """TRAINING RUN"""
         dataloader = torch.utils.data.DataLoader(

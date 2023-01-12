@@ -54,7 +54,7 @@ class Environment:
         suboptimal_path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
         try:
             # hacky way to get number of neurons per layer because I fked up with oracle training
-            weights = torch.load(suboptimal_path)
+            weights = torch.load(suboptimal_path, map_location=cfg.device)
             neurons_per_layer = weights["net.0.0.weight"].shape[0]
 
             # load the oracle
