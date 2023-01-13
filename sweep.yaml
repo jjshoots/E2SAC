@@ -6,6 +6,8 @@ metric:
 parameters:
   env_name:
     value: "AdroitHandDoor-v1"
+  sparse:
+    value: true
 name: "CCGE_AdroitHandDoor-v1"
 command:
   - python3

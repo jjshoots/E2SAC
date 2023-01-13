@@ -1,9 +1,9 @@
 # env params
-sparse: False
-# env_name: ''
+sparse: false
+env_name: ''
 # env_name: 'AdroitHandDoor-v1'
 # env_name: 'AdroitHandPen-v1'
-env_name: 'AdroitHandHammer-v1'
+# env_name: 'AdroitHandHammer-v1'
 # env_name: 'AdroitHandRelocate-v1'
 
 # target_performance of oracle
@@ -24,7 +24,7 @@ exploration_steps: 0
 # CCGE params
 pretrained_oracle: true
 update_oracle: false
-confidence_lambda: 0.1
+confidence_lambda: 0.05
 
 # core SAC params
 use_entropy: true

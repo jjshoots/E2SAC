@@ -6,16 +6,13 @@ wingman-compress-weights
 
 declare -a pids=()
 
-python3 src/generate_oracle.py --wandb --wandb_name="AdroitHandRelocateOracle" --train --env_name="AdroitHandRelocate-v1" &
+wandb agent jjshoots/CCGE2_oracle_search/995wvhyr --count 1 &
 pids+=($!)
 sleep 10
-python3 src/generate_oracle.py --wandb --wandb_name="AdroitHandRelocateOracle" --train --env_name="AdroitHandRelocate-v1" &
+wandb agent jjshoots/CCGE2_oracle_search/995wvhyr --count 1 &
 pids+=($!)
 sleep 10
-python3 src/generate_oracle.py --wandb --wandb_name="AdroitHandRelocateOracle" --train --env_name="AdroitHandRelocate-v1" &
-pids+=($!)
-sleep 10
-python3 src/generate_oracle.py --wandb --wandb_name="AdroitHandRelocateOracle" --train --env_name="AdroitHandRelocate-v1" &
+wandb agent jjshoots/CCGE2_oracle_search/995wvhyr --count 1 &
 pids+=($!)
 sleep 10
 
