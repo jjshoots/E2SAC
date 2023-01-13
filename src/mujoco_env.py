@@ -101,6 +101,15 @@ class Environment:
 
     def update_oracle_weights(self, weights: dict):
         assert self.suboptimal_actor is not None, "Can't update None model."
+        # self.suboptimal_actor.load_state_dict(weights)
+
+        # load the oracle
+        neurons_per_layer = weights["net.0.0.weight"].shape[0]
+        self.suboptimal_actor = Suboptimal_Actor(
+            act_size=self.act_size,
+            obs_size=self.obs_size,
+            neurons_per_layer=neurons_per_layer,
+        ).to(torch.device("cuda:0"))
         self.suboptimal_actor.load_state_dict(weights)
 
     def get_label(self, obs):
