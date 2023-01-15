@@ -9,16 +9,16 @@ pip3 install -r requirements.txt -U
 wingman-compress-weights
 
 declare -a pids=()
-wandb agent jjshoots/CCGE2_oracle_search/wn6wx2nr --count 1 & 
+wandb agent jjshoots/CCGE2/i8s2y9zk --count 3 & 
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2_oracle_search/wn6wx2nr --count 1 & 
+wandb agent jjshoots/CCGE2/i8s2y9zk --count 3 & 
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2_oracle_search/wn6wx2nr --count 1 & 
+wandb agent jjshoots/CCGE2/i8s2y9zk --count 3 & 
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2_oracle_search/wn6wx2nr --count 1 & 
+wandb agent jjshoots/CCGE2/i8s2y9zk --count 3 & 
 pids+=($!)
 sleep 10
 
