@@ -10,7 +10,8 @@ name: "CCGE_AdroitHandPen-v1"
 command:
   - python3
   # - src/mainSAC.py
-  - src/main.py
+  # - src/main.py
+  - src/mainAWAC.py
   - "--train"
   - "--wandb"
   - "--wandb_name=CCGE_AdroitHandPen-v1"

@@ -201,13 +201,6 @@ class AWAC(nn.Module):
         """
         terms = 1.0 - terms
 
-        if torch.isnan(states).any():
-            print("states is nan")
-            print(states)
-        if torch.isnan(actions).any():
-            print("actions is nan")
-            print(actions)
-
         # Get log probs of the actions we have
         output = self.actor(states)
         log_probs = self.actor.get_log_probs(output[0], output[1], actions)
