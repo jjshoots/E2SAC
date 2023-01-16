@@ -218,7 +218,7 @@ class AWAC(nn.Module):
         advantage = (q_old - q_new) * terms
 
         # advantage weighting
-        weighting = (advantage / self.lambda_parameter).exp().detach()
+        weighting = func.softplus(advantage / self.lambda_parameter).detach()
 
         # get loss for q
         rnf_loss = -(log_probs * weighting).mean()
