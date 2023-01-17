@@ -4,6 +4,9 @@ source venv/bin/activate
 
 wingman-compress-weights
 
+pip3 uninstall gymnasium-robotics -y
+pip3 install -e . -r requirements.txt -U
+
 declare -a pids=()
 
 wandb agent jjshoots/CCGE2_oracle_search/4h5hn913 --count 1 &
