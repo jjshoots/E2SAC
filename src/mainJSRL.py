@@ -32,7 +32,7 @@ def train(wm: Wingman):
             next_eval_step = (
                 int(memory.count / cfg.eval_steps_ratio) + 1
             ) * cfg.eval_steps_ratio
-            wm.log["success_rate"], wm.log["eval_perf"] = env.evaluate(cfg, net)
+            wm.log["eval_perf"] = env.evaluate(cfg, net)
             wm.log["max_eval_perf"] = max(
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )

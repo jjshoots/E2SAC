@@ -128,10 +128,9 @@ class Environment:
         self.reset()
 
         # store the list of eval performances here
-        successes = []
-        evaluation = []
+        eval_scores = []
 
-        while len(successes) < cfg.eval_num_episodes:
+        while len(eval_scores) < cfg.eval_num_episodes:
             # get the action based on the state
             if net is not None:
                 output = net.actor(gpuize(self.state, cfg.device).unsqueeze(0))
@@ -144,13 +143,11 @@ class Environment:
             self.step(action)
 
             if self.ended:
-                successes.append(1.0 * self.success)
-                evaluation.append(self.cumulative_reward)
+                eval_scores.append(self.cumulative_reward)
                 self.reset()
 
-        success_rate = np.mean(np.array(successes))
-        evaluation_score = np.mean(np.array(evaluation))
-        return success_rate, evaluation_score
+        eval_score = np.mean(np.array(eval_scores))
+        return eval_score
 
     def display(self, cfg, net=None):
 

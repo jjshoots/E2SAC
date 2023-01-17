@@ -81,7 +81,7 @@ def train(wm: Wingman):
 
     """OFFLINE EVALUATION"""
     # checkpointing
-    wm.log["offline_success_rate"], wm.log["offline_eval_perf"] = env.evaluate(cfg, net)
+    wm.log["offline_eval_perf"] = env.evaluate(cfg, net)
     to_update, model_file, optim_file = wm.checkpoint(
         loss=-float(wm.log["offline_eval_perf"]),
         step=cfg.offline_steps,
@@ -169,7 +169,7 @@ def train(wm: Wingman):
                         optim_set["alpha"].step()
 
         # checkpointing
-        wm.log["online_success_rate"], wm.log["online_eval_perf"] = env.evaluate(cfg, net)
+        wm.log["online_eval_perf"] = env.evaluate(cfg, net)
         to_update, model_file, optim_file = wm.checkpoint(
             loss=-float(wm.log["online_eval_perf"]),
             step=memory.count + cfg.reset_memory * cfg.offline_steps,
