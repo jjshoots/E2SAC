@@ -9,22 +9,22 @@ pip3 install -e . -r requirements.txt -U
 
 declare -a pids=()
 
-wandb agent jjshoots/CCGE2_oracle_search/4h5hn913 --count 1 &
+wandb agent jjshoots/CCGE2_oracle_search/kt6ovfxj --count 1 &
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2_oracle_search/4h5hn913 --count 1 &
+wandb agent jjshoots/CCGE2_oracle_search/kt6ovfxj --count 1 &
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2_oracle_search/4h5hn913 --count 1 &
+wandb agent jjshoots/CCGE2_oracle_search/kt6ovfxj --count 1 &
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2_oracle_search/4h5hn913 --count 1 &
+wandb agent jjshoots/CCGE2_oracle_search/kt6ovfxj --count 1 &
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2_oracle_search/4h5hn913 --count 1 &
+wandb agent jjshoots/CCGE2_oracle_search/kt6ovfxj --count 1 &
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2_oracle_search/4h5hn913 --count 1 &
+wandb agent jjshoots/CCGE2_oracle_search/kt6ovfxj --count 1 &
 pids+=($!)
 sleep 10
 
