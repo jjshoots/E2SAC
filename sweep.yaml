@@ -8,7 +8,7 @@ parameters:
     value: "AdroitHandPen-v1"
   sparse:
     value: true
-name: "CCGE_AdroitHandPen-v1"
+name: "AWAC_AdroitHandPen-v1"
 command:
   - python3
   # - src/mainSAC.py
@@ -16,4 +16,4 @@ command:
   - src/mainAWAC.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=CCGE_AdroitHandPen-v1"
+  - "--wandb_name=AWAC_AdroitHandPen-v1"
