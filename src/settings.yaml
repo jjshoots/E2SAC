@@ -10,7 +10,7 @@ env_name: ''
 target_performance: 0.6
 
 # learning params
-buffer_size: 300000
+buffer_size: 100000
 buffer_size_debug: 100
 batch_size: 256
 total_steps: 1000000
