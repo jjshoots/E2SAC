@@ -204,13 +204,13 @@ class AWAC(nn.Module):
         # Get log probs of the actions we have
         output = self.actor(states)
         log_probs = self.actor.get_log_probs(output[0], output[1], actions)
+        new_actions, new_log_probs = self.actor.sample(*output)
 
         # expectations of Q with clipped double Q, old actions
         q_old = self.critic(states, actions)
         q_old, _ = torch.min(q_old, dim=-1, keepdim=True)
 
         # expectations of Q with clipped double Q, new actions
-        new_actions, new_log_probs = self.actor.sample(*output)
         q_new = self.critic(states, new_actions)
         q_new, _ = torch.min(q_new, dim=-1, keepdim=True)
 
