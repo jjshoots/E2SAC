@@ -28,8 +28,7 @@ confidence_lambda: 0.05
 
 # core SAC params
 use_entropy: true
-target_entropy: null
-# target_entropy: -42.0
+target_entropy: -42.0
 
 # AWAC params
 lambda_parameter: 0.3
