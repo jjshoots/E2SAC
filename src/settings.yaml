@@ -10,9 +10,9 @@ env_name: ''
 target_performance: 0.6
 
 # learning params
-buffer_size: 100000
+buffer_size: 300000
 buffer_size_debug: 100
-batch_size: 256
+batch_size: 1024
 total_steps: 1000000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
@@ -24,11 +24,12 @@ exploration_steps: 0
 # CCGE params
 pretrained_oracle: true
 update_oracle: false
-confidence_lambda: 0.05
+confidence_lambda: 0.1
 
 # core SAC params
 use_entropy: true
-target_entropy: -42.0
+target_entropy: null
+# target_entropy: -42.0
 
 # AWAC params
 lambda_parameter: 0.3
