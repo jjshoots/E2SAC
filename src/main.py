@@ -98,6 +98,8 @@ def train(wm: Wingman):
                 terms = gpuize(stuff[4], cfg.device)
                 labels = gpuize(stuff[5], cfg.device)
 
+                print(rewards.sum())
+
                 # train critic
                 for _ in range(cfg.critic_update_multiplier):
                     net.zero_grad()

@@ -78,7 +78,6 @@ class Environment:
         self.state, _ = self.env.reset()
 
         self.ended = False
-        self.success = False
         self.cumulative_reward = 0.0
 
         return self.state
@@ -98,10 +97,10 @@ class Environment:
         # accumulate reward
         self.cumulative_reward += reward
 
-        # special check for if success
-        self.success = self.success or info["success"]
+        # scale reward x10 for better signal
+        reward = reward * 10.0
 
-        if term or trunc or self.success:
+        if term or trunc:
             self.ended = True
 
         return self.state, reward, term
@@ -172,5 +171,4 @@ class Environment:
                 self.step(self.get_label(self.state))
 
             if self.ended:
-                print(f"Success: {self.success}.")
                 self.reset()
