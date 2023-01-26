@@ -165,57 +165,12 @@ if __name__ == "__main__":
     # list of run arguments
     sweep_objects = []
 
-    title = "Hopper-v4"
+    title = "AdroitHandPenSparse-v1"
     sweep_uri_dict = {}
-    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/zgq81g05"
-    sweep_uri_dict["CCGE_1_Im"] = "jjshoots/CCGE2/8tex48bv"
-    sweep_uri_dict["CCGE_1_Ex"] = "jjshoots/CCGE2/phevs4mc"
-    sweep_uri_dict["CCGE_2_Im"] = "jjshoots/CCGE2/18p6t19p"
-    sweep_uri_dict["CCGE_2_Ex"] = "jjshoots/CCGE2/po10jfqp"
-    # sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/fscr3ka0"
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/x0wyavl1"
 
     baselines_dict = {}
-    baselines_dict["Oracle 1"] = 850.0
-    baselines_dict["Oracle 2"] = 2900.0
-    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
-
-    title = "Ant-v4"
-    sweep_uri_dict = {}
-    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/4uvx5qez"
-    sweep_uri_dict["CCGE_1_Ex"] = "jjshoots/CCGE2/dp4byhg8"
-    sweep_uri_dict["CCGE_2_Ex"] = "jjshoots/CCGE2/b0r4xjqu"
-    sweep_uri_dict["CCGE_2_Im"] = "jjshoots/CCGE2/f9sntmmm"
-    # sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/5ydeyszy"
-
-    baselines_dict = {}
-    baselines_dict["Oracle 1"] = 980.0
-    baselines_dict["Oracle 2"] = 2200.0
-    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
-
-    title = "HalfCheetah-v4"
-    sweep_uri_dict = {}
-    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/95qoyb9w"
-    sweep_uri_dict["CCGE_1_Ex"] = "jjshoots/CCGE2/o61ibecs"
-    sweep_uri_dict["CCGE_2_Ex"] = "jjshoots/CCGE2/62jvni7q"
-    sweep_uri_dict["CCGE_2_Im"] = "jjshoots/CCGE2/5e3vqsse"
-    # sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/3rk3ayzb"
-
-    baselines_dict = {}
-    baselines_dict["Oracle 1"] = 5400.0
-    baselines_dict["Oracle 2"] = 6000.0
-    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
-
-    title = "Walker2d-v4"
-    sweep_uri_dict = {}
-    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/aboikqup"
-    sweep_uri_dict["CCGE_1_Ex"] = "jjshoots/CCGE2/s34yh4a6"
-    sweep_uri_dict["CCGE_1_Im"] = "jjshoots/CCGE2/trgcinhi"
-    sweep_uri_dict["CCGE_2_Ex"] = "jjshoots/CCGE2/n6ufn853"
-    # sweep_uri_dict["CCGE_2_DO"] = "jjshoots/CCGE2/4de8u2d3"
-
-    baselines_dict = {}
-    baselines_dict["Oracle 1"] = 2300.0
-    baselines_dict["Oracle 2"] = 3100.0
+    baselines_dict["Oracle"] = 0.6
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     # process everything with multiprocessing

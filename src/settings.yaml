@@ -24,7 +24,7 @@ exploration_steps: 0
 # CCGE params
 pretrained_oracle: true
 update_oracle: false
-confidence_lambda: 0.1
+confidence_lambda: 0.01
 
 # core SAC params
 use_entropy: true
