@@ -1,4 +1,4 @@
-_RUNS_PER_MACHINE = 4
+_RUNS_PER_MACHINE = 2
 
 # read the lines and grab the url
 sweep_id = ""

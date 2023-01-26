@@ -146,7 +146,7 @@ class AWAC(nn.Module):
         else:
             self.log_alpha = nn.Parameter(torch.tensor(0.0, requires_grad=True))
 
-    def update_q_target(self, tau=0.02):
+    def update_q_target(self, tau=0.05):
         # polyak averaging update for target q network
         for target, source in zip(
             self.critic_target.parameters(), self.critic.parameters()
@@ -191,6 +191,7 @@ class AWAC(nn.Module):
         critic_loss = q_loss
 
         log = dict()
+        log["target_q"] = target_q.mean().detach()
 
         return critic_loss, log
 
