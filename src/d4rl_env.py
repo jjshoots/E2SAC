@@ -97,9 +97,6 @@ class Environment:
         # accumulate reward
         self.cumulative_reward += reward
 
-        if reward == 1.0:
-            print(term)
-
         if term or trunc:
             self.ended = True
 
