@@ -275,10 +275,7 @@ class CCGE(nn.Module):
 
         """ SUPERVISION LOSS"""
         # # supervisory loss is difference between predicted and label
-        # sup_loss = func.mse_loss(labels, actions, reduction="none")
-
-        # supervision loss is just the negative log probability of suboptimal actions
-        sup_loss = -self.actor.get_log_probs(output[0], output[1], labels)
+        sup_loss = func.mse_loss(labels, actions, reduction="none")
 
         """ ENTROPY LOSS"""
         # entropy calculation
