@@ -97,8 +97,8 @@ class Environment:
         # accumulate reward
         self.cumulative_reward += reward
 
-        # scale reward x10 for better signal
-        reward = reward * 10.0
+        if reward == 1.0:
+            print(term)
 
         if term or trunc:
             self.ended = True
