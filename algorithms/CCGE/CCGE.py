@@ -73,27 +73,6 @@ class GaussianActor(nn.Module):
     def infer(mu, sigma):
         return torch.tanh(mu)
 
-    @staticmethod
-    def get_log_probs(mu, sigma, actions):
-        """
-        output:
-            actions is of shape B x act_size
-            log_probs is of shape B x 1
-        """
-        # clamp to prevent explosion
-        actions = actions.clamp(min=-0.99, max=0.99)
-
-        # lower bound sigma and bias it
-        normals = dist.Normal(mu, func.softplus(sigma) + 1e-6)
-
-        # calculate log_probs
-        log_probs = normals.log_prob(torch.atanh(actions)) - torch.log(
-            1 - actions.pow(2) + 1e-6
-        )
-        log_probs = log_probs.sum(dim=-1, keepdim=True)
-
-        return log_probs
-
 
 class CCGE(nn.Module):
     """
@@ -191,6 +170,9 @@ class CCGE(nn.Module):
 
         # supervision scale is a switch
         sup_scale = (uncertainty > self.confidence_lambda) * 1.0
+
+        # TODO: delete this
+        sup_scale = torch.ones_like(sup_scale)
 
         log = dict()
         log["uncertainty"] = uncertainty.mean().detach()
