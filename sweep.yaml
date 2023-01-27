@@ -5,10 +5,10 @@ metric:
   goal: maximize
 parameters:
   env_name:
-    value: "AdroitHandHammer-v1"
+    value: "AdroitHandPen-v1"
   sparse:
     value: true
-name: "CCGE_AdroitHandHammer-v1"
+name: "CCGE_AdroitHandPen-v1"
 command:
   - python3
   # - src/mainSAC.py
@@ -16,4 +16,4 @@ command:
   # - src/mainAWAC.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=CCGE_AdroitHandHammer-v1"
+  - "--wandb_name=CCGE_AdroitHandPen-v1"
