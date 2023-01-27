@@ -1,11 +1,11 @@
 import gymnasium as gym
 import numpy as np
 import torch
+from gymnasium.spaces import Dict
 from wingman import cpuize, gpuize
 
 from suboptimal_policy import Suboptimal_Actor
 
-from gymnasium.spaces import Dict
 
 class Environment:
     """
@@ -51,7 +51,9 @@ class Environment:
         self._action_scale = (action_high - action_low) / 2.0
 
         # load suboptimal policy
-        suboptimal_path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
+        suboptimal_path = (
+            f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
+        )
         try:
             # hacky way to get number of neurons per layer because I fked up with oracle training
             weights = torch.load(suboptimal_path, map_location=cfg.device)
@@ -163,6 +165,7 @@ class Environment:
                 action = cpuize(net.actor.infer(*output))
                 self.step(action)
                 import time
+
                 time.sleep(0.1)
             else:
                 self.step(self.get_label(self.state))

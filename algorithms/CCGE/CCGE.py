@@ -73,6 +73,27 @@ class GaussianActor(nn.Module):
     def infer(mu, sigma):
         return torch.tanh(mu)
 
+    @staticmethod
+    def get_log_probs(mu, sigma, actions):
+        """
+        output:
+            actions is of shape B x act_size
+            log_probs is of shape B x 1
+        """
+        # clamp to prevent explosion
+        actions = actions.clamp(min=-0.99, max=0.99)
+
+        # lower bound sigma and bias it
+        normals = dist.Normal(mu, func.softplus(sigma) + 1e-6)
+
+        # calculate log_probs
+        log_probs = normals.log_prob(torch.atanh(actions)) - torch.log(
+            1 - actions.pow(2) + 1e-6
+        )
+        log_probs = log_probs.sum(dim=-1, keepdim=True)
+
+        return log_probs
+
 
 class CCGE(nn.Module):
     """
@@ -164,7 +185,9 @@ class CCGE(nn.Module):
             ).detach()
 
         # normalize uncertainty
-        uncertainty = (uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs()).detach()
+        uncertainty = (
+            uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs()
+        ).detach()
 
         # supervision scale is a switch
         sup_scale = (uncertainty > self.confidence_lambda) * 1.0
@@ -251,8 +274,11 @@ class CCGE(nn.Module):
         rnf_loss = -(expected_q * terms)
 
         """ SUPERVISION LOSS"""
-        # supervisory loss is difference between predicted and label
-        sup_loss = func.mse_loss(labels, actions, reduction="none")
+        # # supervisory loss is difference between predicted and label
+        # sup_loss = func.mse_loss(labels, actions, reduction="none")
+
+        # supervision loss is just the negative log probability of suboptimal actions
+        sup_loss = -self.actor.get_log_probs(output[0], output[1], labels)
 
         """ ENTROPY LOSS"""
         # entropy calculation
