@@ -38,7 +38,7 @@ def train(wm: Wingman):
 
         """WEIGHTS SAVING"""
         to_update, model_file, optim_file = wm.checkpoint(
-            loss=-float(wm.log["success_rate"]), step=wm.log["num_transitions"]
+            loss=-float(wm.log["eval_perf"]), step=wm.log["num_transitions"]
         )
         if to_update:
             torch.save(net.state_dict(), model_file)
