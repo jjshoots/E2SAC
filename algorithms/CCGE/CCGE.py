@@ -171,9 +171,6 @@ class CCGE(nn.Module):
         # supervision scale is a switch
         sup_scale = (uncertainty > self.confidence_lambda) * 1.0
 
-        # TODO: delete this
-        sup_scale = torch.ones_like(sup_scale)
-
         log = dict()
         log["uncertainty"] = uncertainty.mean().detach()
 

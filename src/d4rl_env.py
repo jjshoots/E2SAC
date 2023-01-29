@@ -80,6 +80,7 @@ class Environment:
         self.state, _ = self.env.reset()
 
         self.ended = False
+        self.success = False
         self.cumulative_reward = 0.0
 
         return self.state
@@ -98,6 +99,7 @@ class Environment:
 
         # accumulate reward
         self.cumulative_reward += reward
+        self.success = info["success"]
 
         if term or trunc:
             self.ended = True
@@ -141,7 +143,7 @@ class Environment:
             self.step(action)
 
             if self.ended:
-                eval_scores.append(self.cumulative_reward)
+                eval_scores.append(float(self.success))
                 self.reset()
 
         eval_score = np.mean(np.array(eval_scores))
@@ -158,7 +160,6 @@ class Environment:
         self.reset()
 
         while True:
-
             if net is not None:
                 output = net.actor(gpuize(self.state, cfg.device).unsqueeze(0))
                 # action = cpuize(net.actor.sample(*output)[0][0])
@@ -171,4 +172,5 @@ class Environment:
                 self.step(self.get_label(self.state))
 
             if self.ended:
+                print(self.cumulative_reward)
                 self.reset()

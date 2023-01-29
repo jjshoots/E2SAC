@@ -26,7 +26,7 @@ wingman-compress-weights
 declare -a pids=()
 """
 
-run_line = f"wandb agent jjshoots/CCGE2/{sweep_id} --count 3 & "
+run_line = f"wandb agent jjshoots/CCGE2/{sweep_id} --count {int(50/_RUNS_PER_MACHINE/4)} & "
 
 joining_lines = """
 pids+=($!)

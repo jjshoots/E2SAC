@@ -7,7 +7,7 @@ parameters:
   env_name:
     value: "AdroitHandHammer-v1"
   sparse:
-    value: true
+    value: false
 name: "CCGE_AdroitHandHammer-v1"
 command:
   - python3
