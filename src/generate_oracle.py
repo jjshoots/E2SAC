@@ -20,11 +20,9 @@ def train(wm: Wingman):
 
     wm.log["epoch"] = 0
     wm.log["eval_perf"] = -math.inf
-    wm.log["max_eval_perf"] = -math.inf
-    wm.log["success_rate"] = 0.0
     next_eval_step = 0
 
-    while wm.log["success_rate"] < cfg.target_performance:
+    while wm.log["eval_perf"] < cfg.target_performance:
         wm.log["epoch"] += 1
 
         """EVAL RUN"""
@@ -32,10 +30,7 @@ def train(wm: Wingman):
             next_eval_step = (
                 int(memory.count / cfg.eval_steps_ratio) + 1
             ) * cfg.eval_steps_ratio
-            wm.log["success_rate"], wm.log["eval_perf"] = env.evaluate(cfg, net)
-            wm.log["max_eval_perf"] = max(
-                [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
-            )
+            wm.log["eval_perf"] = env.evaluate(cfg, net)
 
         """WANDB"""
         wm.log["num_transitions"] = memory.count
