@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
     title = "AdroitHandPenSparse-v1"
     sweep_uri_dict = {}
-    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/x0wyavl1"
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/l9x4ftbg"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 0.6
