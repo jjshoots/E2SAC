@@ -21,6 +21,7 @@ source venv/bin/activate
 pip3 install -e .
 pip3 uninstall gymnasium-robotics -y
 pip3 install -r requirements.txt -U
+rm -rf weights/*
 wingman-compress-weights
 
 declare -a pids=()
