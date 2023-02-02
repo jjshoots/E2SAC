@@ -89,7 +89,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         score = []
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
-            if log["num_transitions"].shape[0] > 80:
+            if log["num_transitions"].shape[0] > 60:
                 data = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
                 score.append(data)
 
@@ -168,6 +168,14 @@ if __name__ == "__main__":
     title = "AdroitHandPenSparse-v1"
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/l9x4ftbg"
+
+    baselines_dict = {}
+    baselines_dict["Oracle"] = 0.6
+    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
+
+    title = "AdroitHandHammerSparse-v1"
+    sweep_uri_dict = {}
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/7bd9gb6p"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 0.6
