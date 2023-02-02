@@ -32,7 +32,7 @@ class Environment:
         self.obs_atti_size = self.env.observation_space["attitude"].shape[0]
         self.obs_targ_size = self.env.observation_space[
             "target_deltas"
-        ].node_space.shape[0]
+        ].feature_space.shape[0]
 
         # constants
         self.device = cfg.device
@@ -110,7 +110,7 @@ class Environment:
         # splice out the observation and mask the target deltas
         self.state_atti = obs["attitude"]
         self.state_targ = np.zeros((self.num_targets, 3))
-        self.state_targ[: len(obs["target_deltas"].nodes)] = obs["target_deltas"].nodes
+        self.state_targ[: len(obs["target_deltas"])] = obs["target_deltas"]
 
         self.ended = False
         self.cumulative_reward = 0
@@ -135,7 +135,7 @@ class Environment:
         # splice out the observation and mask the target deltas
         self.state_atti = obs["attitude"]
         self.state_targ = np.zeros((self.num_targets, 3))
-        self.state_targ[: len(obs["target_deltas"].nodes)] = obs["target_deltas"].nodes
+        self.state_targ[: len(obs["target_deltas"])] = obs["target_deltas"]
 
         # accumulate rewards
         self.cumulative_reward += rew

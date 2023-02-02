@@ -1,5 +1,5 @@
 # env params
-env_name: 'PyFlyt/SimpleWaypointEnv-v0'
+env_name: 'PyFlyt/QuadX-Waypoints-v0'
 agent_hz: 30
 num_targets: 5
 context_length: 2
