@@ -10,13 +10,13 @@ rm -rf weights/*
 wingman-compress-weights
 
 declare -a pids=()
-wandb agent jjshoots/CCGE2/7bd9gb6p --count 3 & 
+wandb agent jjshoots/CCGE2/7flvh3lz --count 3 & 
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2/7bd9gb6p --count 3 & 
+wandb agent jjshoots/CCGE2/7flvh3lz --count 3 & 
 pids+=($!)
 sleep 10
-wandb agent jjshoots/CCGE2/7bd9gb6p --count 3 & 
+wandb agent jjshoots/CCGE2/7flvh3lz --count 3 & 
 pids+=($!)
 sleep 10
 
