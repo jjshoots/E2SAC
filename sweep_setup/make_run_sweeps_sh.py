@@ -1,3 +1,6 @@
+import sys
+
+_TOTAL_GPUS = int(sys.argv[1])
 _RUNS_PER_GPU = 3
 
 # read the lines and grab the url
@@ -27,9 +30,9 @@ wingman-compress-weights
 declare -a pids=()
 """
 
-availab_run_line = f"wandb agent jjshoots/CCGE2/{sweep_id} --count {int(50/_RUNS_PER_GPU/8)} & "
-dream_prophet_run_line_0 = f"CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/{sweep_id} --count {int(50/_RUNS_PER_GPU/8)} & "
-dream_prophet_run_line_1 = f"CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/{sweep_id} --count {int(50/_RUNS_PER_GPU/8)} & "
+availab_run_line = f"wandb agent jjshoots/CCGE2/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
+dream_prophet_run_line_0 = f"CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
+dream_prophet_run_line_1 = f"CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
 
 joining_lines = """
 pids+=($!)
