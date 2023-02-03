@@ -2,9 +2,9 @@
 
 # availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
 # dream_prophet_machines=("dream" "prophet")
-availab_machines=("availab-dl1" "availab-dl2")
+availab_machines=("availab-dl2")
 dream_prophet_machines=()
-total_gpus=2
+total_gpus=1
 
 ######################################################################################################
 # setup the sweep
@@ -44,7 +44,7 @@ for pid in ${pids[*]}; do
 done
 
 ######################################################################################################
-# run all files on availab
+# run all files
 ######################################################################################################
 declare -a pids=()
 
