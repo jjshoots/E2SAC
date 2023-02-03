@@ -37,16 +37,16 @@ method: random
 metric:
   name: max_eval_perf
   goal: maximize
-name: "JSRLRandom-PyFlyt-Waypoints"
+name: "SAC-PyFlyt-Waypoints"
 parameters:
   env_name:
-    value: "PyFlyt/SimpleWaypointEnv-v0"
+    value: "PyFlyt/Fixedwing-Waypoints-v0"
 command:
   - python3
-  - src/mainJSRL.py
+  - src/mainSAC.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=JSRLRandom-PyFlyt-Waypoints"
+  - "--wandb_name=SAC-PyFlyt-Waypoints"
 
 
 # program: mainAWAC.py
