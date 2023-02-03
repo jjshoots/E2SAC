@@ -22,7 +22,6 @@ class Environment:
             cfg.env_name,
             render_mode=("human" if cfg.display else None),
             angle_representation="euler",
-            # use_yaw_targets=False,
             num_targets=cfg.num_targets,
             agent_hz=cfg.agent_hz,
         )
