@@ -1,4 +1,7 @@
-_RUNS_PER_MACHINE = 3
+import sys
+
+_TOTAL_GPUS = int(sys.argv[1])
+_RUNS_PER_GPU = 3
 
 # read the lines and grab the url
 sweep_id = ""
@@ -25,7 +28,9 @@ wingman-compress-weights
 declare -a pids=()
 """
 
-run_line = f"wandb agent jjshoots/CCGE2_oracle_search/{sweep_id} --count 1 & "
+availab_run_line = f"wandb agent jjshoots/CCGE2_oracle_search/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
+dream_prophet_run_line_0 = f"CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2_oracle_search/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
+dream_prophet_run_line_1 = f"CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2_oracle_search/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
 
 joining_lines = """
 pids+=($!)
@@ -38,14 +43,29 @@ for pid in ${pids[*]}; do
 done
 """
 
-# start putting things in a run file
-with open("./sweep_setup/run_sweeps.sh", "w") as f:
+# write for availab machines
+with open("./sweep_setup/run_availab_sweep.sh", "w") as f:
     # shebangs
     f.write(top_lines)
 
     # contents
-    for _ in range(_RUNS_PER_MACHINE):
-        f.write(run_line)
+    for _ in range(_RUNS_PER_GPU):
+        f.write(availab_run_line)
+        f.write(joining_lines)
+
+    # closing
+    f.write(end_lines)
+
+# write for dream prophet
+with open("./sweep_setup/run_dream_prophet_sweep.sh", "w") as f:
+    # shebangs
+    f.write(top_lines)
+
+    # contents
+    for _ in range(_RUNS_PER_GPU):
+        f.write(dream_prophet_run_line_0)
+        f.write(joining_lines)
+        f.write(dream_prophet_run_line_1)
         f.write(joining_lines)
 
     # closing
