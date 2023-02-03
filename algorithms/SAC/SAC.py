@@ -181,6 +181,8 @@ class SAC(nn.Module):
         critic_loss = q_loss
 
         log = dict()
+        log["target_q"] = target_q.mean().detach()
+        log["q_loss"] = q_loss.mean().detach()
 
         return critic_loss, log
 

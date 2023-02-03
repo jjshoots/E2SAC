@@ -14,18 +14,6 @@ rm ./sweep_setup/temp.out
 # make executable
 chmod +x ./sweep_setup/run_sweeps.sh
 
-# sync all files out
-echo "Syncing out..."
-./sync-out.sh
-
 # run all files
-if [ "$HOSTNAME" = "arctic-linx" ]; then
-  ssh availab-dl1 'tmux send-keys -t 0 "./sweep_setup/run_sweeps.sh" ENTER'
-  echo "Sent commands to dl1."
-  ssh availab-dl2 'tmux send-keys -t 0 "./sweep_setup/run_sweeps.sh" ENTER'
-  echo "Sent commands to dl2."
-  ssh availab-dl3 'tmux send-keys -t 0 "./sweep_setup/run_sweeps.sh" ENTER'
-  echo "Sent commands to dl3."
-  ssh availab-dl4 'tmux send-keys -t 0 "./sweep_setup/run_sweeps.sh" ENTER'
-  echo "Sent commands to dl4."
-fi
+# ssh arctic-linx 'tmux send-keys -t 0 "git pull origin ccge2_pyflyt" ENTER'
+# ssh arctic-linx 'tmux send-keys -t 0 "./sweep_setup/run_sweeps.sh" ENTER'
