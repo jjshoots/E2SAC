@@ -34,7 +34,7 @@ use_entropy: true
 target_entropy: -8
 
 # eval settings
-eval_num_episodes: 50
+eval_num_episodes: 20
 eval_steps_ratio: 10000
 
 # wingman required params
