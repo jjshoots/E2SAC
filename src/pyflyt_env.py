@@ -156,6 +156,7 @@ class Environment:
 
         # store the list of eval performances here
         eval_perf = []
+        num_hits = []
 
         while len(eval_perf) < cfg.eval_num_episodes:
 
@@ -174,10 +175,12 @@ class Environment:
 
             if self.ended:
                 eval_perf.append(self.cumulative_reward)
+                num_hits.append(float(self.env.info["num_targets_reached"]))
                 self.reset()
 
         eval_perf = np.mean(np.array(eval_perf))
-        return eval_perf
+        num_hits = np.mean(np.array(num_hits))
+        return num_hits
 
     def display(self, cfg, net=None):
 
