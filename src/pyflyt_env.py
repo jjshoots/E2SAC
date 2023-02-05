@@ -24,6 +24,7 @@ class Environment:
             angle_representation="euler",
             num_targets=cfg.num_targets,
             agent_hz=cfg.agent_hz,
+            sparse_reward=cfg.sparse_reward,
         )
 
         # compute spaces

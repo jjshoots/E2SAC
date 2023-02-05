@@ -1,6 +1,7 @@
 # env params
 # env_name: 'PyFlyt/QuadX-Waypoints-v0'
 env_name: 'PyFlyt/Fixedwing-Waypoints-v0'
+sparse_reward: false
 agent_hz: 30
 num_targets: 5
 context_length: 2
@@ -8,13 +9,13 @@ context_length: 2
 # learning params
 buffer_size: 300000
 buffer_size_debug: 100
-batch_size: 256
+batch_size: 1024
 total_steps: 1000000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 discount_factor: 0.99
-learning_rate: 0.0005
+learning_rate: 0.0003
 exploration_steps: 0
 
 # CCGE params
