@@ -68,7 +68,7 @@ class Backbone(nn.Module):
         return atti_output, targ_output
 
 
-class Actor(nn.Module):
+class Suboptimal_Actor(nn.Module):
     """
     Actor network
     """

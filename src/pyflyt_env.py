@@ -1,9 +1,12 @@
+import torch
 import gymnasium as gym
 import numpy as np
 import PyFlyt.gym_envs
 from PIL import Image
 from PyFlyt.core import PID
 from wingman import cpuize, gpuize
+
+from suboptimal_policy import Suboptimal_Actor
 
 
 class Environment:
@@ -30,6 +33,7 @@ class Environment:
 
         # compute spaces
         self.act_size = self.env.action_space.shape[0]
+        self.context_length = cfg.context_length
         self.obs_atti_size = self.env.observation_space["attitude"].shape[0]
         self.obs_targ_size = self.env.observation_space[
             "target_deltas"
@@ -86,7 +90,21 @@ class Environment:
             # height controllers
             self.z_PID = PID(0.15, 0.5, 0.0, t_lim, self.ctrl_period)
         else:
-            pass
+            suboptimal_path = (
+                f"./suboptimal_policies/wing.pth"
+            )
+            weights = torch.load(suboptimal_path, map_location=self.device)
+
+            # load the oracle
+            self.suboptimal_actor = Suboptimal_Actor(
+                obs_atti_size=self.obs_atti_size,
+                obs_targ_size=self.obs_targ_size,
+                context_length=self.context_length,
+                act_size=self.act_size,
+            ).to(self.device)
+            self.suboptimal_actor.load_state_dict(weights)
+
+            print(f"Loaded {suboptimal_path}")
 
     def compute_PIDs(self):
         if self.is_wing:
@@ -108,11 +126,13 @@ class Environment:
         # normalize
         self.pid_output = (self.pid_output - self._action_mid) / self._action_range
 
-    def get_label(self, *_) -> np.ndarray:
+    def get_label(self, state) -> np.ndarray:
         if not self.is_wing:
             return self.pid_output
         else:
-            pass
+            action = self.suboptimal_actor(*[gpuize(s, self.device) for s in state])
+            action = cpuize(action)[0]
+            return action
 
     def reset(self):
         obs, _ = self.env.reset()
@@ -120,7 +140,7 @@ class Environment:
         # splice out the observation and mask the target deltas
         self.state_atti = obs["attitude"]
         self.state_targ = np.zeros((self.num_targets, 3))
-        self.state_targ[: len(obs["target_deltas"])] = obs["target_deltas"]
+        self.state_targ[: self.context_length] = obs["target_deltas"]
 
         self.ended = False
         self.cumulative_reward = 0
@@ -145,7 +165,7 @@ class Environment:
         # splice out the observation and mask the target deltas
         self.state_atti = obs["attitude"]
         self.state_targ = np.zeros((self.num_targets, 3))
-        self.state_targ[: len(obs["target_deltas"])] = obs["target_deltas"]
+        self.state_targ[: self.context_length] = obs["target_deltas"]
 
         # accumulate rewards
         self.cumulative_reward += rew
