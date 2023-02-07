@@ -21,7 +21,6 @@ top_lines = """#!/bin/bash
 # this file has been automatically generated, do not edit manually
 
 source venv/bin/activate
-rm -rf weights/*
 pip3 uninstall pyflyt -y
 pip3 install -r requirements.txt -U
 wingman-compress-weights

@@ -15,6 +15,7 @@ class Environment:
         super().__init__()
 
         # environment params
+        self.is_wing = "wing" in cfg.env_name
         self.num_targets = cfg.num_targets
 
         # make the env
@@ -44,47 +45,53 @@ class Environment:
         self.setup_oracle()
 
     def setup_oracle(self):
-        # control period of the underlying controller
-        self.ctrl_period = 1.0 / 30.0
+        if not self.is_wing:
+            # control period of the underlying controller
+            self.ctrl_period = 1.0 / 30.0
 
-        # grab the limits from the environment and downscale them
-        a_lim = self.env.action_space.high[0] * 0.4
-        t_lim = self.env.action_space.high[-1] * 0.6
+            # grab the limits from the environment and downscale them
+            a_lim = self.env.action_space.high[0] * 0.4
+            t_lim = self.env.action_space.high[-1] * 0.6
 
-        # input: angular position command
-        # output: angular velocity
-        Kp_ang_pos = np.array([3.0, 3.0])
-        Ki_ang_pos = np.array([0.0, 0.0])
-        Kd_ang_pos = np.array([0.0, 0.0])
-        lim_ang_pos = np.array([a_lim, a_lim])
+            # input: angular position command
+            # output: angular velocity
+            Kp_ang_pos = np.array([3.0, 3.0])
+            Ki_ang_pos = np.array([0.0, 0.0])
+            Kd_ang_pos = np.array([0.0, 0.0])
+            lim_ang_pos = np.array([a_lim, a_lim])
 
-        # input: linear velocity command
-        # output: angular position
-        Kp_lin_vel = np.array([1.0, 1.0])
-        Ki_lin_vel = np.array([1.0, 1.0])
-        Kd_lin_vel = np.array([1.0, 1.0])
-        lim_lin_vel = np.array([1.0, 1.0])
+            # input: linear velocity command
+            # output: angular position
+            Kp_lin_vel = np.array([1.0, 1.0])
+            Ki_lin_vel = np.array([1.0, 1.0])
+            Kd_lin_vel = np.array([1.0, 1.0])
+            lim_lin_vel = np.array([1.0, 1.0])
 
-        ang_pos_PID = PID(
-            Kp_ang_pos,
-            Ki_ang_pos,
-            Kd_ang_pos,
-            lim_ang_pos,
-            self.ctrl_period,
-        )
-        lin_vel_PID = PID(
-            Kp_lin_vel,
-            Ki_lin_vel,
-            Kd_lin_vel,
-            lim_lin_vel,
-            self.ctrl_period,
-        )
-        self.PIDs = [ang_pos_PID, lin_vel_PID]
+            ang_pos_PID = PID(
+                Kp_ang_pos,
+                Ki_ang_pos,
+                Kd_ang_pos,
+                lim_ang_pos,
+                self.ctrl_period,
+            )
+            lin_vel_PID = PID(
+                Kp_lin_vel,
+                Ki_lin_vel,
+                Kd_lin_vel,
+                lim_lin_vel,
+                self.ctrl_period,
+            )
+            self.PIDs = [ang_pos_PID, lin_vel_PID]
 
-        # height controllers
-        self.z_PID = PID(0.15, 0.5, 0.0, t_lim, self.ctrl_period)
+            # height controllers
+            self.z_PID = PID(0.15, 0.5, 0.0, t_lim, self.ctrl_period)
+        else:
+            pass
 
     def compute_PIDs(self):
+        if self.is_wing:
+            return
+
         ang_pos = self.state_atti[3:6]
         lin_vel = self.state_atti[6:9]
         setpoint = self.state_targ[0]
@@ -102,7 +109,10 @@ class Environment:
         self.pid_output = (self.pid_output - self._action_mid) / self._action_range
 
     def get_label(self, *_) -> np.ndarray:
-        return self.pid_output
+        if not self.is_wing:
+            return self.pid_output
+        else:
+            pass
 
     def reset(self):
         obs, _ = self.env.reset()
