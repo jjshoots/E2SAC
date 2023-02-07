@@ -115,23 +115,25 @@ def train(wm: Wingman):
                     optim_dict = dict()
                     for key in optim_set:
                         optim_dict[key] = optim_set[key].state_dict()
-                    torch.save(opt_dict, optim_file)
+                    torch.save(optim_dict, optim_file)
 
 
 def eval_display(wm: Wingman):
     cfg = wm.cfg
     env = setup_env(wm)
 
-    if cfg.debug:
-        net = None
+    if not cfg.debug:
+        model, _ = setup_nets(wm)
     else:
-        net, _ = setup_nets(wm)
+        model = None
 
     if wm.cfg.display:
-        env.display(cfg, net)
+        env.display(cfg, model)
     elif wm.cfg.evaluate:
         while True:
-            print(env.evaluate(cfg, net))
+            print(env.evaluate(cfg, model))
+            print("---------------------------")
+            print("---------------------------")
 
 
 def setup_env(wm: Wingman):
@@ -147,20 +149,20 @@ def setup_nets(wm: Wingman):
     cfg = wm.cfg
 
     # set up networks and optimizers
-    net = SAC(
-        act_size=cfg.act_size,
+    model = SAC(
         obs_size=cfg.obs_size,
+        act_size=cfg.act_size,
         entropy_tuning=cfg.use_entropy,
         target_entropy=cfg.target_entropy,
         discount_factor=cfg.discount_factor,
     ).to(cfg.device)
     actor_optim = optim.AdamW(
-        net.actor.parameters(), lr=cfg.learning_rate, amsgrad=True
+        model.actor.parameters(), lr=cfg.learning_rate, amsgrad=True
     )
     critic_optim = optim.AdamW(
-        net.critic.parameters(), lr=cfg.learning_rate, amsgrad=True
+        model.critic.parameters(), lr=cfg.learning_rate, amsgrad=True
     )
-    alpha_optim = optim.AdamW([net.log_alpha], lr=0.01, amsgrad=True)
+    alpha_optim = optim.AdamW([model.log_alpha], lr=0.01, amsgrad=True)
 
     optim_set = dict()
     optim_set["actor"] = actor_optim
@@ -171,18 +173,20 @@ def setup_nets(wm: Wingman):
     has_weights, model_file, optim_file = wm.get_weight_files()
     if has_weights:
         # load the model
-        net.load_state_dict(torch.load(model_file, map_location=torch.device("cpu")))
+        model.load_state_dict(
+            torch.load(model_file, map_location=torch.device(cfg.device))
+        )
 
         # load the optimizer
-        # opt_dict = torch.load(optim_file, map_location=torch.device("cpu"))
-        # for opt_key in opt_dict:
-        #     optim_set[opt_key].load_state_dict(opt_dict[opt_key])
+        opt_dict = torch.load(optim_file, map_location=torch.device(cfg.device))
+        for opt_key in opt_dict:
+            optim_set[opt_key].load_state_dict(opt_dict[opt_key])
 
     # path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
     # torch.save(net.actor.net.state_dict(), path)
     # exit()
 
-    return net, optim_set
+    return model, optim_set
 
 
 if __name__ == "__main__":

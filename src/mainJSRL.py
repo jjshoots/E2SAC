@@ -158,8 +158,8 @@ def eval_display(wm: Wingman):
         env.display(cfg, model)
     elif wm.cfg.evaluate:
         while True:
-            print("---------------------------")
             print(env.evaluate(cfg, model))
+            print("---------------------------")
             print("---------------------------")
 
 
@@ -191,10 +191,10 @@ def setup_nets(wm: Wingman):
     )
     alpha_optim = optim.AdamW([model.log_alpha], lr=0.01, amsgrad=True)
 
-    optims = dict()
-    optims["actor"] = actor_optim
-    optims["critic"] = critic_optim
-    optims["alpha"] = alpha_optim
+    optim_set = dict()
+    optim_set["actor"] = actor_optim
+    optim_set["critic"] = critic_optim
+    optim_set["alpha"] = alpha_optim
 
     # get latest weight files
     has_weights, model_file, optim_file = wm.get_weight_files()
@@ -205,15 +205,14 @@ def setup_nets(wm: Wingman):
         )
 
         # load the optimizer
-        checkpoint = torch.load(optim_file, map_location=torch.device(cfg.device))
-
-        for opt_key in checkpoint:
-            optims[opt_key].load_state_dict(checkpoint[opt_key])
+        opt_dict = torch.load(optim_file, map_location=torch.device(cfg.device))
+        for opt_key in opt_dict:
+            optim_set[opt_key].load_state_dict(opt_dict[opt_key])
 
     # torch.save(net.actor.net.state_dict(), f"./{set.env_name}_big.pth")
     # exit()
 
-    return model, optims
+    return model, optim_set
 
 
 if __name__ == "__main__":

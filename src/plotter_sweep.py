@@ -181,6 +181,14 @@ if __name__ == "__main__":
     baselines_dict["Oracle"] = 0.6
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
+    title = "AdroitHandDoorSparse-v1"
+    sweep_uri_dict = {}
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/drcvhipk"
+
+    baselines_dict = {}
+    baselines_dict["Oracle"] = 0.6
+    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
+
     # process everything with multiprocessing
     with Pool() as pool:
         pool.starmap(process_sweeps, sweep_objects)

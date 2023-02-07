@@ -8,12 +8,13 @@ parameters:
     value: "AdroitHandDoor-v1"
   sparse:
     value: true
-name: "CCGE_AdroitHandDoorSparse-v1"
+name: "JSRL_AdroitHandDoorSparse-v1"
 command:
   - python3
   # - src/mainSAC.py
-  - src/main.py
+  # - src/main.py
+  - src/mainJSRL.py
   # - src/mainAWAC.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=CCGE_AdroitHandDoorSparse-v1"
+  - "--wandb_name=JSRL_AdroitHandDoorSparse-v1"
