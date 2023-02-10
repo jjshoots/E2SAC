@@ -131,7 +131,7 @@ class Environment:
             return self.pid_output
         else:
             action = self.suboptimal_actor(*[gpuize(s, self.device) for s in state])
-            action = cpuize(action)[0]
+            action = cpuize(torch.tanh(action))[0]
             return action
 
     def reset(self):
@@ -140,7 +140,7 @@ class Environment:
         # splice out the observation and mask the target deltas
         self.state_atti = obs["attitude"]
         self.state_targ = np.zeros((self.num_targets, 3))
-        self.state_targ[: self.context_length] = obs["target_deltas"]
+        self.state_targ[: len(obs["target_deltas"])] = obs["target_deltas"]
 
         self.ended = False
         self.cumulative_reward = 0
@@ -165,7 +165,7 @@ class Environment:
         # splice out the observation and mask the target deltas
         self.state_atti = obs["attitude"]
         self.state_targ = np.zeros((self.num_targets, 3))
-        self.state_targ[: self.context_length] = obs["target_deltas"]
+        self.state_targ[: len(obs["target_deltas"])] = obs["target_deltas"]
 
         # accumulate rewards
         self.cumulative_reward += rew
@@ -200,7 +200,7 @@ class Environment:
                 action = net.actor.infer(*output)
                 action = cpuize(action)[0]
             else:
-                action = self.get_label()
+                action = self.get_label((state_atti, state_targ))
 
             self.step(action)
 
@@ -235,7 +235,7 @@ class Environment:
                 # action = cpuize(net.actor.sample(*output)[0][0])
                 action = cpuize(net.actor.infer(*output))
             else:
-                action = self.get_label()
+                action = self.get_label((state_atti, state_targ))
 
             # print(action, self.pid_output)
 
