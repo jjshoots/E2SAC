@@ -46,6 +46,9 @@ class Environment:
         self._action_mid = (action_high + action_low) / 2.0
         self._action_range = (action_high - action_low) / 2.0
 
+        # suboptimal actor init
+        self.suboptimal_actor = None
+
         self.setup_oracle()
 
     def setup_oracle(self):
@@ -90,6 +93,10 @@ class Environment:
             # height controllers
             self.z_PID = PID(0.15, 0.5, 0.0, t_lim, self.ctrl_period)
         else:
+            # don't setup the oracle if it already exists
+            if self.suboptimal_actor is not None:
+                return
+
             suboptimal_path = (
                 f"./suboptimal_policies/wing.pth"
             )

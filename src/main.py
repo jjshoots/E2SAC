@@ -46,7 +46,7 @@ def train(wm: Wingman):
                 # get the initial state and label
                 obs_atti = env.state_atti
                 obs_targ = env.state_targ
-                lbl = env.get_label()
+                lbl = env.get_label((obs_atti, obs_targ))
 
                 if memory.count < cfg.exploration_steps:
                     act = env.env.action_space.sample()
