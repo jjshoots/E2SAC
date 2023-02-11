@@ -184,6 +184,7 @@ if __name__ == "__main__":
     title = "AdroitHandDoorSparse-v1"
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/drcvhipk"
+    sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/949u8m4v"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 0.6
