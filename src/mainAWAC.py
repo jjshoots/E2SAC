@@ -30,7 +30,7 @@ def train(wm: Wingman):
                 # get the initial state and label
                 obs_atti = env.state_atti
                 obs_targ = env.state_targ
-                label = env.get_label()
+                label = env.get_label((obs_atti, obs_targ))
 
                 # get the next state and other stuff
                 next_obs_atti, next_obs_targ, reward, termination = env.step(label)
