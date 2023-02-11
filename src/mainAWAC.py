@@ -218,9 +218,9 @@ def train(wm: Wingman):
                         optims["alpha"].step()
 
         # checkpointing
-        wm.log["online_eval_perf"] = env.evaluate(cfg, model)
+        wm.log["eval_perf"] = env.evaluate(cfg, model)
         to_update, model_file, optim_file = wm.checkpoint(
-            loss=-float(wm.log["online_eval_perf"]),
+            loss=-float(wm.log["eval_perf"]),
             step=memory.count + cfg.reset_memory * cfg.offline_steps,
         )
         if to_update:
