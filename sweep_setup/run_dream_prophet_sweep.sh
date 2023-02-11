@@ -8,22 +8,34 @@ pip3 install -r requirements.txt -U
 wingman-compress-weights
 
 declare -a pids=()
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2_oracle_search/cqlprjnn --count 17 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2_oracle_search/ja4ojskk --count 10 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2_oracle_search/cqlprjnn --count 17 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2_oracle_search/ja4ojskk --count 10 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2_oracle_search/cqlprjnn --count 17 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2_oracle_search/ja4ojskk --count 10 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2_oracle_search/cqlprjnn --count 17 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2_oracle_search/ja4ojskk --count 10 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2_oracle_search/cqlprjnn --count 17 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2_oracle_search/ja4ojskk --count 10 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2_oracle_search/cqlprjnn --count 17 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2_oracle_search/ja4ojskk --count 10 & 
+pids+=($!)
+sleep 10
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2_oracle_search/ja4ojskk --count 10 & 
+pids+=($!)
+sleep 10
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2_oracle_search/ja4ojskk --count 10 & 
+pids+=($!)
+sleep 10
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2_oracle_search/ja4ojskk --count 10 & 
+pids+=($!)
+sleep 10
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2_oracle_search/ja4ojskk --count 10 & 
 pids+=($!)
 sleep 10
 

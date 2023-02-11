@@ -3,7 +3,6 @@ metric:
   name: max_eval_perf
   goal: maximize
 name: "CCGE-Fixedwing-Waypoints"
-# name: "AWAC-PyFlyt-QuadXWaypoints"
 parameters:
   env_name:
     value: "PyFlyt/Fixedwing-Waypoints-v0"
@@ -16,4 +15,3 @@ command:
   # - src/mainJSRL.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=CCGE-Fixedwing-Waypoints"
