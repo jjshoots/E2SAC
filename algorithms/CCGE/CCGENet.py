@@ -145,7 +145,7 @@ class Critic(nn.Module):
             _features_description, _activation_description
         )
 
-        self.register_buffer("uncertainty_bias", torch.rand(1) * 1000.0, persistent=True)
+        self.register_buffer("uncertainty_bias", torch.rand(1) * 100.0, persistent=True)
 
     def forward(self, obs_atti, obs_targ, actions):
         # pass things through the backbone
