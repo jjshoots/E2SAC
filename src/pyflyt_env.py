@@ -250,7 +250,7 @@ class Environment:
             if cfg.render_gif:
                 frames.append(self.env.render()[..., :3].astype(np.uint8))
 
-            if self.ended or len(frames) == 4:
+            if self.ended:
                 if cfg.render_gif:
                     print("-----------------------------------------")
                     print(f"Saving gif...")
