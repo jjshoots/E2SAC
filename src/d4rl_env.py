@@ -81,7 +81,6 @@ class Environment:
 
         self.ended = False
         self.success = False
-        self.cumulative_reward = 0.0
 
         return self.state
 
@@ -97,9 +96,8 @@ class Environment:
         # step through the env
         self.state, reward, term, trunc, info = self.env.step(action)
 
-        # accumulate reward
-        self.cumulative_reward += reward
         self.success |= info["success"]
+        reward += self.success * 10.0
 
         if term or trunc:
             self.ended = True
@@ -172,5 +170,5 @@ class Environment:
                 self.step(self.get_label(self.state))
 
             if self.ended:
-                print(self.cumulative_reward)
+                print(self.success)
                 self.reset()

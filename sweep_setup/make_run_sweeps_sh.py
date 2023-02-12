@@ -1,7 +1,7 @@
 import sys
 
 _TOTAL_GPUS = int(sys.argv[1])
-_RUNS_PER_GPU = 5
+_RUNS_PER_GPU = 4
 
 # read the lines and grab the url
 sweep_id = ""
