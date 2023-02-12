@@ -99,7 +99,7 @@ class Environment:
 
         # accumulate reward
         self.cumulative_reward += reward
-        self.success = info["success"]
+        self.success |= info["success"]
 
         if term or trunc:
             self.ended = True

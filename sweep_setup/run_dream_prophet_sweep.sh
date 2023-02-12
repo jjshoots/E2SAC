@@ -10,22 +10,34 @@ rm -rf weights/*
 wingman-compress-weights
 
 declare -a pids=()
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/949u8m4v --count 3 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/pdxci089 --count 2 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/949u8m4v --count 3 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/pdxci089 --count 2 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/949u8m4v --count 3 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/pdxci089 --count 2 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/949u8m4v --count 3 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/pdxci089 --count 2 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/949u8m4v --count 3 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/pdxci089 --count 2 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/949u8m4v --count 3 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/pdxci089 --count 2 & 
+pids+=($!)
+sleep 10
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/pdxci089 --count 2 & 
+pids+=($!)
+sleep 10
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/pdxci089 --count 2 & 
+pids+=($!)
+sleep 10
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/pdxci089 --count 2 & 
+pids+=($!)
+sleep 10
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/pdxci089 --count 2 & 
 pids+=($!)
 sleep 10
 
