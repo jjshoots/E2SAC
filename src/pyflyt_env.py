@@ -197,7 +197,6 @@ class Environment:
         num_hits = []
 
         while len(eval_perf) < cfg.eval_num_episodes:
-
             state_atti = gpuize(self.state_atti, cfg.device).unsqueeze(0)
             state_targ = gpuize(self.state_targ, cfg.device).unsqueeze(0)
 
@@ -233,7 +232,6 @@ class Environment:
         frames = []
 
         while True:
-
             state_atti = gpuize(self.state_atti, cfg.device).unsqueeze(0)
             state_targ = gpuize(self.state_targ, cfg.device).unsqueeze(0)
 
@@ -252,7 +250,7 @@ class Environment:
             if cfg.render_gif:
                 frames.append(self.env.render()[..., :3].astype(np.uint8))
 
-            if self.ended:
+            if self.ended or len(frames) == 4:
                 if cfg.render_gif:
                     print("-----------------------------------------")
                     print(f"Saving gif...")
