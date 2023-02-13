@@ -165,30 +165,30 @@ if __name__ == "__main__":
     # list of run arguments
     sweep_objects = []
 
-    title = "AdroitHandPenSparse-v1"
-    sweep_uri_dict = {}
-    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/l9x4ftbg"
+    # title = "AdroitHandPenSparse-v1"
+    # sweep_uri_dict = {}
+    # sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/l9x4ftbg"
 
-    baselines_dict = {}
-    baselines_dict["Oracle"] = 0.6
-    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
+    # baselines_dict = {}
+    # baselines_dict["Oracle"] = 0.6
+    # sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     title = "AdroitHandHammerSparse-v1"
     sweep_uri_dict = {}
-    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/7e9yxsv3"
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/t82mp63g"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 0.6
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
-    title = "AdroitHandDoorSparse-v1"
-    sweep_uri_dict = {}
-    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/drcvhipk"
-    sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/949u8m4v"
+    # title = "AdroitHandDoorSparse-v1"
+    # sweep_uri_dict = {}
+    # sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/drcvhipk"
+    # sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/949u8m4v"
 
-    baselines_dict = {}
-    baselines_dict["Oracle"] = 0.6
-    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
+    # baselines_dict = {}
+    # baselines_dict["Oracle"] = 0.6
+    # sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     # process everything with multiprocessing
     with Pool() as pool:
