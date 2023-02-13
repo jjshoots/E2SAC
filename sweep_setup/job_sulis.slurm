@@ -9,8 +9,9 @@
 #SBATCH --account=su003
 
 module purge
-module load GCC/10.2.0  CUDA/11.1.1  OpenMPI/4.0.5
-module load PyTorch/1.9.0
+module load nvidia/cuda-11.2
+module load GCCcore/11.3.0
+module load Python/3.10.4
 
 source ~/.bashrc
 ./sweep_setup/run_sulis_sweep.sh
