@@ -5,4 +5,4 @@ gymnasium
 matplotlib
 seaborn
 git+https://github.com/jjshoots/rliable.git
-git+https://github.com/jjshoots/Gymnasium-Robotics.git@d4rl_sparsify_more
+git+https://github.com/jjshoots/Gymnasium-Robotics.git

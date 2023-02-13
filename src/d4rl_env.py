@@ -97,7 +97,7 @@ class Environment:
         self.state, reward, term, trunc, info = self.env.step(action)
 
         self.success |= info["success"]
-        reward += self.success * 10.0
+        reward = self.success * 100.0
 
         if term or trunc:
             self.ended = True
