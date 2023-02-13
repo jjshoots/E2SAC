@@ -3,6 +3,7 @@
 # this file has been automatically generated, do not edit manually
 
 source venv/bin/activate
+# pip install wandb==0.13.3 --upgrade
 # pip3 install -U pip
 # pip3 install -e .
 # pip3 uninstall gymnasium-robotics -y
@@ -10,54 +11,11 @@ source venv/bin/activate
 # wingman-compress-weights
 
 declare -a pids=()
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/egl0hc0f --count 1 &
-pids+=($!)
-sleep 10
+for i in {1..16}; do
+    wandb agent jjshoots/CCGE2/5ynv1ou8 --count 1 &
+    pids+=($!)
+    sleep 10
+done
 
 for pid in ${pids[*]}; do
     wait $pid
