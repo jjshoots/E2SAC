@@ -9,9 +9,9 @@ parameters:
     # value: "PyFlyt/QuadX-Waypoints-v0"
 command:
   - python3
-  - src/main.py
+  # - src/main.py
   # - src/mainSAC.py
-  # - src/mainAWAC.py
+  - src/mainAWAC.py
   # - src/mainJSRL.py
   - "--train"
   - "--wandb"
