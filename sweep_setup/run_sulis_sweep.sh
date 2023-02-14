@@ -11,8 +11,8 @@ source venv/bin/activate
 # wingman-compress-weights
 
 declare -a pids=()
-for i in {1..16}; do
-    wandb agent jjshoots/CCGE2/8ut2moc5 --count 1 &
+for i in {1..10}; do
+    wandb agent jjshoots/CCGE2/2m2fok07 --count 1 &
     pids+=($!)
     sleep 10
 done
