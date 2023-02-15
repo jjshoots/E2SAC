@@ -5,8 +5,8 @@ metric:
 name: "CCGE-Fixedwing-Waypoints"
 parameters:
   env_name:
-    value: "PyFlyt/Fixedwing-Waypoints-v0"
-    # value: "PyFlyt/QuadX-Waypoints-v0"
+    # value: "PyFlyt/Fixedwing-Waypoints-v0"
+    value: "PyFlyt/QuadX-Waypoints-v0"
 command:
   - python3
   # - src/main.py
