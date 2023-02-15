@@ -165,13 +165,13 @@ if __name__ == "__main__":
     # list of run arguments
     sweep_objects = []
 
-    # title = "AdroitHandPenSparse-v1"
-    # sweep_uri_dict = {}
-    # sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/l9x4ftbg"
+    title = "AdroitHandPenSparse-v1"
+    sweep_uri_dict = {}
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/hoakb8au"
 
-    # baselines_dict = {}
-    # baselines_dict["Oracle"] = 0.6
-    # sweep_objects.append((title, sweep_uri_dict, baselines_dict))
+    baselines_dict = {}
+    baselines_dict["Oracle"] = 0.6
+    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     title = "AdroitHandHammerSparse-v1"
     sweep_uri_dict = {}
@@ -181,13 +181,13 @@ if __name__ == "__main__":
     baselines_dict["Oracle"] = 0.6
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
-    # title = "AdroitHandDoorSparse-v1"
-    # sweep_uri_dict = {}
-    # sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/drcvhipk"
+    title = "AdroitHandDoorSparse-v1"
+    sweep_uri_dict = {}
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/2m2fok07"
 
-    # baselines_dict = {}
-    # baselines_dict["Oracle"] = 0.6
-    # sweep_objects.append((title, sweep_uri_dict, baselines_dict))
+    baselines_dict = {}
+    baselines_dict["Oracle"] = 0.6
+    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     # process everything with multiprocessing
     with Pool() as pool:
