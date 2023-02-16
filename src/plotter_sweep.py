@@ -93,8 +93,6 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
                 data = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
                 score.append(data)
 
-        print(len(score))
-
         # stack along num_runs axis
         score = np.stack(score, axis=0)
         # expand along num_games axis
@@ -133,12 +131,10 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
             # color="black",
             linestyle="--",
         )
-        print(color_palette[len(algorithms) + i])
         algorithms.append(key)
 
     # form the legend
     color_dict = dict(zip(algorithms, color_palette))
-    print(color_dict)
     fake_patches = [
         patches.Patch(color=color_dict[alg], alpha=0.75) for alg in algorithms
     ]

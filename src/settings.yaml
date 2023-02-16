@@ -27,8 +27,8 @@ confidence_lambda: 0.1
 # AWAC params
 lambda_parameter: 0.3
 offline_epochs: 10
-offline_steps: 200000
-online_steps: 800000
+offline_steps: 100000
+online_steps: 900000
 reset_memory: false
 
 # core SAC params
