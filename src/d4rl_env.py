@@ -98,7 +98,8 @@ class Environment:
 
         self.success |= info["success"]
 
-        if term or trunc or self.success:
+        # if term or trunc or self.success:
+        if term or trunc:
             self.ended = True
 
         return self.state, reward, term
