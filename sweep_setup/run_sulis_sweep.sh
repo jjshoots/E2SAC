@@ -13,7 +13,7 @@ source venv/bin/activate
 
 declare -a pids=()
 for i in {1..10}; do
-    wandb agent jjshoots/CCGE2/q61cfyci --count 1 &
+    wandb agent jjshoots/CCGE2/gnrp57gk --count 1 &
     pids+=($!)
     sleep 10
 done
