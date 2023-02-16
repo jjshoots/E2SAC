@@ -7,9 +7,11 @@ source venv/bin/activate
 # pip3 install -U pip
 # pip3 install -e .
 # pip3 install -r requirements.txt -U
-# wingman-compress-weights
+
 # pip3 uninstall gymnasium-robotics -y
 # pip3 install git+https://github.com/jjshoots/Gymnasium-Robotics.git
+
+wingman-compress-weights
 
 declare -a pids=()
 for i in {1..10}; do
