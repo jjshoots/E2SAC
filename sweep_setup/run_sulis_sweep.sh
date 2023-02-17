@@ -7,37 +7,37 @@ source venv/bin/activate
 # pip3 uninstall gymnasium-robotics -y
 # pip3 install -r requirements.txt -U
 # rm -rf weights/*
-wingman-compress-weights
+# wingman-compress-weights
 
 declare -a pids=()
-wandb agent jjshoots/CCGE2/rntods6t --count 1 & 
+wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/rntods6t --count 1 & 
+wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/rntods6t --count 1 & 
+wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/rntods6t --count 1 & 
+wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/rntods6t --count 1 & 
+wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/rntods6t --count 1 & 
+wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/rntods6t --count 1 & 
+wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/rntods6t --count 1 & 
+wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/rntods6t --count 1 & 
+wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/rntods6t --count 1 & 
+wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
 pids+=($!)
 sleep 20
 
