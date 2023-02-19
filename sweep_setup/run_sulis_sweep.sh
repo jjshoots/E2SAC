@@ -10,34 +10,34 @@ source venv/bin/activate
 # wingman-compress-weights
 
 declare -a pids=()
-wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
+wandb agent jjshoots/CCGE2/zhk3131v --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
+wandb agent jjshoots/CCGE2/zhk3131v --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
+wandb agent jjshoots/CCGE2/zhk3131v --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
+wandb agent jjshoots/CCGE2/zhk3131v --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
+wandb agent jjshoots/CCGE2/zhk3131v --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
+wandb agent jjshoots/CCGE2/zhk3131v --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
+wandb agent jjshoots/CCGE2/zhk3131v --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
+wandb agent jjshoots/CCGE2/zhk3131v --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
+wandb agent jjshoots/CCGE2/zhk3131v --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/40yq8jft --count 1 & 
+wandb agent jjshoots/CCGE2/zhk3131v --count 1 & 
 pids+=($!)
 sleep 20
 

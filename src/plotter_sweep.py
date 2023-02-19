@@ -165,17 +165,17 @@ if __name__ == "__main__":
     # list of run arguments
     sweep_objects = []
 
-    # title = "AdroitHandPenSparse-v1"
-    # sweep_uri_dict = {}
-    # sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/hoakb8au"
+    title = "AdroitHandPenSparse-v1"
+    sweep_uri_dict = {}
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/40yq8jft"
 
-    # baselines_dict = {}
-    # baselines_dict["Oracle"] = 0.6
-    # sweep_objects.append((title, sweep_uri_dict, baselines_dict))
+    baselines_dict = {}
+    baselines_dict["Oracle"] = 0.6
+    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     title = "AdroitHandHammerSparse-v1"
     sweep_uri_dict = {}
-    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/llha0rha"
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/4ouyzaqo"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 0.6
@@ -183,7 +183,8 @@ if __name__ == "__main__":
 
     title = "AdroitHandDoorSparse-v1"
     sweep_uri_dict = {}
-    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/2m2fok07"
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/nqut7mkj"
+    sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/j9ycylgj"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 0.6
