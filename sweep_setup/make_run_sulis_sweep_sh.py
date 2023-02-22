@@ -1,4 +1,4 @@
-_RUNS_PER_GPU = 10
+_RUNS_PER_GPU = 6
 
 # read the lines and grab the url
 sweep_id = ""
