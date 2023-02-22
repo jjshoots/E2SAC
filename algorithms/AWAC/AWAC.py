@@ -207,20 +207,24 @@ class AWAC(nn.Module):
         log_probs = self.actor.get_log_probs(output[0], output[1], actions)
         new_actions, new_log_probs = self.actor.sample(*output)
 
-        # expectations of Q with clipped double Q, old actions
-        q_old = self.critic(states, actions)
-        q_old, _ = torch.min(q_old, dim=-1, keepdim=True)
+        with torch.no_grad():
+            # expectations of Q with clipped double Q, old actions
+            q_old = self.critic(states, actions)
+            q_old, _ = torch.min(q_old, dim=-1, keepdim=True)
 
-        # expectations of Q with clipped double Q, new actions
-        q_new = self.critic(states, new_actions)
-        q_new, _ = torch.min(q_new, dim=-1, keepdim=True)
+            # expectations of Q with clipped double Q, new actions
+            q_new = self.critic(states, new_actions)
+            q_new, _ = torch.min(q_new, dim=-1, keepdim=True)
 
-        # reinforcement target is maximization of (Q + alpha * entropy) * done
-        advantage = (q_old - q_new) * terms
+            # reinforcement target is maximization of advantage
+            advantage = (q_old - q_new) * terms
 
-        # advantage weighting
-        weighting = func.softmax(advantage / self.lambda_parameter).detach()
-        # weighting = (advantage / self.lambda_parameter).exp().detach()
+            # advantage weighting
+            weighting = (
+                func.softmax(advantage / self.lambda_parameter, dim=0)
+                * advantage.shape[0]
+            )
+            # weighting = (advantage / self.lambda_parameter).exp()
 
         # get loss for q
         rnf_loss = -(log_probs * weighting).mean()
@@ -234,6 +238,7 @@ class AWAC(nn.Module):
         log = dict()
         log["weighting"] = weighting.mean()
         log["actor_loss"] = actor_loss.mean()
+        log["advantage"] = advantage.mean()
 
         return actor_loss, log
 
