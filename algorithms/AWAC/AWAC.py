@@ -224,6 +224,7 @@ class AWAC(nn.Module):
                 func.softmax(advantage / self.lambda_parameter, dim=0)
                 * advantage.shape[0]
             )
+            print(weighting.mean())
             # weighting = (advantage / self.lambda_parameter).exp()
 
         # get loss for q
