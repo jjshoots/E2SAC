@@ -2,7 +2,7 @@
 env_name: ""
 # env_name: 'PyFlyt/QuadX-Waypoints-v0'
 env_name: 'PyFlyt/Fixedwing-Waypoints-v0'
-sparse_reward: true
+sparse_reward: false
 agent_hz: 30
 num_targets: 5
 context_length: 1
@@ -15,7 +15,8 @@ total_steps: 3000000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
-discount_factor: 0.99
+discount_factor: 0.92
+# discount_factor: 0.99
 learning_rate: 0.0004
 exploration_steps: 0
 
@@ -60,4 +61,5 @@ wandb_name: ''
 wandb_notes: ''
 wandb_id: ''
 wandb_entity: 'jjshoots'
-wandb_project: 'CCGE2'
+# wandb_project: 'CCGE2'
+wandb_project: 'CCGE2_oracle_search'

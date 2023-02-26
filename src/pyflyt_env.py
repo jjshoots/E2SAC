@@ -93,6 +93,7 @@ class Environment:
             # height controllers
             self.z_PID = PID(0.15, 0.5, 0.0, t_lim, self.ctrl_period)
         else:
+            return
             # don't setup the oracle if it already exists
             if self.suboptimal_actor is not None:
                 return
@@ -220,7 +221,6 @@ class Environment:
         return num_hits
 
     def display(self, cfg, net=None):
-
         if net is not None:
             net.eval()
 
