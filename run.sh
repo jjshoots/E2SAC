@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
-availab_machines=("availab-dl3" "availab-dl4")
-dream_prophet_machines=("dream" "prophet")
-total_gpus=4
+# dream_prophet_machines=("dream" "prophet")
+availab_machines=("availab-dl1")
+dream_prophet_machines=()
+total_gpus=1
 
 ######################################################################################################
 # setup the sweep
