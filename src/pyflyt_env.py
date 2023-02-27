@@ -1,7 +1,7 @@
-import torch
 import gymnasium as gym
 import numpy as np
 import PyFlyt.gym_envs
+import torch
 from PIL import Image
 from PyFlyt.core import PID
 from wingman import cpuize, gpuize
@@ -93,14 +93,11 @@ class Environment:
             # height controllers
             self.z_PID = PID(0.15, 0.5, 0.0, t_lim, self.ctrl_period)
         else:
-            return
             # don't setup the oracle if it already exists
             if self.suboptimal_actor is not None:
                 return
 
-            suboptimal_path = (
-                f"./suboptimal_policies/wing.pth"
-            )
+            suboptimal_path = f"./suboptimal_policies/wing.pth"
             weights = torch.load(suboptimal_path, map_location=self.device)
 
             # load the oracle
@@ -243,7 +240,6 @@ class Environment:
                 action = self.get_label((state_atti, state_targ))
 
             # print(action, self.pid_output)
-
             self.step(action)
 
             # this captures the camera image
