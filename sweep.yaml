@@ -5,16 +5,16 @@ metric:
   goal: maximize
 parameters:
   env_name:
-    value: "AdroitHandHammer-v1"
+    value: "AdroitHandDoor-v1"
   sparse:
     value: true
-name: "JSRL_AdroitHandHammerSparse-v1"
+name: "AWAC_AdroitHandDoorSparse-v1"
 command:
   - python3
   # - src/main.py
   # - src/mainSAC.py
-  - src/mainJSRL.py
-  # - src/mainAWAC.py
+  # - src/mainJSRL.py
+  - src/mainAWAC.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=JSRL_AdroitHandHammerSparse-v1"
+  - "--wandb_name=AWAC_AdroitHandDoorSparse-v1"

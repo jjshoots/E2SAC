@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:ampere_a100:1
 #SBATCH --partition=gpu
 #SBATCH --time=48:00:00
-#SBATCH --account=su003
+#SBATCH --account=su404-iftc1-gpu
 
 module purge
 module load nvidia/cuda-11.2
