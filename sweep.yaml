@@ -9,7 +9,7 @@ parameters:
     value: "PyFlyt/Fixedwing-Waypoints-v0"
     # value: "PyFlyt/QuadX-Waypoints-v0"
   sparse_reward:
-    value: false
+    value: true
 command:
   - python3
   - src/main.py
