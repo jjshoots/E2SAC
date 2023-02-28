@@ -58,7 +58,7 @@ class Environment:
 
             # grab the limits from the environment and downscale them
             a_lim = self.env.action_space.high[0] * 0.4
-            t_lim = self.env.action_space.high[-1] * 0.6
+            t_lim = self.env.action_space.high[-1]
 
             # input: angular position command
             # output: angular velocity
@@ -91,7 +91,7 @@ class Environment:
             self.PIDs = [ang_pos_PID, lin_vel_PID]
 
             # height controllers
-            self.z_PID = PID(0.15, 0.5, 0.0, t_lim, self.ctrl_period)
+            self.z_PID = PID(0.3, 0.5, 0.0, t_lim, self.ctrl_period)
         else:
             # don't setup the oracle if it already exists
             if self.suboptimal_actor is not None:
@@ -130,6 +130,7 @@ class Environment:
 
         # normalize
         self.pid_output = (self.pid_output - self._action_mid) / self._action_range
+        self.pid_output[-1] = np.clip(self.pid_output[-1], -0.3, 1.0)
 
     def get_label(self, state) -> np.ndarray:
         if not self.is_wing:
