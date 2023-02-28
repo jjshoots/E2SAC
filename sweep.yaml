@@ -7,8 +7,6 @@ parameters:
   env_name:
     value: "PyFlyt/Fixedwing-Waypoints-v0"
     # value: "PyFlyt/QuadX-Waypoints-v0"
-  sparse_reward:
-    value: false
 command:
   - python3
   - src/main.py
