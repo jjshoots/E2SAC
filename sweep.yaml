@@ -3,7 +3,7 @@ metric:
   name: max_eval_perf
   goal: maximize
 project: "CCGE2_oracle_search"
-name: "SAC-Fixedwing-Waypoints"
+name: "CCGE-Fixedwing-Waypoints"
 parameters:
   env_name:
     value: "PyFlyt/Fixedwing-Waypoints-v0"
@@ -12,8 +12,8 @@ parameters:
     value: false
 command:
   - python3
-  # - src/main.py
-  - src/mainSAC.py
+  - src/main.py
+  # - src/mainSAC.py
   # - src/mainAWAC.py
   # - src/mainJSRL.py
   - "--train"
