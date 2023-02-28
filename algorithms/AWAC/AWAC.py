@@ -219,12 +219,15 @@ class AWAC(nn.Module):
             # reinforcement target is maximization of advantage
             advantage = (q_old - q_new) * terms
 
+            # advantage normalization
+            advantage = advantage / torch.max(advantage)[0]
+
             # advantage weighting
-            weighting = (
-                func.softmax(advantage / self.lambda_parameter, dim=0)
-                * advantage.shape[0]
-            )
-            # weighting = (advantage / self.lambda_parameter).exp()
+            weighting = (advantage / self.lambda_parameter).exp()
+            # weighting = (
+            #     func.softmax(advantage / self.lambda_parameter, dim=0)
+            #     * advantage.shape[0]
+            # )
 
         # get loss for q
         rnf_loss = -(log_probs * weighting).mean()
