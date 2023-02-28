@@ -219,22 +219,29 @@ class AWAC(nn.Module):
         # Get log probs of the actions we have
         output = self.actor(obs_atti, obs_targ)
         log_probs = self.actor.get_log_probs(output[0], output[1], actions)
-
-        # expectations of Q with clipped double Q, old actions
-        q_old = self.critic(obs_atti, obs_targ, actions)
-        q_old, _ = torch.min(q_old, dim=-1, keepdim=True)
-
-        # expectations of Q with clipped double Q, new actions
         new_actions, new_log_probs = self.actor.sample(*output)
-        q_new = self.critic(obs_atti, obs_targ, new_actions)
-        q_new, _ = torch.min(q_new, dim=-1, keepdim=True)
 
-        # reinforcement target is maximization of (Q + alpha * entropy) * done
-        advantage = (q_old - q_new) * terms
-        advantage = torch.clamp(advantage, -torch.inf, 5.0)
+        with torch.no_grad():
+            # expectations of Q with clipped double Q, old actions
+            q_old = self.critic(obs_atti, obs_targ, actions)
+            q_old, _ = torch.min(q_old, dim=-1, keepdim=True)
 
-        # advantage weighting
-        weighting = func.softplus(advantage / self.lambda_parameter).detach()
+            # expectations of Q with clipped double Q, new actions
+            q_new = self.critic(obs_atti, obs_targ, new_actions)
+            q_new, _ = torch.min(q_new, dim=-1, keepdim=True)
+
+            # reinforcement target is maximization of advantage
+            advantage = (q_old - q_new) * terms
+
+            # advantage normalization
+            advantage = advantage / torch.max(advantage)
+
+            # advantage weighting
+            weighting = (advantage / self.lambda_parameter).exp()
+            # weighting = (
+            #     func.softmax(advantage / self.lambda_parameter, dim=0)
+            #     * advantage.shape[0]
+            # )
 
         # get loss for q and entropy
         rnf_loss = -(log_probs * weighting).mean()
