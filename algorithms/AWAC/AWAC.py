@@ -220,7 +220,7 @@ class AWAC(nn.Module):
             advantage = (q_old - q_new) * terms
 
             # advantage normalization
-            advantage = advantage / torch.max(advantage)[0]
+            advantage = advantage / torch.max(advantage)
 
             # advantage weighting
             weighting = (advantage / self.lambda_parameter).exp()
