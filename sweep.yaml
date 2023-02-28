@@ -2,6 +2,7 @@ method: random
 metric:
   name: max_eval_perf
   goal: maximize
+project: "CCGE2_oracle_search"
 name: "CCGE-Fixedwing-Waypoints"
 parameters:
   env_name:
