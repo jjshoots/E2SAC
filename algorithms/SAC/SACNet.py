@@ -136,7 +136,7 @@ class Critic(nn.Module):
         _features_description = [
             3 * embedding_size,
             embedding_size,
-            2,
+            1,
         ]
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
