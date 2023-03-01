@@ -177,7 +177,7 @@ if __name__ == "__main__":
     title = "AdroitHandHammerSparse-v1"
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/4ouyzaqo"
-    sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/jo5yi1p4"
+    sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/nc8m5se6"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 0.6
@@ -186,7 +186,7 @@ if __name__ == "__main__":
     title = "AdroitHandDoorSparse-v1"
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/nqut7mkj"
-    sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/j9ycylgj"
+    sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/951i458k"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 0.6
