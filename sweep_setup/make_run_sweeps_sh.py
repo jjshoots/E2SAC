@@ -1,10 +1,11 @@
 import sys
 
 _TOTAL_GPUS = int(sys.argv[1])
-_RUNS_PER_GPU = 3
+_RUNS_PER_GPU = 4
 
 # read the lines and grab the url
 sweep_id = ""
+project_id = ""
 with open("./sweep_setup/temp.out", "r") as f:
     # read lines
     lines = f.readlines()
@@ -12,8 +13,8 @@ with open("./sweep_setup/temp.out", "r") as f:
     # find the url
     for line in lines:
         if "View sweep at:" in line:
-            sweep_id = line.split(" ")[-1]
             sweep_id = line.split("/")[-1]
+            project_id = line.split("/")[-2]
             sweep_id = sweep_id.replace("\n", "")
 
 top_lines = """#!/bin/bash
@@ -28,9 +29,9 @@ wingman-compress-weights
 declare -a pids=()
 """
 
-availab_run_line = f"wandb agent jjshoots/CCGE2_oracle_search/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
-dream_prophet_run_line_0 = f"CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2_oracle_search/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
-dream_prophet_run_line_1 = f"CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2_oracle_search/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
+availab_run_line = f"wandb agent jjshoots/{project_id}/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
+dream_prophet_run_line_0 = f"CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/{project_id}/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
+dream_prophet_run_line_1 = f"CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/{project_id}/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
 
 joining_lines = """
 pids+=($!)
