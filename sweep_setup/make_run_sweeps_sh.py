@@ -12,7 +12,7 @@ with open("./sweep_setup/temp.out", "r") as f:
 
     # find the url
     for line in lines:
-        if "View sweep at:" in line:
+        if "Run sweep agent with:" in line:
             sweep_id = line.split("/")[-1]
             project_id = line.split("/")[-2]
             sweep_id = sweep_id.replace("\n", "")
