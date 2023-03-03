@@ -2,7 +2,7 @@
 
 if [[ $HOSTNAME == *"sulis"* ]]; then
   cd ~/e2SAC/
-  for i in {1..8}; do
+  for i in {1..10}; do
     sbatch sweep_setup/job_sulis.slurm
     sleep 10
   done
