@@ -10,19 +10,19 @@ source venv/bin/activate
 # wingman-compress-weights
 
 declare -a pids=()
-wandb agent jjshoots/CCGE2/z2jwpkwa --count 1 &
+wandb agent jjshoots/CCGE2/q0aslwwl --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/z2jwpkwa --count 1 &
+wandb agent jjshoots/CCGE2/q0aslwwl --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/z2jwpkwa --count 1 &
+wandb agent jjshoots/CCGE2/q0aslwwl --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/z2jwpkwa --count 1 &
+wandb agent jjshoots/CCGE2/q0aslwwl --count 1 & 
 pids+=($!)
 sleep 20
-wandb agent jjshoots/CCGE2/z2jwpkwa --count 1 &
+wandb agent jjshoots/CCGE2/q0aslwwl --count 1 & 
 pids+=($!)
 sleep 20
 
