@@ -166,22 +166,22 @@ if __name__ == "__main__":
     title = "PyFlyt/QuadX-Waypoints-v0"
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/ecyxommv"
-    sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/qanjaxgs"
-    sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/qanjaxgs"
+    # sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/qanjaxgs"
+    # sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/qanjaxgs"
 
     baselines_dict = {}
-    baselines_dict["Oracle"] = 2.88
+    baselines_dict["Oracle"] = 3.0
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
 
     title = "PyFlyt/Fixedwing-Waypoints-v0"
     sweep_uri_dict = {}
-    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/ecyxommv"
-    sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/qanjaxgs"
-    sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/qanjaxgs"
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/0uhkj47y"
+    # sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/qanjaxgs"
+    # sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/qanjaxgs"
 
     baselines_dict = {}
-    baselines_dict["Oracle"] = 2.60
+    baselines_dict["Oracle"] = 1.2
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     # process everything with multiprocessing
