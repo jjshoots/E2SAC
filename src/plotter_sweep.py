@@ -163,9 +163,9 @@ if __name__ == "__main__":
     # list of run arguments
     sweep_objects = []
 
-    title = "PyFlyt/QuadX-Waypoints-v0"
+    title = "PyFlyt:QuadX-Waypoints-v0"
     sweep_uri_dict = {}
-    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/ecyxommv"
+    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/q0aslwwl"
     # sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/qanjaxgs"
     # sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/qanjaxgs"
 
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
 
-    title = "PyFlyt/Fixedwing-Waypoints-v0"
+    title = "PyFlyt:Fixedwing-Waypoints-v0"
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/0uhkj47y"
     # sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/qanjaxgs"
