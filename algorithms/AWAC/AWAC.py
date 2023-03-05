@@ -205,6 +205,7 @@ class AWAC(nn.Module):
         critic_loss = q_loss
 
         log = dict()
+        log["target_q"] = target_q.mean().detach()
 
         return critic_loss, log
 
@@ -234,7 +235,7 @@ class AWAC(nn.Module):
             advantage = (q_old - q_new) * terms
 
             # advantage normalization
-            advantage = advantage / torch.max(advantage)
+            advantage = advantage / abs(torch.max(advantage))
 
             # advantage weighting
             weighting = (advantage / self.lambda_parameter).exp()
@@ -243,18 +244,19 @@ class AWAC(nn.Module):
             #     * advantage.shape[0]
             # )
 
-        # get loss for q and entropy
+        # get loss for q
         rnf_loss = -(log_probs * weighting).mean()
 
         # entropy bonus
         ent_loss = (self.log_alpha.exp().detach() * new_log_probs * terms).mean()
 
-        # total loss
+        # sum all losses
         actor_loss = rnf_loss + ent_loss
 
         log = dict()
         log["weighting"] = weighting.mean()
-        log["actor_loss"] = rnf_loss.mean()
+        log["actor_loss"] = actor_loss.mean()
+        log["advantage"] = advantage.mean()
 
         return actor_loss, log
 
