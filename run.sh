@@ -1,9 +1,8 @@
 #!/bin/bash
 
-# availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
-availab_machines=("availab-dl2" "availab-dl3" "availab-dl4")
+availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
 dream_prophet_machines=("dream" "prophet")
-total_gpus=7
+total_gpus=8
 
 if true; then
   ######################################################################################################
