@@ -90,6 +90,15 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
             if log["num_transitions"].shape[0] > 60:
+
+                # exception if num_transitions doesn't start at 10k
+                if log["num_transitions"][0] != 10000:
+                    start_transitions = [i for i in range(10000, int(log["num_transitions"][0]))]
+                    start_eval_perf = [0.0] * len(start_transitions)
+
+                    log["num_transitions"] = np.concatenate([start_transitions, log["num_transitions"]], axis=-1)
+                    log["eval_perf"] = np.concatenate([start_eval_perf, log["eval_perf"]], axis=-1)
+
                 data = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
                 score.append(data)
 
@@ -157,7 +166,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         fontsize=30,
     )
     plt.tight_layout()
-    plt.savefig(f"resource/{title}.pdf", dpi=100)
+    plt.savefig(f"plots/{title}.pdf", dpi=100)
     # plt.show()
 
 
