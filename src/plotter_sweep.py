@@ -179,7 +179,7 @@ if __name__ == "__main__":
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/0uhkj47y"
     # sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/qanjaxgs"
-    # sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/qanjaxgs"
+    sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/ypqy1j56"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 1.2
