@@ -89,7 +89,8 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         score = []
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
-            if log["num_transitions"].shape[0] > num_intervals - 1:
+            if log["num_transitions"].shape[0] > 60:
+            # if log["num_transitions"].shape[0] > num_intervals - 1:
                 data = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
                 score.append(data)
 
@@ -167,7 +168,7 @@ if __name__ == "__main__":
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/q0aslwwl"
     # sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/qanjaxgs"
-    # sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/qanjaxgs"
+    sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/687am7ph"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 3.0
