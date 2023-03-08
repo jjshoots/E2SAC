@@ -3,7 +3,7 @@ import numpy as np
 import PyFlyt.gym_envs
 import torch
 from PIL import Image
-from PyFlyt.core import PID
+from PyFlyt.core.abstractions import PID
 from wingman import cpuize, gpuize
 
 from suboptimal_policy import Suboptimal_Actor
@@ -138,6 +138,7 @@ class Environment:
         else:
             action = self.suboptimal_actor(*[gpuize(s, self.device) for s in state])
             action = cpuize(torch.tanh(action))[0]
+
             return action
 
     def reset(self):
