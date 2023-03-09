@@ -144,10 +144,6 @@ def train(wm: Wingman):
                         optim_dict[key] = optims[key].state_dict()
                     torch.save(optim_dict, optim_file)
 
-                if wm.log["eval_perf"] >= 1.2:
-                    torch.save(model.actor.net.state_dict(), "./wing.pth")
-                    exit()
-
 
 def eval_display(wm: Wingman):
     cfg = wm.cfg
