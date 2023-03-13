@@ -29,6 +29,7 @@ class Environment:
             num_targets=cfg.num_targets,
             agent_hz=cfg.agent_hz,
             sparse_reward=cfg.sparse_reward,
+            render_resolution=(1920, 1080),
         )
 
         # compute spaces
@@ -231,7 +232,9 @@ class Environment:
 
         gifs_save_path = "./rendered_gifs"
         total_gifs = 0
+        num_steps = 0
         frames = []
+        overlay = None
 
         while True:
             state_atti = gpuize(self.state_atti, cfg.device).unsqueeze(0)
@@ -246,12 +249,28 @@ class Environment:
 
             # print(action, self.pid_output)
             self.step(action)
+            num_steps += 1
 
-            # this captures the camera image
+            # this captures the camera image for gif
             if cfg.render_gif:
                 frames.append(self.env.render()[..., :3].astype(np.uint8))
 
+            # this captures the camera image for overlay trajectory
+            if cfg.render_overlay and num_steps % 7 == 0:
+                if overlay is None:
+                    overlay = self.env.render()[..., :3]
+                else:
+                    overlay = np.min(np.stack([overlay, self.env.render()[..., :3]], axis=0), axis=0)
+
             if self.ended:
+                if cfg.render_overlay:
+                    from matplotlib import pyplot as plt
+
+                    num_steps = 0
+                    plt.imshow(overlay)
+                    plt.show()
+                    exit()
+
                 if cfg.render_gif:
                     print("-----------------------------------------")
                     print(f"Saving gif...")
