@@ -8,28 +8,28 @@ pip3 install -r requirements.txt -U
 wingman-compress-weights
 
 declare -a pids=()
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/jddo3yi3 --count 1 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/yoj6zdgj --count 1 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/jddo3yi3 --count 1 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/yoj6zdgj --count 1 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/jddo3yi3 --count 1 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/yoj6zdgj --count 1 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/jddo3yi3 --count 1 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/yoj6zdgj --count 1 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/jddo3yi3 --count 1 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/yoj6zdgj --count 1 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/jddo3yi3 --count 1 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/yoj6zdgj --count 1 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/jddo3yi3 --count 1 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/yoj6zdgj --count 1 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/jddo3yi3 --count 1 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/yoj6zdgj --count 1 & 
 pids+=($!)
 sleep 10
 
