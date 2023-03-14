@@ -2,6 +2,7 @@ import sys
 
 _TOTAL_GPUS = int(sys.argv[1])
 _RUNS_PER_GPU = 4
+_TOTAL_RUNS = 30
 
 # read the lines and grab the url
 sweep_id = ""
@@ -30,8 +31,8 @@ declare -a pids=()
 """
 
 availab_run_line = f"wandb agent jjshoots/{project_id}/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
-dream_prophet_run_line_0 = f"CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/{project_id}/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
-dream_prophet_run_line_1 = f"CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/{project_id}/{sweep_id} --count {round(50/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
+dream_prophet_run_line_0 = f"CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/{project_id}/{sweep_id} --count {round(_TOTAL_RUNS/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
+dream_prophet_run_line_1 = f"CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/{project_id}/{sweep_id} --count {round(_TOTAL_RUNS/_RUNS_PER_GPU/_TOTAL_GPUS)} & "
 
 joining_lines = """
 pids+=($!)

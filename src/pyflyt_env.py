@@ -141,7 +141,7 @@ class Environment:
             action = cpuize(torch.tanh(action))[0]
 
             # flip sign because of legacy error in PyFlyt
-            action[0, 1] *= -1.0
+            action[..., 1] *= -1.0
 
             return action
 
