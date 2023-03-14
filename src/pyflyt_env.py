@@ -140,9 +140,6 @@ class Environment:
             action = self.suboptimal_actor(*[gpuize(s, self.device) for s in state])
             action = cpuize(torch.tanh(action))[0]
 
-            # flip sign because of legacy error in PyFlyt
-            action[..., 1] *= -1.0
-
             return action
 
     def reset(self):
@@ -256,7 +253,7 @@ class Environment:
                 frames.append(self.env.render()[..., :3].astype(np.uint8))
 
             # this captures the camera image for overlay trajectory
-            if cfg.render_overlay and num_steps % 7 == 0:
+            if cfg.render_overlay and num_steps % 5 == 0:
                 if overlay is None:
                     overlay = self.env.render()[..., :3]
                 else:
@@ -264,11 +261,11 @@ class Environment:
 
             if self.ended:
                 if cfg.render_overlay:
-                    from matplotlib import pyplot as plt
+                    from PIL import Image
 
                     num_steps = 0
-                    plt.imshow(overlay)
-                    plt.show()
+                    im = Image.fromarray(overlay)
+                    im.save("./quadx_trajectory.png")
                     exit()
 
                 if cfg.render_gif:
