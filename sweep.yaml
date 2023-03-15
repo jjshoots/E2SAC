@@ -3,7 +3,7 @@ metric:
   name: max_eval_perf
   goal: maximize
 project: "CCGE2"
-name: "SAC-Fixedwing-Waypoints"
+name: "SAC-QuadX-Waypoints"
 parameters:
   env_name:
     # value: "PyFlyt/Fixedwing-Waypoints-v0"
