@@ -166,8 +166,9 @@ if __name__ == "__main__":
 
     title = "PyFlyt:QuadX-Waypoints-v0"
     sweep_uri_dict = {}
-    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/q0aslwwl"
-    sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/687am7ph"
+    sweep_uri_dict["CCGE-Sparse"] = "jjshoots/CCGE2/q0aslwwl"
+    sweep_uri_dict["AWAC-Sparse"] = "jjshoots/CCGE2/687am7ph"
+    sweep_uri_dict["SAC_Dense"] = "jjshoots/CCGE2/86hr5s13"
 
     baselines_dict = {}
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
@@ -175,9 +176,9 @@ if __name__ == "__main__":
 
     title = "PyFlyt:Fixedwing-Waypoints-v0"
     sweep_uri_dict = {}
-    sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/0uhkj47y"
-    sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/ypqy1j56"
-    sweep_uri_dict["SAC"] = "jjshoots/CCGE2/yoj6zdgj"
+    sweep_uri_dict["CCGE-Sparse"] = "jjshoots/CCGE2/0uhkj47y"
+    sweep_uri_dict["AWAC-Sparse"] = "jjshoots/CCGE2/ypqy1j56"
+    sweep_uri_dict["SAC-Dense"] = "jjshoots/CCGE2/yoj6zdgj"
 
     baselines_dict = {}
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
