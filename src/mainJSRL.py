@@ -51,8 +51,10 @@ def train(wm: Wingman):
             while not env.ended:
                 # JSRL if needed
                 if steps < oracle_steps:
-                    lbl = env.get_label()
-                    _ = env.step(lbl)
+                    obs_atti = env.state_atti
+                    obs_targ = env.state_targ
+                    label = env.get_label((obs_atti, obs_targ))
+                    _ = env.step(label)
                 else:
                     # get the initial observation
                     obs_atti = env.state_atti
@@ -72,7 +74,7 @@ def train(wm: Wingman):
 
                     # store stuff in mem
                     memory.push(
-                        (
+                        [
                             obs_atti,
                             obs_targ,
                             act,
@@ -80,7 +82,7 @@ def train(wm: Wingman):
                             next_obs_atti,
                             next_obs_targ,
                             term,
-                        )
+                        ]
                     )
 
                 # increment our step counter
