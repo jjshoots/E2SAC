@@ -269,6 +269,8 @@ class Environment:
                     exit()
 
                 if cfg.render_gif:
+                    from PIL import Image
+
                     print("-----------------------------------------")
                     print(f"Saving gif...")
                     print("-----------------------------------------")
