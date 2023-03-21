@@ -178,7 +178,7 @@ if __name__ == "__main__":
     title = "PyFlyt:Fixedwing-Waypoints-v0"
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/0uhkj47y"
-    # sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/qanjaxgs"
+    sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/iha679rs"
     sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/ypqy1j56"
 
     baselines_dict = {}
