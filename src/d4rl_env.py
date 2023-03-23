@@ -155,10 +155,19 @@ class Environment:
 
         # make the env
         self.env.close()
-        self.env = gym.make(self.env_name, render_mode="human")
+        render_mode = "rgb_array" if cfg.render_gif else "human"
+        self.env = gym.make(self.env_name, render_mode=render_mode)
         self.reset()
 
+        gifs_save_path = "./rendered_gifs"
+        total_gifs = 0
+        frames = []
+
         while True:
+            # this captures the camera image for gif
+            if cfg.render_gif:
+                frames.append(self.env.render()[..., :3].astype(np.uint8))
+
             if net is not None:
                 output = net.actor(gpuize(self.state, cfg.device).unsqueeze(0))
                 # action = cpuize(net.actor.sample(*output)[0][0])
@@ -173,3 +182,23 @@ class Environment:
             if self.ended:
                 print(self.success)
                 self.reset()
+
+                # if no render gif, skip the render gif part
+                if not cfg.render_gif:
+                    continue
+
+                from PIL import Image
+
+                print("-----------------------------------------")
+                print(f"Saving gif...")
+                print("-----------------------------------------")
+                frames = [Image.fromarray(frame) for frame in frames]
+                frames[0].save(
+                    f"{gifs_save_path}/gif{total_gifs}.gif",
+                    save_all=True,
+                    append_images=frames[1:],
+                    duration=1000 / 30,
+                    loop=0,
+                )
+                frames = []
+                total_gifs += 1

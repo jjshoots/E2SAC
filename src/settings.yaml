@@ -46,6 +46,7 @@ debug: false
 train: false
 display: false
 evaluate: false
+render_gif: false
 
 weights_directory: 'weights'
 version_number: null
