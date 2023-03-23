@@ -167,7 +167,7 @@ if __name__ == "__main__":
     title = "PyFlyt:QuadX-Waypoints-v0"
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/q0aslwwl"
-    # sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/qanjaxgs"
+    sweep_uri_dict["JSRL"] = "jjshoots/CCGE2/41yuome1"
     sweep_uri_dict["AWAC"] = "jjshoots/CCGE2/687am7ph"
 
     baselines_dict = {}
