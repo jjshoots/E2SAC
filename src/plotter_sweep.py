@@ -124,7 +124,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         iqm_cis,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e4)",
-        ylabel="Evaluation IQM",
+        ylabel="Evaluation Success Rate",
         labelsize=30,
         ticklabelsize=30,
         figsize=(9, 9),
