@@ -90,7 +90,14 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
             if log["num_transitions"].shape[0] > 60:
-            # if log["num_transitions"].shape[0] > num_intervals - 1:
+                # exception if num_transitions doesn't start at 10k
+                if log["num_transitions"][0] != 10000:
+                    start_transitions = [i for i in range(10000, int(log["num_transitions"][0]))]
+                    start_eval_perf = [0.0] * len(start_transitions)
+
+                    log["num_transitions"] = np.concatenate([start_transitions, log["num_transitions"]], axis=-1)
+                    log["eval_perf"] = np.concatenate([start_eval_perf, log["eval_perf"]], axis=-1)
+
                 data = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
                 score.append(data)
 
@@ -116,7 +123,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         iqm_cis,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e4)",
-        ylabel="Evaluation IQM",
+        ylabel="Evaluation Waypoints Reached",
         labelsize=30,
         ticklabelsize=30,
         figsize=(9, 9),
@@ -152,7 +159,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
     )
 
     plt.title(
-        title,
+        title.replace(":", "/"),
         fontsize=30,
     )
     plt.tight_layout()
