@@ -29,7 +29,6 @@ class Environment:
             num_targets=cfg.num_targets,
             agent_hz=cfg.agent_hz,
             sparse_reward=cfg.sparse_reward,
-            render_resolution=(1920, 1080),
         )
 
         # compute spaces
