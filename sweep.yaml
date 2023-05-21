@@ -8,11 +8,14 @@ parameters:
     value: "Ant-v4"
   target_performance:
     value: 2200
-name: "CCGE_B_Ex_Extended_Ant"
+  random_rollover:
+    value: true
+  update_oracle:
+    value: true
+name: "CCGE_B_Ex_RandEx_Ant"
 command:
   - python3
   # - src/mainSAC.py
   - src/main.py
   - "--train"
   - "--wandb"
-  - "--wandb_name=CCGE_B_Ex_Extended_Ant"

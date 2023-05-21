@@ -1,6 +1,7 @@
 torch
-numpy
+numpy == 1.23.5
 jj-wingman
+mujoco == 2.3.2
 gymnasium[mujoco]
 matplotlib
 seaborn
