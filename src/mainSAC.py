@@ -57,7 +57,7 @@ def train(wm: Wingman):
                 next_obs, rew, term = env.step(action)
 
                 # store stuff in mem
-                memory.push((obs, action, rew, next_obs, term))
+                memory.push((obs, action, rew, next_obs, term), random_rollover=cfg.random_rollover)
 
             # for logging
             wm.log["total_reward"] = env.cumulative_reward

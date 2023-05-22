@@ -10,12 +10,12 @@ parameters:
     value: 2200
   random_rollover:
     value: true
-  update_oracle:
-    value: true
-name: "CCGE_B_Ex_RandEx_Ant"
+  buffer_size:
+    value: 500000
+name: "CCGE_Forget_Ext_RR"
 command:
   - python3
-  # - src/mainSAC.py
   - src/main.py
+  # - src/main.py
   - "--train"
   - "--wandb"
