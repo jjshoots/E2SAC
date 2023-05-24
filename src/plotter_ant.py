@@ -114,7 +114,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         x_axis / 1e4,
         iqm_scores,
         iqm_cis,
-        custom_colors=color_palette,
+        custom_color=color_palette,
         algorithms=algorithms,
         xlabel=r"Timesteps (1e4)",
         ylabel="Evaluation IQM",
@@ -155,7 +155,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         fontsize=30,
     )
     plt.tight_layout()
-    plt.savefig(f"resource/{title}.pdf", dpi=100)
+    plt.savefig(f"resource/weak_ant.pdf", dpi=100)
     # plt.show()
 
 
@@ -168,7 +168,7 @@ if __name__ == "__main__":
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/00dtckco"
     sweep_uri_dict["SAC_RR"] = "jjshoots/CCGE2/sc5wfw83"
     sweep_uri_dict["SAC_Ext"] = "jjshoots/CCGE2/vigk09s5"
-    sweep_uri_dict["SAC_Ext_RR"] = "jjshoots/CCGE2/"
+    # sweep_uri_dict["SAC_Ext_RR"] = "jjshoots/CCGE2/"
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/i5l7a9wm"
     sweep_uri_dict["CCGE_RR"] = "jjshoots/CCGE2/3oeiia5t"
     sweep_uri_dict["CCGE_Ext"] = "jjshoots/CCGE2/g0nwlo72"
