@@ -9,13 +9,13 @@ parameters:
   target_performance:
     value: 2200
   random_rollover:
-    value: true
+    value: false
   buffer_size:
     value: 500000
-name: "CCGE_Forget_Ext_RR"
+name: "SAC_Forget_Ext"
 command:
   - python3
-  - src/main.py
+  - src/mainSAC.py
   # - src/main.py
   - "--train"
   - "--wandb"
