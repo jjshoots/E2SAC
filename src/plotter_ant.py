@@ -107,7 +107,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         [metrics.aggregate_iqm(scores[..., frame]) for frame in range(scores.shape[-1])]
     )
     # compute confidence intervals
-    iqm_scores, iqm_cis = rly.get_interval_estimates(scores, iqm, reps=100000, confidence_interval_size=0.5)
+    iqm_scores, iqm_cis = rly.get_interval_estimates(scores, iqm, reps=50000)
 
     # plot sample efficiency curve
     plot_utils.plot_sample_efficiency_curve(
@@ -144,7 +144,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         loc="lower right",
         fancybox=True,
         # ncol=len(algorithms),
-        ncol=1,
+        ncol=2,
         fontsize=18,
         # handleheight=1.8,
         # bbox_to_anchor=(0.5, 1.4),
@@ -175,8 +175,6 @@ if __name__ == "__main__":
     sweep_uri_dict["CCGE_Ext_RR"] = "jjshoots/CCGE2/76pwgxu4"
 
     baselines_dict = {}
-    baselines_dict["Oracle 1"] = 980.0
-    baselines_dict["Oracle 2"] = 2200.0
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     # process everything with multiprocessing
