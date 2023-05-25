@@ -9,10 +9,10 @@ parameters:
   target_performance:
     value: 2200
   random_rollover:
-    value: false
+    value: true
   buffer_size:
     value: 500000
-name: "SAC_Forget_Ext"
+name: "SAC_Forget_Ext_RR"
 command:
   - python3
   - src/mainSAC.py
