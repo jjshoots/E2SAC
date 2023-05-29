@@ -168,7 +168,7 @@ if __name__ == "__main__":
     sweep_uri_dict["SAC"] = "jjshoots/CCGE2/00dtckco"
     sweep_uri_dict["SAC_RR"] = "jjshoots/CCGE2/sc5wfw83"
     sweep_uri_dict["SAC_Ext"] = "jjshoots/CCGE2/vigk09s5"
-    # sweep_uri_dict["SAC_Ext_RR"] = "jjshoots/CCGE2/fp6vqi7q"
+    sweep_uri_dict["SAC_Ext_RR"] = "jjshoots/CCGE2/fp6vqi7q"
     sweep_uri_dict["CCGE"] = "jjshoots/CCGE2/i5l7a9wm"
     sweep_uri_dict["CCGE_RR"] = "jjshoots/CCGE2/3oeiia5t"
     sweep_uri_dict["CCGE_Ext"] = "jjshoots/CCGE2/g0nwlo72"
