@@ -82,7 +82,8 @@ def train(wm: Wingman):
                         next_obs_targ,
                         term,
                         lbl,
-                    ]
+                    ],
+                    random_rollover=cfg.random_rollover
                 )
 
             # for logging
