@@ -1,8 +1,11 @@
 #!/bin/bash
 
 availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
-dream_prophet_machines=("dream" "prophet")
+# dream_prophet_machines=("dream" "prophet")
+dream_prophet_machines=()
 total_gpus=8
+total_runs=100
+runs_per_gpu=3
 
 ######################################################################################################
 # setup the sweep
@@ -12,7 +15,7 @@ wandb sweep sweep.yaml &> ./sweep_setup/temp.out
 
 # automatically generate sh file for availab servers
 echo "Generating run.sh"
-python3 sweep_setup/make_run_sweeps_sh.py $total_gpus
+python3 sweep_setup/make_run_sweeps_sh.py $total_gpus $total_runs $runs_per_gpu
 
 # remove the temp file
 rm ./sweep_setup/temp.out

@@ -18,6 +18,7 @@ actor_update_multiplier: 1
 discount_factor: 0.99
 learning_rate: 0.0004
 exploration_steps: 0
+random_rollover: false
 
 # CCGE params
 pretrained_oracle: true
