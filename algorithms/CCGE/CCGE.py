@@ -238,8 +238,8 @@ class CCGE(nn.Module):
         log["target_q"] = target_q.mean().detach()
         log["q_loss"] = q_loss.mean().detach()
         log["f_loss"] = f_loss.mean().detach()
-        log["q_td_ratio"] = (bellman_loss / target_q).mean().detach()
-        log["f_td_ratio"] = (target_f / target_q).mean().detach()
+        log["q_td_ratio"] = abs(bellman_loss / target_q).mean().detach()
+        log["f_td_ratio"] = abs(target_f / target_q).mean().detach()
 
         return critic_loss, log
 
