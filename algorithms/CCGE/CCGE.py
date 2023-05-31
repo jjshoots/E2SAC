@@ -232,11 +232,14 @@ class CCGE(nn.Module):
         # critic loss is q loss plus uncertainty loss
         critic_loss = q_loss + f_loss
 
+        # some logging parameters
         log = dict()
         log["target_f"] = target_f.mean().detach()
         log["target_q"] = target_q.mean().detach()
         log["q_loss"] = q_loss.mean().detach()
         log["f_loss"] = f_loss.mean().detach()
+        log["q_td_ratio"] = (bellman_loss / target_q).mean().detach()
+        log["f_td_ratio"] = (target_f / target_q).mean().detach()
 
         return critic_loss, log
 
