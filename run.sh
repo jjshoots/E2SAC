@@ -3,8 +3,8 @@
 availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
 # dream_prophet_machines=("dream" "prophet")
 dream_prophet_machines=()
-total_gpus=8
-total_runs=100
+total_gpus=4
+total_runs=55
 runs_per_gpu=3
 
 ######################################################################################################
