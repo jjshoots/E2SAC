@@ -30,6 +30,8 @@ sns.set_style("white")
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
 
+split_size = 4
+
 
 def get_log_from_uri(uri, keys, api=None):
     assert isinstance(keys, list), "keys must be a list."
@@ -52,37 +54,86 @@ def process_sweeps(title, sweep_uri):
     api = wandb.Api(timeout=30)
     runs = api.sweep(sweep_uri).runs
 
-    # the x axis
-    x_vals = [run.config["confidence_lambda"] for run in runs]
-
     # sup scale metrics
-    sup_scale = []
+    # this is an array of [x_vals, 10] for each 100k
+    x_vals = []
+    sup_ratios = []
+    eval_perfs = []
     for run in runs:
-        history = run.scan_history(["sup_scale"])
-        sup_scale.append(np.array([row["sup_scale"] for row in history]))
-    sup_scale_mean = [x.mean() for x in sup_scale]
-    sup_scale_var = [x.var() for x in sup_scale]
+        history = run.scan_history(["sup_scale", "eval_perf"])
+        if history.max_step < 100:
+            continue
 
-    plt.scatter(x_vals, sup_scale_mean)
-    plt.scatter(x_vals, sup_scale_var)
-    plt.show()
+        x_vals.append(run.config["confidence_lambda"])
+        history = run.scan_history(["sup_scale", "eval_perf"])
 
-    # eval metrics
-    eval_perf = []
-    for run in runs:
-        history = run.scan_history(["eval_perf"])
-        eval_perf.append(np.array([row["eval_perf"] for row in history]))
-    eval_perf_max = [x.max() for x in eval_perf]
-    eval_perf_mean = [x.mean() for x in eval_perf]
-    eval_perf_var = [x.var() for x in eval_perf]
+        # record the supervision ratios
+        log = np.array([row["sup_scale"] for row in history])
+        log = log.reshape(split_size, -1)
+        log = log.mean(axis=-1)
+        sup_ratios.append(log)
 
+        log = np.array([row["eval_perf"] for row in history])
+        log = log.reshape(split_size, -1)
+        log = log.mean(axis=-1)
+        eval_perfs.append(log)
+
+    # sort the things
+    # the x axis, sorted
+    sorted_indices = np.argsort(x_vals)
+    x_vals = np.take(x_vals, sorted_indices)
+    sup_ratios = np.take(sup_ratios, sorted_indices, axis=0)
+    eval_perfs = np.take(eval_perfs, sorted_indices, axis=0)
+
+    # save the data
+    np.save("./sensitivity_data/x_vals.npy", x_vals)
+    np.save("./sensitivity_data/sup_ratios.npy", sup_ratios)
+    np.save("./sensitivity_data/eval_perfs.npy", eval_perfs)
+
+
+def plot_data():
+    x_vals = np.load("./sensitivity_data/x_vals.npy")
+    sup_ratios = np.load("./sensitivity_data/sup_ratios.npy")
+    eval_perfs = np.load("./sensitivity_data/eval_perfs.npy")
+
+    # kernel for data smoothing
+    kernel_size = 5
+    kernel = np.ones(kernel_size) / kernel_size
+
+    # colors
+    # color_palette = sns.color_palette("colorblind")
+    color_palette = sns.color_palette("Reds")
+
+    # interpolation range
+    x_axis = np.linspace(0, 5.0, 100)
+
+    # all the labels
+    labels = ["0-250k", "250-500k", "500-750k", "750-1000k"]
+
+    for i, vals in enumerate(sup_ratios.T):
+        vals = np.interp(x_axis, x_vals, vals)
+        vals = np.convolve(vals, kernel, mode="valid")
+        plt.plot(x_axis[:len(vals)], vals, c=color_palette[i], label=labels[i])
+    plt.title("Mean Supervision Ratio \nvs. Confidence Scale", fontsize=30)
+    plt.legend(fontsize=24)
+    plt.tight_layout()
+    plt.savefig("sensitivity_data/sup_vs_conf.pdf", dpi=100)
     plt.close()
-    plt.scatter(x_vals, eval_perf_max)
-    plt.scatter(x_vals, eval_perf_mean)
-    plt.show()
+
+    for i, vals in enumerate(eval_perfs.T):
+        vals = np.interp(x_axis, x_vals, vals)
+        vals = np.convolve(vals, kernel, mode="valid")
+        plt.plot(x_axis[:len(vals)], vals, c=color_palette[i], label=labels[i])
+    plt.title("Mean Evaluation Performance \nvs. Confidence Scale", fontsize=30)
+    # plt.legend(fontsize=12)
+    plt.tight_layout()
+    plt.savefig(f"sensitivity_data/eval_vs_conf.pdf", dpi=100)
+    plt.close()
+
 
 if __name__ == "__main__":
     title = "lambdaSensitivity:PyFlyt"
     sweep_uri = "jjshoots/CCGE2/k1vw5iq6"
 
-    process_sweeps(title, sweep_uri)
+    # process_sweeps(title, sweep_uri)
+    plot_data()

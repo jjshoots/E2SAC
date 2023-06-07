@@ -83,7 +83,7 @@ def train(wm: Wingman):
                         term,
                         lbl,
                     ],
-                    random_rollover=cfg.random_rollover
+                    random_rollover=cfg.random_rollover,
                 )
 
             # for logging

@@ -256,7 +256,9 @@ class Environment:
                 if overlay is None:
                     overlay = self.env.render()[..., :3]
                 else:
-                    overlay = np.min(np.stack([overlay, self.env.render()[..., :3]], axis=0), axis=0)
+                    overlay = np.min(
+                        np.stack([overlay, self.env.render()[..., :3]], axis=0), axis=0
+                    )
 
             if self.ended:
                 if cfg.render_overlay:

@@ -90,7 +90,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         for run in runs[algorithm]:
             log = get_log_from_run(run, ["num_transitions", "eval_perf"])
             if log["num_transitions"].shape[0] > 60:
-            # if log["num_transitions"].shape[0] > num_intervals - 1:
+                # if log["num_transitions"].shape[0] > num_intervals - 1:
                 data = np.interp(x_axis, log["num_transitions"], log["eval_perf"])
                 score.append(data)
 
@@ -173,7 +173,6 @@ if __name__ == "__main__":
     baselines_dict = {}
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
-
     title = "PyFlyt:Fixedwing-Waypoints-v0"
     sweep_uri_dict = {}
     sweep_uri_dict["CCGE-Sparse"] = "jjshoots/CCGE2/0uhkj47y"
@@ -182,7 +181,6 @@ if __name__ == "__main__":
 
     baselines_dict = {}
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
-
 
     title = "PyFlyt:Rocket-Landing-v0"
     sweep_uri_dict = {}
