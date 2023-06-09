@@ -135,5 +135,5 @@ if __name__ == "__main__":
     title = "lambdaSensitivity:PyFlyt"
     sweep_uri = "jjshoots/CCGE2/k1vw5iq6"
 
-    # process_sweeps(title, sweep_uri)
+    process_sweeps(title, sweep_uri)
     plot_data()
