@@ -5,17 +5,15 @@ metric:
   goal: maximize
 parameters:
   env_name:
-    value: "Ant-v4"
+    value: "Walker2d-v4"
   target_performance:
-    value: 2200
-  random_rollover:
-    value: true
-  buffer_size:
-    value: 500000
-name: "SAC_Forget_Ext_RR"
+    value: 3100
+  confidence_lambda:
+    min: 0.001
+    max: 5.0
+name: "CCGE_Sensitivity_2"
 command:
   - python3
-  - src/mainSAC.py
-  # - src/main.py
+  - src/main.py
   - "--train"
   - "--wandb"
