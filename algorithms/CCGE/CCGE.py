@@ -165,12 +165,11 @@ class CCGE(nn.Module):
 
         # normalize uncertainty
         uncertainty = (
-            (uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs())
-            * self.confidence_lambda
+            uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs()
         ).detach()
 
         # supervision scale is a switch
-        sup_scale = (uncertainty > 0.5) * 1.0
+        sup_scale = (uncertainty > self.confidence_lambda) * 1.0
 
         log = dict()
         log["uncertainty"] = uncertainty.mean().detach()
