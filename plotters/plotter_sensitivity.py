@@ -102,20 +102,20 @@ def plot_data():
 
     # colors
     # color_palette = sns.color_palette("colorblind")
-    color_palette = sns.color_palette("Reds")
+    color_palette = sns.color_palette("Reds", n_colors=8)
 
     # interpolation range
-    x_axis = np.linspace(0, 5.0, 100)
+    x_axis = np.linspace(0, 5.0, 200)
 
     # all the labels
-    labels = ["0-250k", "250-500k", "500-750k", "750-1000k"]
+    labels = ["0-250k", "250-500k", "500-750k", "750-1000k", "1000-1250k", "1250-1500k", "1500-1750k", "1750-2000k"]
 
     for i, vals in enumerate(sup_ratios.T):
         vals = np.interp(x_axis, x_vals, vals)
         vals = np.convolve(vals, kernel, mode="valid")
         plt.plot(x_axis[:len(vals)], vals, c=color_palette[i], label=labels[i])
     plt.title("Mean Supervision Ratio \nvs. Confidence Scale", fontsize=30)
-    plt.legend(fontsize=24)
+    # plt.legend(fontsize=24)
     plt.tight_layout()
     plt.savefig("sensitivity_data/sup_vs_conf.pdf", dpi=100)
     plt.close()
@@ -135,5 +135,5 @@ if __name__ == "__main__":
     title = "lambdaSensitivity:Ant_v4"
     sweep_uri = "jjshoots/CCGE2/oqxdqmhk"
 
-    process_sweeps(title, sweep_uri)
+    # process_sweeps(title, sweep_uri)
     plot_data()
