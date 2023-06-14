@@ -30,7 +30,7 @@ sns.set_style("white")
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
 
-split_size = 8
+split_size = 5
 
 
 def get_log_from_uri(uri, keys, api=None):
@@ -61,7 +61,7 @@ def process_sweeps(title, sweep_uri):
     eval_perfs = []
     for run in runs:
         history = run.scan_history(["sup_scale", "eval_perf"])
-        if history.max_step < 200:
+        if history.max_step < 100:
             continue
 
         x_vals.append(run.config["confidence_lambda"])
@@ -105,10 +105,10 @@ def plot_data():
     color_palette = sns.color_palette("Reds", n_colors=8)
 
     # interpolation range
-    x_axis = np.linspace(0, 5.0, 200)
+    x_axis = np.linspace(0, 5.0, 100)
 
     # all the labels
-    labels = ["0-250k", "250-500k", "500-750k", "750-1000k", "1000-1250k", "1250-1500k", "1500-1750k", "1750-2000k"]
+    labels = ["0-200k", "200-400", "400-600", "600-800", "800-1000"]
 
     for i, vals in enumerate(sup_ratios.T):
         vals = np.interp(x_axis, x_vals, vals)
@@ -133,7 +133,7 @@ def plot_data():
 
 if __name__ == "__main__":
     title = "lambdaSensitivity:Ant_v4"
-    sweep_uri = "jjshoots/CCGE2/oqxdqmhk"
+    sweep_uri = "jjshoots/CCGE2/j5zgbzgh"
 
-    # process_sweeps(title, sweep_uri)
+    process_sweeps(title, sweep_uri)
     plot_data()
