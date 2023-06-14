@@ -30,7 +30,7 @@ sns.set_style("white")
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.serif"] = ["Times New Roman"] + plt.rcParams["font.serif"]
 
-split_size = 4
+split_size = 5
 
 
 def get_log_from_uri(uri, keys, api=None):
@@ -108,7 +108,7 @@ def plot_data():
     x_axis = np.linspace(0, 5.0, 100)
 
     # all the labels
-    labels = ["0-250k", "250-500k", "500-750k", "750-1000k"]
+    labels = ["0-200k", "200-400k", "400-600k", "600-800k", "800-1000k"]
 
     for i, vals in enumerate(sup_ratios.T):
         vals = np.interp(x_axis, x_vals, vals)
@@ -135,5 +135,5 @@ if __name__ == "__main__":
     title = "lambdaSensitivity:PyFlyt"
     sweep_uri = "jjshoots/CCGE2/k1vw5iq6"
 
-    # process_sweeps(title, sweep_uri)
+    process_sweeps(title, sweep_uri)
     plot_data()
