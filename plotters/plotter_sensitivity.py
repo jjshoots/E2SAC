@@ -122,7 +122,7 @@ def plot_data():
     plt.yticks(fontsize=30)
     plt.xticks(fontsize=30)
     plt.tight_layout()
-    plt.savefig("sensitivity_data/sup_vs_conf.pdf", dpi=100)
+    plt.savefig("sensitivity_data/pyflyt_sup_vs_conf.pdf", dpi=100)
     plt.close()
 
     plt.figure(figsize=(9, 9))
@@ -137,7 +137,7 @@ def plot_data():
     plt.yticks(fontsize=30)
     plt.xticks(fontsize=30)
     plt.tight_layout()
-    plt.savefig(f"sensitivity_data/eval_vs_conf.pdf", dpi=100)
+    plt.savefig(f"sensitivity_data/pyflyt_eval_vs_conf.pdf", dpi=100)
     plt.close()
 
 
