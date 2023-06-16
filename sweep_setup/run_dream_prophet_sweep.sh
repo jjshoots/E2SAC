@@ -8,22 +8,22 @@ pip3 install -r requirements.txt -U
 wingman-compress-weights
 
 declare -a pids=()
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/4ncmrrb2 --count 5 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/rwjcrl5t --count 8 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/4ncmrrb2 --count 5 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/rwjcrl5t --count 8 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/4ncmrrb2 --count 5 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/rwjcrl5t --count 8 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/4ncmrrb2 --count 5 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/rwjcrl5t --count 8 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/4ncmrrb2 --count 5 & 
+CUDA_VISIBLE_DEVICES=0 wandb agent jjshoots/CCGE2/rwjcrl5t --count 8 & 
 pids+=($!)
 sleep 10
-CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/4ncmrrb2 --count 5 & 
+CUDA_VISIBLE_DEVICES=1 wandb agent jjshoots/CCGE2/rwjcrl5t --count 8 & 
 pids+=($!)
 sleep 10
 

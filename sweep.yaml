@@ -3,16 +3,13 @@ metric:
   name: max_eval_perf
   goal: maximize
 project: "CCGE2"
-name: "CCGE_QuadX_Sensitivity"
+name: "CCGE_QuadX_NoSup"
 parameters:
   env_name:
     # value: "PyFlyt/Fixedwing-Waypoints-v0"
     value: "PyFlyt/QuadX-Waypoints-v0"
   sparse_reward:
     value: true
-  confidence_lambda:
-    min: 0.001
-    max: 5.0
 command:
   - python3
   - src/main.py
