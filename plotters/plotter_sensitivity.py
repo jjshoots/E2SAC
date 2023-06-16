@@ -110,22 +110,32 @@ def plot_data():
     # all the labels
     labels = ["0-200k", "200-400", "400-600", "600-800", "800-1000"]
 
+    plt.figure(figsize=(9, 9))
     for i, vals in enumerate(sup_ratios.T):
         vals = np.interp(x_axis, x_vals, vals)
         vals = np.convolve(vals, kernel, mode="valid")
         plt.plot(x_axis[:len(vals)], vals, c=color_palette[i], label=labels[i])
     plt.title("Mean Supervision Ratio \nvs. Confidence Scale", fontsize=30)
-    # plt.legend(fontsize=24)
+    plt.legend(fontsize=18)
+    plt.ylabel("Mean Supervision Ratio", fontsize=30)
+    plt.xlabel("Confidence Scale, $\lambda$", fontsize=30)
+    plt.yticks(fontsize=30)
+    plt.xticks(fontsize=30)
     plt.tight_layout()
     plt.savefig("sensitivity_data/sup_vs_conf.pdf", dpi=100)
     plt.close()
 
+    plt.figure(figsize=(9, 9))
     for i, vals in enumerate(eval_perfs.T):
         vals = np.interp(x_axis, x_vals, vals)
         vals = np.convolve(vals, kernel, mode="valid")
         plt.plot(x_axis[:len(vals)], vals, c=color_palette[i], label=labels[i])
     plt.title("Mean Evaluation Performance \nvs. Confidence Scale", fontsize=30)
-    # plt.legend(fontsize=12)
+    plt.legend(fontsize=18)
+    plt.ylabel("Mean Evaluation Performance", fontsize=30)
+    plt.xlabel("Confidence Scale, $\lambda$", fontsize=30)
+    plt.yticks(fontsize=30)
+    plt.xticks(fontsize=30)
     plt.tight_layout()
     plt.savefig(f"sensitivity_data/eval_vs_conf.pdf", dpi=100)
     plt.close()
@@ -135,5 +145,5 @@ if __name__ == "__main__":
     title = "lambdaSensitivity:Ant_v4"
     sweep_uri = "jjshoots/CCGE2/j5zgbzgh"
 
-    process_sweeps(title, sweep_uri)
+    # process_sweeps(title, sweep_uri)
     plot_data()
