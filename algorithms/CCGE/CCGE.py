@@ -258,7 +258,6 @@ class CCGE(nn.Module):
         sup_scale, expected_q, log2 = self.calc_sup_scale(
             obs_atti, obs_targ, actions, labels
         )
-        sup_scale *= 0.0
 
         """ REINFORCEMENT LOSS """
         # expectations of Q with clipped double Q
