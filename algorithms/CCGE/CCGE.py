@@ -244,6 +244,7 @@ class CCGE(nn.Module):
 
         # compute supervision scale and expected q for actions
         sup_scale, expected_q, to_log = self.calc_sup_scale(states, actions, labels)
+        sup_scale = sup_scale * 0.0
 
         """ REINFORCEMENT LOSS """
         # expectations of Q with clipped double Q

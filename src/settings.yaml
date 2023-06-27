@@ -50,6 +50,7 @@ evaluate: false
 weights_directory: 'weights'
 version_number: null
 mark_number: 0
+log_status: false
 
 increment: false
 logging_interval: 10000

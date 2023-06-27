@@ -8,10 +8,7 @@ parameters:
     value: "Walker2d-v4"
   target_performance:
     value: 3100
-  confidence_lambda:
-    min: 0.001
-    max: 5.0
-name: "CCGE_Sensitivity_2"
+name: "CCGE_Walker_NoSup"
 command:
   - python3
   - src/main.py
