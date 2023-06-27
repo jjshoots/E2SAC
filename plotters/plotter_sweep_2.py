@@ -180,7 +180,8 @@ if __name__ == "__main__":
     title = "PyFlyt_QuadX-Guidance-Supervision"
     sweep_uri_dict = {}
     sweep_uri_dict["Supervision + Guidance"] = "jjshoots/CCGE2/q0aslwwl"
-    sweep_uri_dict["No Supervision"] = "jjshoots/CCGE2/rwjcrl5t"
+    sweep_uri_dict["Guidance Only"] = "jjshoots/CCGE2/rwjcrl5t"
+    sweep_uri_dict["Supervision Only"] = "jjshoots/CCGE2/5qlnw03b"
 
     baselines_dict = {}
     baselines_dict["Oracle"] = 3.0
