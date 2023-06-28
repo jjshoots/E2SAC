@@ -155,7 +155,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
     legend = plt.legend(
         fake_patches,
         algorithms,
-        loc="lower right",
+        loc="center right",
         fancybox=True,
         # ncol=len(algorithms),
         ncol=1,
