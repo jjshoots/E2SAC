@@ -169,7 +169,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         fontsize=30,
     )
     plt.tight_layout()
-    plt.savefig(f"plots/Walker2d-v4-guide-sup.pdf", dpi=100)
+    plt.savefig(f"resource/Walker2d-v4-guide-sup.pdf", dpi=100)
     # plt.show()
 
 
@@ -179,12 +179,12 @@ if __name__ == "__main__":
 
     title = "Walker2d-v4\nGuidance vs. Supervision"
     sweep_uri_dict = {}
-    sweep_uri_dict["Supervision + Guidance"] = "jjshoots/CCGE2/q0aslwwl"
-    sweep_uri_dict["Guidance Only"] = "jjshoots/CCGE2/rwjcrl5t"
-    sweep_uri_dict["Supervision Only"] = "jjshoots/CCGE2/5qlnw03b"
+    sweep_uri_dict["Supervision + Guidance"] = "jjshoots/CCGE2/n6ufn853"
+    sweep_uri_dict["Guidance Only"] = "jjshoots/CCGE2/3a92kbas"
+    sweep_uri_dict["Supervision Only"] = "jjshoots/CCGE2/wtfin9dd"
 
     baselines_dict = {}
-    baselines_dict["Oracle"] = 3.0
+    baselines_dict["Oracle"] = 3100.0
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     # process everything with multiprocessing
