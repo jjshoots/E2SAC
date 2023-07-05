@@ -5,10 +5,10 @@ metric:
   goal: maximize
 parameters:
   env_name:
-    value: "Walker2d-v4"
+    value: "Ant-v4"
   target_performance:
-    value: 3100
-name: "CCGE_Walker_NoGuide"
+    value: 2200
+name: "CCGE_Ant_NoGuide"
 command:
   - python3
   - src/main.py
