@@ -8,7 +8,7 @@ parameters:
     value: "Ant-v4"
   target_performance:
     value: 2200
-name: "CCGE_Ant_NoGuide"
+name: "CCGE_Ant_NoSup"
 command:
   - python3
   - src/main.py

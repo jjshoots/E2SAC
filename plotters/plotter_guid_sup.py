@@ -169,7 +169,8 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         fontsize=30,
     )
     plt.tight_layout()
-    plt.savefig(f"resource/Walker2d-v4-guide-sup.pdf", dpi=100)
+    filename = title.split("\n")
+    plt.savefig(f"resource/{filename}-guide-sup.pdf", dpi=100)
     # plt.show()
 
 
