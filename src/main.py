@@ -70,11 +70,12 @@ def train(wm: Wingman):
                     t_act, _ = net.actor.sample(*output)
 
                     # move label to gpu
-                    t_lbl = gpuize(lbl, cfg.device)
+                    # t_lbl = gpuize(lbl, cfg.device)
 
                     # figure out whether to follow policy or oracle
-                    sup_scale, *_ = net.calc_sup_scale(t_obs, t_act, t_lbl)
-                    act = lbl if sup_scale.squeeze(0) == 1.0 else cpuize(t_act)
+                    # sup_scale, *_ = net.calc_sup_scale(t_obs, t_act, t_lbl)
+                    # act = lbl if sup_scale.squeeze(0) == 1.0 else cpuize(t_act)
+                    act = cpuize(t_act)
 
                 # get the next state and other stuff
                 next_obs, rew, term = env.step(act)

@@ -1,9 +1,9 @@
 # env params
 sparse: false
 env_name: ''
-env_name: 'AdroitHandDoor-v1'
+# env_name: 'AdroitHandDoor-v1'
 # env_name: 'AdroitHandPen-v1'
-# env_name: 'AdroitHandHammer-v1'
+env_name: 'AdroitHandHammer-v1'
 # env_name: 'AdroitHandRelocate-v1'
 
 # target_performance of oracle
@@ -51,6 +51,7 @@ render_gif: false
 weights_directory: 'weights'
 version_number: null
 mark_number: 0
+log_status: false
 
 increment: false
 logging_interval: 10000
