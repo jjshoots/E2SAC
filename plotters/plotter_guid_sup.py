@@ -188,6 +188,16 @@ if __name__ == "__main__":
     baselines_dict["Oracle"] = 3100.0
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
+    title = "Ant-v4\nGuidance vs. Supervision"
+    sweep_uri_dict = {}
+    sweep_uri_dict["Supervision + Guidance"] = "jjshoots/CCGE2/b0r4xjqu"
+    sweep_uri_dict["Guidance Only"] = "jjshoots/CCGE2/3d8yleyc"
+    sweep_uri_dict["Supervision Only"] = "jjshoots/CCGE2/vxtb4692"
+
+    baselines_dict = {}
+    baselines_dict["Oracle"] = 3100.0
+    sweep_objects.append((title, sweep_uri_dict, baselines_dict))
+
     # process everything with multiprocessing
     with Pool() as pool:
         pool.starmap(process_sweeps, sweep_objects)
