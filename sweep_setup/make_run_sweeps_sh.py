@@ -21,7 +21,7 @@ top_lines = """#!/bin/bash
 # this file has been automatically generated, do not edit manually
 
 source venv/bin/activate
-pip3 install -e .
+pip3 install -e . -r requirements.txt
 rm -rf weights/*
 wingman-compress-weights
 
