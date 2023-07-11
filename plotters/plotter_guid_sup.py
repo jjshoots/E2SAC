@@ -169,7 +169,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         fontsize=30,
     )
     plt.tight_layout()
-    filename = title.split("\n")
+    filename = title.split("\n")[0]
     plt.savefig(f"resource/{filename}-guide-sup.pdf", dpi=100)
     # plt.show()
 
