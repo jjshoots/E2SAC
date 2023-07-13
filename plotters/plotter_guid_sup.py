@@ -155,7 +155,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
     legend = plt.legend(
         fake_patches,
         algorithms,
-        loc="center right",
+        loc="lower right",
         fancybox=True,
         # ncol=len(algorithms),
         ncol=1,
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     sweep_uri_dict["Supervision Only"] = "jjshoots/CCGE2/vxtb4692"
 
     baselines_dict = {}
-    baselines_dict["Oracle"] = 3100.0
+    baselines_dict["Oracle"] = 2200.0
     sweep_objects.append((title, sweep_uri_dict, baselines_dict))
 
     # process everything with multiprocessing
