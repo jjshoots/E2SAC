@@ -169,7 +169,8 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         fontsize=30,
     )
     plt.tight_layout()
-    plt.savefig(f"plots/quadx-guide-sup.pdf", dpi=100)
+    filename = title.split("\n")[0]
+    plt.savefig(f"plots/{filename}-guide-sup.pdf", dpi=100)
     # plt.show()
 
 
@@ -177,7 +178,7 @@ if __name__ == "__main__":
     # list of run arguments
     sweep_objects = []
 
-    title = "PyFlyt:QuadX\nGuidance vs. Supervision"
+    title = "PyFlyt:QuadX-Waypoints-v0\nGuidance vs. Supervision"
     sweep_uri_dict = {}
     sweep_uri_dict["Supervision + Guidance"] = "jjshoots/CCGE2/q0aslwwl"
     sweep_uri_dict["Guidance Only"] = "jjshoots/CCGE2/rwjcrl5t"
