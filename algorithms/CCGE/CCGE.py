@@ -14,14 +14,11 @@ class Q_Ensemble(nn.Module):
     Q Network Ensembles with uncertainty estimates
     """
 
-    def __init__(
-        self, act_size, obs_atti_size, obs_targ_size, context_length, num_networks=2
-    ):
+    def __init__(self, act_size, obs_att_size, obs_img_size, num_networks=2):
         super().__init__()
 
         networks = [
-            Critic(act_size, obs_atti_size, obs_targ_size, context_length)
-            for _ in range(num_networks)
+            Critic(act_size, obs_att_size, obs_img_size) for _ in range(num_networks)
         ]
         self.networks = nn.ModuleList(networks)
 
@@ -45,9 +42,9 @@ class GaussianActor(nn.Module):
     Gaussian Actor
     """
 
-    def __init__(self, act_size, obs_atti_size, obs_targ_size, context_length):
+    def __init__(self, act_size, obs_att_size, obs_img_size):
         super().__init__()
-        self.net = Actor(act_size, obs_atti_size, obs_targ_size, context_length)
+        self.net = Actor(act_size, obs_att_size, obs_img_size)
 
     def forward(self, obs_atti, obs_targ):
         output = self.net(obs_atti, obs_targ)
@@ -86,9 +83,8 @@ class CCGE(nn.Module):
     def __init__(
         self,
         act_size,
-        obs_atti_size,
-        obs_targ_size,
-        context_length,
+        obs_att_size,
+        obs_img_size,
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.99,
@@ -96,23 +92,24 @@ class CCGE(nn.Module):
     ):
         super().__init__()
 
-        self.obs_atti_size = obs_atti_size
-        self.obs_targ_size = obs_targ_size
+        self.obs_att_size = obs_att_size
+        self.obs_img_size = obs_img_size
         self.act_size = act_size
         self.use_entropy = entropy_tuning
         self.gamma = discount_factor
         self.confidence_lambda = confidence_lambda
 
         # actor head
-        self.actor = GaussianActor(
-            act_size, obs_atti_size, obs_targ_size, context_length
-        )
+        self.actor = GaussianActor(act_size, obs_att_size, obs_img_size)
 
         # twin delayed Q networks
-        self.critic = Q_Ensemble(act_size, obs_atti_size, obs_targ_size, context_length)
-        self.critic_target = Q_Ensemble(
-            act_size, obs_atti_size, obs_targ_size, context_length
-        ).eval()
+        self.critic = Q_Ensemble(act_size, obs_att_size, obs_img_size)
+        self.critic_target = Q_Ensemble(act_size, obs_att_size, obs_img_size).eval()
+
+        # torch 2.0 compile things
+        # self.actor = torch.compile(self.actor)
+        # self.critic = torch.compile(self.critic)
+        # self.critic_target = torch.compile(self.critic_target)
 
         # copy weights and disable gradients for the target network
         self.critic_target.load_state_dict(self.critic.state_dict())
@@ -143,14 +140,14 @@ class CCGE(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_sup_scale(self, obs_atti, obs_targ, actions, labels):
+    def calc_sup_scale(self, obs_att, obs_img, actions, labels):
         # stack actions and labels to perform inference on both together
         actions_labels = torch.stack((actions, labels), dim=0)
 
         # put all actions and labels and states through critic
         # shape is 2 x 2 x B x num_networks,
         # value_uncertainty x actions_labels x batch x num_networks
-        critic_output = self.critic(obs_atti, obs_targ, actions_labels)
+        critic_output = self.critic(obs_att, obs_img, actions_labels)
 
         # splice the output to get q of actions
         expected_q = critic_output[0, 0, ...]
@@ -182,10 +179,11 @@ class CCGE(nn.Module):
         return sup_scale, expected_q, log
 
     def calc_critic_loss(
-        self, obs_atti, obs_targ, actions, rewards, next_obs_atti, next_obs_targ, terms
+        self, obs_att, obs_img, actions, rewards, next_obs_atti, next_obs_targ, terms
     ):
         """
-        obs_atti, obs_targ is of shape B x input_shape
+        obs_att is of shape B x input_shape
+        obs_img is of shape B x C x H x W
         actions is of shape B x act_size
         rewards is of shape B x 1
         terms is of shape B x 1
@@ -193,7 +191,7 @@ class CCGE(nn.Module):
         terms = 1.0 - terms
 
         # current predicted f and f
-        current_q, current_f = self.critic(obs_atti, obs_targ, actions)
+        current_q, current_f = self.critic(obs_att, obs_img, actions)
 
         # compute next q and next f and target_q
         with torch.no_grad():
@@ -243,20 +241,20 @@ class CCGE(nn.Module):
 
         return critic_loss, log
 
-    def calc_actor_loss(self, obs_atti, obs_targ, terms, labels):
+    def calc_actor_loss(self, obs_att, obs_img, terms, labels):
         """
-        obs_atti, obs_targ is of shape B x input_shape
+        obs_att, obs_img is of shape B x input_shape
         terms is of shape B x 1
         """
         terms = 1.0 - terms
 
         # We re-sample actions to calculate expectations of Q.
-        output = self.actor(obs_atti, obs_targ)
+        output = self.actor(obs_att, obs_img)
         actions, entropies = self.actor.sample(*output)
 
         # compute supervision scale and expected q for actions
         sup_scale, expected_q, log2 = self.calc_sup_scale(
-            obs_atti, obs_targ, actions, labels
+            obs_att, obs_img, actions, labels
         )
 
         """ REINFORCEMENT LOSS """
@@ -292,14 +290,14 @@ class CCGE(nn.Module):
 
         return actor_loss, log
 
-    def calc_alpha_loss(self, obs_atti, obs_targ):
+    def calc_alpha_loss(self, obs_att, obs_img):
         """
-        obs_atti, obs_targ is of shape B x input_shape
+        obs_att, obs_img is of shape B x input_shape
         """
         if not self.entropy_tuning:
             return torch.zeros(1)
 
-        output = self.actor(obs_atti, obs_targ)
+        output = self.actor(obs_att, obs_img)
         _, log_probs = self.actor.sample(*output)
 
         # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.

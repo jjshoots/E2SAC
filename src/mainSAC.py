@@ -3,10 +3,10 @@ from signal import SIGINT, signal
 
 import torch
 import torch.optim as optim
+from pyflyt_env import Environment
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
 from algorithms import SAC
-from pyflyt_env import Environment
 
 
 def train(wm: Wingman):

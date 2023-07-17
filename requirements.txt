@@ -2,5 +2,4 @@ jj-wingman
 gymnasium[mujoco]
 matplotlib
 seaborn
-git+https://github.com/jjshoots/PyFlyt.git
 git+https://github.com/jjshoots/rliable.git

@@ -3,10 +3,10 @@ from signal import SIGINT, signal
 
 import torch
 import torch.optim as optim
+from rail_env import RailEnv
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
 from algorithms import CCGE
-from pyflyt_env import Environment
 
 
 def train(wm: Wingman):
@@ -42,47 +42,44 @@ def train(wm: Wingman):
         model.zero_grad()
 
         with torch.no_grad():
-            while not env.ended:
+            while not (env.ended):
                 # get the initial state and label
-                obs_atti = env.state_atti
-                obs_targ = env.state_targ
-                lbl = env.get_label((obs_atti, obs_targ))
+                obs_att = env.obs_att
+                obs_img = env.obs_img
+                lbl = env.label
 
                 if memory.count < cfg.exploration_steps:
                     act = env.env.action_space.sample()
                 else:
                     # move observation to gpu
-                    t_obs_atti = gpuize(obs_atti, cfg.device)
-                    t_obs_targ = gpuize(obs_targ, cfg.device)
+                    t_obs_att = gpuize(obs_att, cfg.device)
+                    t_obs_img = gpuize(obs_img, cfg.device)
 
                     # get the action from policy
-                    output = model.actor(t_obs_atti, t_obs_targ)
+                    output = model.actor(t_obs_att, t_obs_img)
                     t_act, _ = model.actor.sample(*output)
 
                     # move label to gpu
                     t_lbl = gpuize(lbl, cfg.device)
 
-                    if False:
-                        # figure out whether to follow policy or oracle
-                        sup_scale, *_ = model.calc_sup_scale(
-                            t_obs_atti, t_obs_targ, t_act, t_lbl
-                        )
-                        act = lbl if sup_scale.squeeze(0) == 1.0 else cpuize(t_act)
-                    else:
-                        act = cpuize(t_act)
+                    # figure out whether to follow policy or oracle
+                    sup_scale, *_ = model.calc_sup_scale(
+                        t_obs_att, t_obs_img, t_act, t_lbl
+                    )
+                    act = lbl if sup_scale.squeeze(0) == 1.0 else cpuize(t_act)
 
                 # get the next state and other stuff
-                next_obs_atti, next_obs_targ, rew, term = env.step(act)
+                next_obs_att, next_obs_img, rew, term = env.step(act)
 
                 # store stuff in mem
                 memory.push(
                     [
-                        obs_atti,
-                        obs_targ,
+                        obs_att,
+                        obs_img,
                         act,
                         rew,
-                        next_obs_atti,
-                        next_obs_targ,
+                        next_obs_att,
+                        next_obs_img,
                         term,
                         lbl,
                     ],
@@ -101,12 +98,12 @@ def train(wm: Wingman):
             for batch_num, stuff in enumerate(dataloader):
                 model.train()
 
-                obs_atti = gpuize(stuff[0], cfg.device)
-                obs_targ = gpuize(stuff[1], cfg.device)
+                obs_att = gpuize(stuff[0], cfg.device)
+                obs_img = gpuize(stuff[1], cfg.device)
                 actions = gpuize(stuff[2], cfg.device)
                 rewards = gpuize(stuff[3], cfg.device)
-                next_obs_atti = gpuize(stuff[4], cfg.device)
-                next_obs_targ = gpuize(stuff[5], cfg.device)
+                next_obs_att = gpuize(stuff[4], cfg.device)
+                next_obs_img = gpuize(stuff[5], cfg.device)
                 terms = gpuize(stuff[6], cfg.device)
                 labels = gpuize(stuff[7], cfg.device)
 
@@ -114,12 +111,12 @@ def train(wm: Wingman):
                 for _ in range(cfg.critic_update_multiplier):
                     model.zero_grad()
                     q_loss, log = model.calc_critic_loss(
-                        obs_atti,
-                        obs_targ,
+                        obs_att,
+                        obs_img,
                         actions,
                         rewards,
-                        next_obs_atti,
-                        next_obs_targ,
+                        next_obs_att,
+                        next_obs_img,
                         terms,
                     )
                     wm.log = {**wm.log, **log}
@@ -131,7 +128,7 @@ def train(wm: Wingman):
                 for _ in range(cfg.actor_update_multiplier):
                     model.zero_grad()
                     rnf_loss, log = model.calc_actor_loss(
-                        obs_atti, obs_targ, terms, labels
+                        obs_att, obs_img, terms, labels
                     )
                     wm.log = {**wm.log, **log}
                     rnf_loss.backward()
@@ -140,7 +137,7 @@ def train(wm: Wingman):
                     # train entropy regularizer
                     if model.use_entropy:
                         model.zero_grad()
-                        ent_loss, log = model.calc_alpha_loss(obs_atti, obs_targ)
+                        ent_loss, log = model.calc_alpha_loss(obs_att, obs_img)
                         wm.log = {**wm.log, **log}
                         ent_loss.backward()
                         optims["alpha"].step()
@@ -182,9 +179,9 @@ def eval_display(wm: Wingman):
 
 def setup_env(wm: Wingman):
     cfg = wm.cfg
-    env = Environment(cfg)
-    cfg.obs_atti_size = env.obs_atti_size
-    cfg.obs_targ_size = env.obs_targ_size
+    env = RailEnv(cfg)
+    cfg.obs_att_size = env.obs_att_size
+    cfg.obs_img_size = env.obs_img_size
     cfg.act_size = env.act_size
 
     return env
@@ -196,9 +193,8 @@ def setup_nets(wm: Wingman):
     # set up networks and optimizers
     model = CCGE(
         act_size=cfg.act_size,
-        obs_atti_size=cfg.obs_atti_size,
-        obs_targ_size=cfg.obs_targ_size,
-        context_length=cfg.context_length,
+        obs_att_size=cfg.obs_att_size,
+        obs_img_size=cfg.obs_img_size,
         entropy_tuning=cfg.use_entropy,
         target_entropy=cfg.target_entropy,
         discount_factor=cfg.discount_factor,
