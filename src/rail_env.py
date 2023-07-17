@@ -82,7 +82,6 @@ class RailEnv:
 
         # store the list of eval performances here
         eval_perf = []
-        num_hits = []
 
         while len(eval_perf) < cfg.eval_num_episodes:
             obs_att = gpuize(self.obs_att, cfg.device).unsqueeze(0)
@@ -103,8 +102,7 @@ class RailEnv:
                 self.reset()
 
         eval_perf = np.mean(np.array(eval_perf))
-        num_hits = np.mean(np.array(num_hits))
-        return num_hits
+        return eval_perf
 
     def display(self, cfg, net=None):
         if net is not None:
