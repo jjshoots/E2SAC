@@ -10,5 +10,3 @@
 *.egg-info
 */__pycache__
 */archive
-*/textures
-/textures

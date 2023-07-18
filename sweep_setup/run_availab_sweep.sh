@@ -3,18 +3,10 @@
 # this file has been automatically generated, do not edit manually
 
 source venv/bin/activate
-pip3 uninstall pyflyt -y
-pip3 install -r requirements.txt -U
 wingman-compress-weights
 
 declare -a pids=()
-wandb agent jjshoots/CCGE2/5qlnw03b --count 8 & 
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/5qlnw03b --count 8 & 
-pids+=($!)
-sleep 10
-wandb agent jjshoots/CCGE2/5qlnw03b --count 8 & 
+wandb agent jjshoots/ccge2_railway/jwmvzrhk --count 1 & 
 pids+=($!)
 sleep 10
 

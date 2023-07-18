@@ -1,11 +1,9 @@
 #!/bin/bash
 
 availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
-# dream_prophet_machines=("dream" "prophet")
-dream_prophet_machines=()
 total_gpus=4
-total_runs=100
-runs_per_gpu=3
+total_runs=4
+runs_per_gpu=1
 
 ######################################################################################################
 # setup the sweep
@@ -22,7 +20,21 @@ rm ./sweep_setup/temp.out
 
 # make executable
 chmod +x ./sweep_setup/run_availab_sweep.sh
-chmod +x ./sweep_setup/run_dream_prophet_sweep.sh
+
+######################################################################################################
+# sync the env files
+######################################################################################################
+echo "Syncing env files..."
+declare -a pids=()
+
+for machine in ${availab_machines[@]}; do
+  rsync -avr --delete --exclude-from='rsync_ignore_out.txt' ../pyflyt_rail_env/ $machine:~/Sandboxes/pyflyt_rail_env &
+  pids+=($!)
+done
+
+for pid in ${pids[*]}; do
+  wait $pid
+done
 
 ######################################################################################################
 # sync all files out
@@ -32,11 +44,6 @@ declare -a pids=()
 
 for machine in ${availab_machines[@]}; do
   rsync -avr --delete --exclude-from='rsync_ignore_out.txt' ./ $machine:~/Sandboxes/e2SAC/ &
-  pids+=($!)
-done
-
-for machine in ${dream_prophet_machines[@]}; do
-  rsync -avr --delete --exclude-from='rsync_ignore_out.txt' ./ $machine:~/e2SAC/ &
   pids+=($!)
 done
 
@@ -51,12 +58,6 @@ declare -a pids=()
 
 for machine in ${availab_machines[@]}; do
   ssh $machine 'tmux send-keys -t 0 "./sweep_setup/run_availab_sweep.sh" ENTER' &
-  echo "Sent commands to $machine."
-  pids+=($!)
-done
-
-for machine in ${dream_prophet_machines[@]}; do
-  ssh $machine 'tmux send-keys -t 0 "./sweep_setup/run_dream_prophet_sweep.sh" ENTER' &
   echo "Sent commands to $machine."
   pids+=($!)
 done
