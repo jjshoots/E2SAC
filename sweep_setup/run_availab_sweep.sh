@@ -6,7 +6,7 @@ source venv/bin/activate
 wingman-compress-weights
 
 declare -a pids=()
-wandb agent jjshoots/ccge2_railway/jwmvzrhk --count 1 & 
+wandb agent jjshoots/ccge2_railway/r9w6knbv --count 1 & 
 pids+=($!)
 sleep 10
 
