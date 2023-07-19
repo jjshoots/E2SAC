@@ -3,7 +3,7 @@ metric:
   name: max_eval_perf
   goal: maximize
 project: "ccge2_railway"
-name: "Trial_1"
+name: "Trial_3"
 parameters:
   buffer_size:
     value: 30000

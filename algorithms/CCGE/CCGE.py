@@ -256,7 +256,6 @@ class CCGE(nn.Module):
         sup_scale, expected_q, log2 = self.calc_sup_scale(
             obs_att, obs_img, actions, labels
         )
-        sup_scale = torch.ones_like(sup_scale)
 
         """ REINFORCEMENT LOSS """
         # expectations of Q with clipped double Q
