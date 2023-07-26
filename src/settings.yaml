@@ -1,12 +1,4 @@
-# env params
-env_name: ''
-# env_name: 'Ant-v4'
-# env_name: 'HalfCheetah-v4'
-# env_name: 'Hopper-v4'
-env_name: 'Walker2d-v4'
-
-# target_performance of oracle
-target_performance: 3100
+env_name: "stable_gym:QuadXHoverCost-v1"
 
 # learning params
 buffer_size: 300000
@@ -29,13 +21,6 @@ confidence_lambda: 1.0
 # core SAC params
 use_entropy: true
 target_entropy: null
-
-# AWAC params
-lambda_parameter: 0.05
-offline_epochs: 10
-offline_steps: 100000
-online_steps: 900000
-reset_memory: false
 
 # eval settings
 eval_num_episodes: 100

@@ -2,8 +2,8 @@
 
 availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
 total_gpus=4
-total_runs=100
-runs_per_gpu=3
+total_runs=8
+runs_per_gpu=2
 
 ######################################################################################################
 # setup the sweep

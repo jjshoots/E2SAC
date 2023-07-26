@@ -23,8 +23,7 @@ top_lines = """#!/bin/bash
 # this file has been automatically generated, do not edit manually
 
 source venv/bin/activate
-pip3 uninstall pyflyt -y
-pip3 install -r requirements.txt -U
+pip3 install gym==0.25.1
 wingman-compress-weights
 
 declare -a pids=()

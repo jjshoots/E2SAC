@@ -5,12 +5,10 @@ metric:
   goal: maximize
 parameters:
   env_name:
-    value: "Ant-v4"
-  target_performance:
-    value: 2200
-name: "CCGE_Ant_NoSup"
+    value: "stable_gym:QuadXHoverCost-v1"
+name: "QuadXHover"
 command:
   - python3
-  - src/main.py
+  - src/mainSAC.py
   - "--train"
   - "--wandb"

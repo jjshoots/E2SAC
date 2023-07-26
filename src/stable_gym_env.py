@@ -2,7 +2,7 @@ import warnings
 
 import gymnasium as gym
 import numpy as np
-import torch
+from stable_gym.envs.robotics.quadrotor.quadx_hover_cost import QuadXHoverCost
 from wingman import cpuize, gpuize
 
 from suboptimal_policy import Suboptimal_Actor
@@ -17,8 +17,9 @@ class Environment:
         super().__init__()
 
         # make the env
+        # self.env = QuadXHoverCost()
         self.env = gym.make(
-            cfg.env_name, render_mode=("human" if cfg.display else "rgb_array")
+            "stable_gym:QuadXHoverCost-v1", render_mode=("human" if cfg.display else None)
         )
 
         # compute spaces
@@ -39,35 +40,6 @@ class Environment:
         action_low = self.env.action_space.low
         self._action_mid = (action_high + action_low) / 2.0
         self._action_scale = (action_high - action_low) / 2.0
-
-        # load suboptimal policy
-        try:
-            path = f"./suboptimal_policies/{cfg.env_name}_{cfg.target_performance}.pth"
-
-            # hacky way to get number of neurons per layer because I fked up with oracle training
-            weights = torch.load(path)
-            neurons_per_layer = weights["net.0.0.weight"].shape[0]
-
-            # load the oracle
-            self.suboptimal_actor = Suboptimal_Actor(
-                act_size=self.act_size,
-                obs_size=self.obs_size,
-                neurons_per_layer=neurons_per_layer,
-            ).to(cfg.device)
-            self.suboptimal_actor.load_state_dict(weights)
-
-            print(f"Loaded {path}")
-        except FileNotFoundError:
-            warnings.warn("--------------------------------------------------")
-            warnings.warn(f"Failed to load suboptimal actor {path}, ignoring.")
-            warnings.warn("--------------------------------------------------")
-
-            # load the oracle
-            self.suboptimal_actor = Suboptimal_Actor(
-                act_size=self.act_size,
-                obs_size=self.obs_size,
-                neurons_per_layer=256,
-            ).to(cfg.device)
 
         self.reset()
 
@@ -90,6 +62,7 @@ class Environment:
 
         # step through the env
         self.state, reward, term, trunc, info = self.env.step(action)
+        reward *= -1.0
 
         # accumulate rewards
         self.cumulative_reward += reward
@@ -99,27 +72,8 @@ class Environment:
 
         return self.state, reward, term
 
-    def update_oracle_weights(self, weights: dict):
-        assert self.suboptimal_actor is not None, "Can't update None model."
-        # self.suboptimal_actor.load_state_dict(weights)
-
-        # load the oracle
-        neurons_per_layer = weights["net.0.0.weight"].shape[0]
-        self.suboptimal_actor = Suboptimal_Actor(
-            act_size=self.act_size,
-            obs_size=self.obs_size,
-            neurons_per_layer=neurons_per_layer,
-        ).to(torch.device("cuda:0"))
-        self.suboptimal_actor.load_state_dict(weights)
-
     def get_label(self, obs):
-        if self.suboptimal_actor is not None:
-            action = self.suboptimal_actor(gpuize(obs, self.device))
-            action = torch.tanh(action[0])
-            action = cpuize(action)[0]
-            return action
-        else:
-            return self.do_nothing
+        return self.do_nothing
 
     def evaluate(self, cfg, net=None):
         if net is not None:
@@ -127,7 +81,7 @@ class Environment:
 
         # make the env
         self.env.close()
-        self.env = gym.make(cfg.env_name, render_mode="rgb_array")
+        self.env = gym.make(cfg.env_name, render_mode=None)
         self.reset()
 
         # store the list of eval performances here

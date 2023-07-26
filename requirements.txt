@@ -5,4 +5,6 @@ mujoco == 2.3.2
 gymnasium[mujoco]
 matplotlib
 seaborn
+gym==0.25.1
 git+https://github.com/jjshoots/rliable.git
+git+https://github.com/rickstaa/stable-gym
