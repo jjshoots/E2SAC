@@ -11,7 +11,9 @@ class RailEnv:
     def __init__(self, cfg):
         super().__init__()
 
-        self.env = Environment(render_mode="human" if cfg.display else None)
+        self.env = Environment(
+            agent_hz=cfg.agent_hz, render_mode="human" if cfg.display else None
+        )
 
         # compute spaces
         self.act_size = self.env.action_space.shape[0]
@@ -32,14 +34,16 @@ class RailEnv:
         self.obs_att = obs["attitude"]
         self.obs_img = obs["rgba_img"].transpose((2, 0, 1))
 
+        self.infos = dict()
         self.ended = False
         self.cumulative_reward = 0
+        self.reward_breakdown = 0.0
 
         return self.obs_att, self.obs_img
 
     @property
     def label(self) -> np.ndarray:
-        label = np.zeros((self.act_size, ))
+        label = np.zeros((self.act_size,))
         track_position = self.env.track_state
         label[0] = 0.75
         label[1] = track_position[0]
@@ -57,7 +61,7 @@ class RailEnv:
         action = action * self._action_range + self._action_mid
 
         # step through the env multiple times
-        obs, rew, term, trunc, info = self.env.step(action)
+        obs, rew, term, trunc, self.infos = self.env.step(action)
 
         # splice out the observation and mask the target deltas
         self.obs_att = obs["attitude"]

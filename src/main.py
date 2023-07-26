@@ -3,10 +3,10 @@ from signal import SIGINT, signal
 
 import torch
 import torch.optim as optim
-from rail_env import RailEnv
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
 from algorithms import CCGE
+from rail_env import RailEnv
 
 
 def train(wm: Wingman):
@@ -88,6 +88,13 @@ def train(wm: Wingman):
 
             # for logging
             wm.log["total_reward"] = env.cumulative_reward
+
+            # log the reward breakdown
+            for key, value in zip(
+                env.infos["reward_breakdown_keys"],
+                env.infos["reward_breakdown"],
+            ):
+                wm.log[key] = value
 
         """TRAINING RUN"""
         dataloader = torch.utils.data.DataLoader(

@@ -1,12 +1,12 @@
 # environment settings
-agent_hz: 30
+agent_hz: 10
 
 # learning params
 buffer_size: 50000
 buffer_size_debug: 100
 batch_size: 256
 total_steps: 500000
-repeats_per_buffer: 1
+repeats_per_buffer: 3
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 discount_factor: 0.99
@@ -16,7 +16,7 @@ random_rollover: false
 
 # CCGE params
 update_oracle: false
-confidence_lambda: 0.0
+confidence_lambda: 0.3
 
 # core SAC params
 use_entropy: true
