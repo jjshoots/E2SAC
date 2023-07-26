@@ -1,16 +1,52 @@
-#!/bin/fish
-if [ "$hostname" = "snow-fox" ]
-  ./sync-out.sh
-  # ssh availab-dl1 'tmux send-keys -t 0 "./run_availab_ccge.sh" ENTER'
-  # ssh availab-dl2 'tmux send-keys -t 0 "./run_availab_ccge.sh" ENTER'
-  ssh availab-dl3 'tmux send-keys -t 0 "./run_availab_ccge.sh" ENTER'
-  ssh availab-dl4 'tmux send-keys -t 0 "./run_availab_ccge.sh" ENTER'
-else if [ "$hostname" = "availab-dl1" ]
-  bash ./run_availab.sh
-else if [ "$hostname" = "availab-dl2" ]
-  bash ./run_availab.sh
-else if [ "$hostname" = "dream" ]
-  bash ./run_dream_prophet.sh
-else if [ "$hostname" = "prophet" ]
-  bash ./run_dream_prophet.sh
-end
+#!/bin/bash
+
+availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
+total_gpus=4
+total_runs=100
+runs_per_gpu=3
+
+######################################################################################################
+# setup the sweep
+######################################################################################################
+echo "Generating sweep..."
+wandb sweep sweep.yaml &> ./sweep_setup/temp.out
+
+# automatically generate sh file for availab servers
+echo "Generating run.sh"
+python3 sweep_setup/make_run_sweeps_sh.py $total_gpus $total_runs $runs_per_gpu
+
+# remove the temp file
+rm ./sweep_setup/temp.out
+
+# make executable
+chmod +x ./sweep_setup/run_availab_sweep.sh
+
+######################################################################################################
+# sync all files out
+######################################################################################################
+echo "Syncing out..."
+declare -a pids=()
+
+for machine in ${availab_machines[@]}; do
+  rsync -avr --delete --exclude-from='rsync_ignore_out.txt' ./ $machine:~/Sandboxes/e2SAC/ &
+  pids+=($!)
+done
+
+for pid in ${pids[*]}; do
+  wait $pid
+done
+
+######################################################################################################
+# run all files
+######################################################################################################
+declare -a pids=()
+
+for machine in ${availab_machines[@]}; do
+  ssh $machine 'tmux send-keys -t 0 "./sweep_setup/run_availab_sweep.sh" ENTER' &
+  echo "Sent commands to $machine."
+  pids+=($!)
+done
+
+for pid in ${pids[*]}; do
+  wait $pid
+done

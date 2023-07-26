@@ -37,10 +37,6 @@ offline_steps: 100000
 online_steps: 900000
 reset_memory: false
 
-# OAC params
-oac_beta: 4.66
-oac_delta: 6.86
-
 # eval settings
 eval_num_episodes: 100
 eval_steps_ratio: 10000
@@ -66,4 +62,4 @@ wandb_name: ''
 wandb_notes: ''
 wandb_id: ''
 wandb_entity: 'jjshoots'
-wandb_project: 'CCGE2'
+wandb_project: 'ccge2_stable_gym'
