@@ -135,9 +135,7 @@ def process_sweeps(title, sweep_uri_dict, baselines_dict):
         algorithms.append(key)
 
     # form the legend
-    legend_patches = [
-        patches.Patch(color=color, alpha=0.75) for color in color_palette
-    ]
+    legend_patches = [patches.Patch(color=color, alpha=0.75) for color in color_palette]
     plt.legend(
         legend_patches,
         algorithms,

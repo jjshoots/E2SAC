@@ -5,8 +5,8 @@ metric:
   goal: maximize
 parameters:
   env_name:
-    value: "stable_gym:QuadXHoverCost-v1"
-name: "QuadXHover"
+    value: "stable_gym:QuadXWaypointsCost-v1"
+name: "QuadXWaypoints"
 command:
   - python3
   - src/mainSAC.py

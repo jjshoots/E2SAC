@@ -114,7 +114,7 @@ def plot_data():
     for i, vals in enumerate(sup_ratios.T):
         vals = np.interp(x_axis, x_vals, vals)
         vals = np.convolve(vals, kernel, mode="valid")
-        plt.plot(x_axis[:len(vals)], vals, c=color_palette[i], label=labels[i])
+        plt.plot(x_axis[: len(vals)], vals, c=color_palette[i], label=labels[i])
     plt.title("Ant-v4 \n Guidance Ratio \nvs. Confidence Scale", fontsize=30)
     plt.legend(fontsize=18)
     plt.ylabel("Mean Guidance Ratio", fontsize=30)
@@ -129,7 +129,7 @@ def plot_data():
     for i, vals in enumerate(eval_perfs.T):
         vals = np.interp(x_axis, x_vals, vals)
         vals = np.convolve(vals, kernel, mode="valid")
-        plt.plot(x_axis[:len(vals)], vals, c=color_palette[i], label=labels[i])
+        plt.plot(x_axis[: len(vals)], vals, c=color_palette[i], label=labels[i])
     plt.title("Ant-v4 \nEvaluation Performance \nvs. Confidence Scale", fontsize=30)
     plt.legend(fontsize=18)
     plt.ylabel("Mean Evaluation Performance", fontsize=30)

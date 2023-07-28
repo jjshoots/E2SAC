@@ -1,11 +1,6 @@
-import warnings
-
 import gymnasium as gym
 import numpy as np
-from stable_gym.envs.robotics.quadrotor.quadx_hover_cost import QuadXHoverCost
 from wingman import cpuize, gpuize
-
-from suboptimal_policy import Suboptimal_Actor
 
 
 class Environment:
@@ -17,9 +12,9 @@ class Environment:
         super().__init__()
 
         # make the env
-        # self.env = QuadXHoverCost()
         self.env = gym.make(
-            "stable_gym:QuadXHoverCost-v1", render_mode=("human" if cfg.display else None)
+            cfg.env_name,
+            render_mode=("human" if cfg.display else None),
         )
 
         # compute spaces
@@ -32,6 +27,8 @@ class Environment:
             self.obs_size = self.env.observation_space.shape[0]
         else:
             raise NotImplementedError("Unsure how to deal with observation space.")
+
+        print(self.env.observation_space.shape)
 
         # constants
         self.device = cfg.device
@@ -126,6 +123,9 @@ class Environment:
                 self.step(action)
             else:
                 self.step(self.get_label(self.state))
+
+            print(self.env.observation_space)
+            print(self.state.shape)
 
             if self.ended:
                 print(f"Total Reward: {self.cumulative_reward}")
