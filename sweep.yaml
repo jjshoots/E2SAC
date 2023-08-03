@@ -4,11 +4,11 @@ metric:
   name: max_eval_perf
   goal: maximize
 parameters:
-  env_name:
-    value: "stable_gym:QuadXWaypointsCost-v1"
-name: "QuadXWaypoints"
+  agent_hz:
+    value: 40
+name: "Trial_0"
 command:
   - python3
-  - src/mainSAC.py
+  - src/main.py
   - "--train"
   - "--wandb"

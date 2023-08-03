@@ -3,10 +3,10 @@ from signal import SIGINT, signal
 
 import torch
 import torch.optim as optim
-from mujoco_env import Environment
 from wingman import ReplayBuffer, Wingman, cpuize, gpuize, shutdown_handler
 
-from algorithms import CCGE
+from algorithms import SAC
+from dogfight_env import Environment
 
 
 def train(wm: Wingman):
@@ -18,21 +18,15 @@ def train(wm: Wingman):
     net, optim_set = setup_nets(wm)
     memory = ReplayBuffer(cfg.buffer_size)
 
-    # setup the oracle
-    if not cfg.pretrained_oracle:
-        env.update_oracle_weights(net.actor.net.state_dict())
-        print("Using from scratch oracle.")
-
     wm.log["epoch"] = 0
     wm.log["eval_perf"] = -math.inf
     wm.log["max_eval_perf"] = -math.inf
-    wm.log["oracle_eval_perf"] = env.evaluate(cfg, None)
     next_eval_step = 0
 
     while memory.count <= cfg.total_steps:
         wm.log["epoch"] += 1
 
-        """EVALUATE POLICY"""
+        """EVAL RUN"""
         if memory.count >= next_eval_step:
             next_eval_step = (
                 int(memory.count / cfg.eval_steps_ratio) + 1
@@ -42,48 +36,27 @@ def train(wm: Wingman):
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )
 
-        """UPDATE ORACLE"""
-        if cfg.update_oracle:
-            if wm.log["eval_perf"] > wm.log["oracle_eval_perf"]:
-                env.update_oracle_weights(net.actor.net.state_dict())
-                wm.log["oracle_eval_perf"] = wm.log["eval_perf"]
-                print("Found new best oracle, updating.")
-
-        """ENVIRONMENT ROLLOUT"""
+        """ENVIRONMENT INTERACTION"""
         env.reset()
         net.eval()
         net.zero_grad()
 
         with torch.no_grad():
             while not env.ended:
+
                 # get the initial state and label
-                obs = env.state
-                lbl = env.get_label(obs)
-
-                if memory.count < cfg.exploration_steps:
-                    act = env.env.action_space.sample()
-                else:
-                    # move observation to gpu
-                    t_obs = gpuize(obs, cfg.device)
-
-                    # get the action from policy
-                    output = net.actor(t_obs)
-                    t_act, _ = net.actor.sample(*output)
-
-                    # move label to gpu
-                    t_lbl = gpuize(lbl, cfg.device)
-
-                    # figure out whether to follow policy or oracle
-                    sup_scale, *_ = net.calc_sup_scale(t_obs, t_act, t_lbl)
-                    act = lbl if sup_scale.squeeze(0) == 1.0 else cpuize(t_act)
+                output = net.actor(gpuize(env.obs, cfg.device).unsqueeze(0))
+                acts, _ = net.actor.sample(*output)
+                acts = cpuize(acts)
 
                 # get the next state and other stuff
-                next_obs, rew, term = env.step(act)
+                next_obs, rews, terms = env.step(acts)
 
                 # store stuff in mem
                 memory.push(
-                    (obs, act, rew, next_obs, term, lbl),
+                    (env.obs, acts, rews, next_obs, terms),
                     random_rollover=cfg.random_rollover,
+                    bulk=True
                 )
 
             # for logging
@@ -99,17 +72,16 @@ def train(wm: Wingman):
                 net.train()
 
                 states = gpuize(stuff[0], cfg.device)
-                actions = gpuize(stuff[1], cfg.device)
-                rewards = gpuize(stuff[2], cfg.device)
+                acts = gpuize(stuff[1], cfg.device)
+                rews = gpuize(stuff[2], cfg.device)
                 next_states = gpuize(stuff[3], cfg.device)
                 terms = gpuize(stuff[4], cfg.device)
-                labels = gpuize(stuff[5], cfg.device)
 
                 # train critic
                 for _ in range(cfg.critic_update_multiplier):
                     net.zero_grad()
                     q_loss, log = net.calc_critic_loss(
-                        states, actions, rewards, next_states, terms
+                        states, acts, rews, next_states, terms
                     )
                     wm.log = {**wm.log, **log}
                     q_loss.backward()
@@ -119,7 +91,7 @@ def train(wm: Wingman):
                 # train actor
                 for _ in range(cfg.actor_update_multiplier):
                     net.zero_grad()
-                    rnf_loss, log = net.calc_actor_loss(states, terms, labels)
+                    rnf_loss, log = net.calc_actor_loss(states, terms)
                     wm.log = {**wm.log, **log}
                     rnf_loss.backward()
                     optim_set["actor"].step()
@@ -160,7 +132,7 @@ def eval_display(wm: Wingman):
     cfg = wm.cfg
     env = setup_env(wm)
 
-    if False:
+    if not cfg.debug:
         net, _ = setup_nets(wm)
     else:
         net = None
@@ -185,13 +157,12 @@ def setup_nets(wm: Wingman):
     cfg = wm.cfg
 
     # set up networks and optimizers
-    net = CCGE(
+    net = SAC(
         act_size=cfg.act_size,
         obs_size=cfg.obs_size,
         entropy_tuning=cfg.use_entropy,
         target_entropy=cfg.target_entropy,
         discount_factor=cfg.discount_factor,
-        confidence_lambda=cfg.confidence_lambda,
     ).to(cfg.device)
     actor_optim = optim.AdamW(
         net.actor.parameters(), lr=cfg.learning_rate, amsgrad=True
@@ -218,8 +189,7 @@ def setup_nets(wm: Wingman):
         for opt_key in optim_set:
             optim_set[opt_key].load_state_dict(checkpoint["optim"][opt_key])
 
-    # torch.save(net.actor.net.state_dict(), f"./{set.env_name}_big.pth")
-    # exit()
+        print(f"Lowest Running Loss for Net: {wm.lowest_loss}")
 
     return net, optim_set
 

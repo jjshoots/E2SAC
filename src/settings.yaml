@@ -1,6 +1,4 @@
-# env_name: "stable_gym:QuadXHoverCost-v1"
-# env_name: "stable_gym:QuadXTrackingCost-v1"
-env_name: "stable_gym:QuadXWaypointsCost-v1"
+agent_hz: 40
 
 # learning params
 buffer_size: 300000
@@ -10,15 +8,9 @@ total_steps: 1000000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
-discount_factor: 0.99
+discount_factor: 0.98
 learning_rate: 0.0004
-exploration_steps: 0
 random_rollover: false
-
-# CCGE params
-pretrained_oracle: true
-update_oracle: false
-confidence_lambda: 1.0
 
 # core SAC params
 use_entropy: true
@@ -49,4 +41,4 @@ wandb_name: ''
 wandb_notes: ''
 wandb_id: ''
 wandb_entity: 'jjshoots'
-wandb_project: 'ccge2_stable_gym'
+wandb_project: 'sac_dogfight'
