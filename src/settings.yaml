@@ -6,7 +6,7 @@ buffer_size: 50000
 buffer_size_debug: 100
 batch_size: 256
 total_steps: 500000
-repeats_per_buffer: 3
+repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 discount_factor: 0.99

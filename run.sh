@@ -57,8 +57,8 @@ done
 declare -a pids=()
 
 for machine in ${availab_machines[@]}; do
+  echo "Sending commands to $machine..."
   ssh $machine 'tmux send-keys -t 0 "./sweep_setup/run_availab_sweep.sh" ENTER' &
-  echo "Sent commands to $machine."
   pids+=($!)
 done
 
