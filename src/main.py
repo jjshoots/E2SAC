@@ -56,11 +56,11 @@ def train(wm: Wingman):
                 memory.push(
                     (env.obs, acts, rews, next_obs, terms),
                     random_rollover=cfg.random_rollover,
-                    bulk=True
+                    bulk=True,
                 )
 
             # for logging
-            wm.log["total_reward"] = env.cumulative_reward
+            wm.log["total_reward"] = sum(env.cumulative_reward) / env.env.num_drones
 
         """TRAINING RUN"""
         dataloader = torch.utils.data.DataLoader(

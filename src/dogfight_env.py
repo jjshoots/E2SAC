@@ -67,7 +67,11 @@ class Environment:
                 actions = cpuize(actions)
             else:
                 actions = np.stack(
-                    [self.env.action_space.sample() for _ in range(self.env.num_drones)], axis=0
+                    [
+                        self.env.action_space.sample()
+                        for _ in range(self.env.num_drones)
+                    ],
+                    axis=0,
                 )
 
             self.step(actions)
@@ -94,7 +98,11 @@ class Environment:
                 actions = cpuize(net.actor.infer(*output))
             else:
                 actions = np.stack(
-                    [self.env.action_space.sample() for _ in range(self.env.num_drones)], axis=0
+                    [
+                        self.env.action_space.sample()
+                        for _ in range(self.env.num_drones)
+                    ],
+                    axis=0,
                 )
 
             self.step(actions)
@@ -102,5 +110,6 @@ class Environment:
             if self.ended:
                 print("-----------------------------------------")
                 print(f"Total Reward: {self.cumulative_reward}")
+                print(self.infos)
                 print("-----------------------------------------")
                 self.reset()

@@ -1,8 +1,9 @@
 #!/bin/bash
 
-availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
-total_gpus=4
-total_runs=8
+# availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
+availab_machines=("availab-dl1" "availab-dl2")
+total_gpus=2
+total_runs=4
 runs_per_gpu=2
 
 ######################################################################################################
