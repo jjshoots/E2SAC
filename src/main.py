@@ -31,7 +31,7 @@ def train(wm: Wingman):
             next_eval_step = (
                 int(memory.count / cfg.eval_steps_ratio) + 1
             ) * cfg.eval_steps_ratio
-            wm.log["eval_perf"] = env.evaluate(cfg, net)
+            # wm.log["eval_perf"] = env.evaluate(cfg, net)
             wm.log["max_eval_perf"] = max(
                 [float(wm.log["max_eval_perf"]), float(wm.log["eval_perf"])]
             )
@@ -43,9 +43,9 @@ def train(wm: Wingman):
 
         with torch.no_grad():
             while not env.ended:
-
-                # get the initial state and label
-                output = net.actor(gpuize(env.obs, cfg.device).unsqueeze(0))
+                # get the initial state and action
+                obs = env.obs
+                output = net.actor(gpuize(obs, cfg.device).unsqueeze(0))
                 acts, _ = net.actor.sample(*output)
                 acts = cpuize(acts)
 

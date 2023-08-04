@@ -14,7 +14,7 @@ random_rollover: false
 
 # core SAC params
 use_entropy: true
-target_entropy: -8.0
+target_entropy: null
 
 # eval settings
 eval_num_episodes: 100
