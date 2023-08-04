@@ -54,7 +54,7 @@ def train(wm: Wingman):
 
                 # store stuff in mem
                 memory.push(
-                    (env.obs, acts, rews, next_obs, terms),
+                    (obs, acts, rews, next_obs, terms),
                     random_rollover=cfg.random_rollover,
                     bulk=True,
                 )
