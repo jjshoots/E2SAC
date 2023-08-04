@@ -14,7 +14,7 @@ def train(wm: Wingman):
     cfg = wm.cfg
 
     # setup env, model, replaybuffer
-    env = setup_env(wm)
+    env = setup_env(wmwm)
     net, optim_set = setup_nets(wm)
     memory = ReplayBuffer(cfg.buffer_size)
 
