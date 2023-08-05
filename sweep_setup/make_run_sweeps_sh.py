@@ -23,8 +23,12 @@ top_lines = """#!/bin/bash
 # this file has been automatically generated, do not edit manually
 
 source venv/bin/activate
+
+pip3 uninstall pyflyt -y
+pip3 install pyflyt --no-cache-dir -U
 pip3 uninstall pyflyt_dogfight -y
 pip3 install git+https://github.com/jjshoots/pyflyt_dogfight --no-cache-dir -U
+
 wingman-compress-weights
 
 declare -a pids=()

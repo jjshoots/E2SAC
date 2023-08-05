@@ -37,7 +37,7 @@ class Critic(nn.Module):
         self.act_size = act_size
         self.obs_size = obs_size
 
-        _features_description = [act_size + obs_size, 512, 512, 512, 1]
+        _features_description = [act_size + obs_size, 512, 512, 1]
         _activation_description = ["relu"] * (len(_features_description) - 2) + [
             "identity"
         ]

@@ -1,4 +1,5 @@
 import numpy as np
+from PIL import Image
 from pyflyt_dogfight import DogfightEnv
 from wingman import cpuize, gpuize
 
@@ -90,6 +91,8 @@ class Environment:
         # reset the env
         self.reset()
 
+        frames = []
+        num_gifs = 0
         while True:
             obs = gpuize(self.obs, cfg.device)
 
@@ -107,9 +110,25 @@ class Environment:
 
             self.step(actions)
 
+            if cfg.make_gif:
+                frames.append(self.env.render())
+
             if self.ended:
                 print("-----------------------------------------")
                 print(f"Total Reward: {self.cumulative_reward}")
                 print(self.infos)
                 print("-----------------------------------------")
+
+                if cfg.make_gif:
+                    frames = [Image.fromarray(f) for f in frames]
+                    frames[0].save(
+                        f"./gifs/gif{num_gifs}.gif",
+                        save_all=True,
+                        append_images=frames[1:],
+                        duration=(1000.0 / cfg.agent_hz),
+                        loop=0,
+                    )
+                    frames = []
+                    num_gifs += 1
+
                 self.reset()

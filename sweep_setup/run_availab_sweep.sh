@@ -8,10 +8,10 @@ pip3 install git+https://github.com/jjshoots/pyflyt_dogfight --no-cache-dir -U
 wingman-compress-weights
 
 declare -a pids=()
-wandb agent jjshoots/sac_dogfight/euub3j0x --count 1 & 
+wandb agent jjshoots/sac_dogfight/0s22zljh --count 1 & 
 pids+=($!)
 sleep 10
-wandb agent jjshoots/sac_dogfight/euub3j0x --count 1 & 
+wandb agent jjshoots/sac_dogfight/0s22zljh --count 1 & 
 pids+=($!)
 sleep 10
 
