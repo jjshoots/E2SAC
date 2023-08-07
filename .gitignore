@@ -1,3 +1,6 @@
+# ignore gifs
+gifs/
+
 # slurm
 slurm-*
 

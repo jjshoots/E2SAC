@@ -3,15 +3,17 @@
 # this file has been automatically generated, do not edit manually
 
 source venv/bin/activate
+
 pip3 uninstall pyflyt_dogfight -y
 pip3 install git+https://github.com/jjshoots/pyflyt_dogfight --no-cache-dir -U
+
 wingman-compress-weights
 
 declare -a pids=()
-wandb agent jjshoots/sac_dogfight/0s22zljh --count 1 & 
+wandb agent jjshoots/sac_dogfight/ayvlrysx --count 1 & 
 pids+=($!)
 sleep 10
-wandb agent jjshoots/sac_dogfight/0s22zljh --count 1 & 
+wandb agent jjshoots/sac_dogfight/ayvlrysx --count 1 & 
 pids+=($!)
 sleep 10
 
