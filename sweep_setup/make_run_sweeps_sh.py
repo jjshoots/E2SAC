@@ -24,6 +24,8 @@ top_lines = """#!/bin/bash
 
 source venv/bin/activate
 
+pip3 install pyflyt -U
+
 pip3 uninstall pyflyt_dogfight -y
 pip3 install git+https://github.com/jjshoots/pyflyt_dogfight --no-cache-dir -U
 
