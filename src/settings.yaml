@@ -1,16 +1,16 @@
 agent_hz: 40
 
 # learning params
-buffer_size: 4000000
+buffer_size: 400000
 buffer_size_debug: 100
 batch_size: 1024
 total_steps: 2000000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
-discount_factor: 0.98
+discount_factor: 0.99
 learning_rate: 0.0004
-random_rollover: false
+random_rollover: true
 
 # core SAC params
 use_entropy: true
@@ -26,6 +26,7 @@ train: false
 display: false
 make_gif: false
 evaluate: false
+human: false
 
 weights_directory: 'weights'
 version_number: null

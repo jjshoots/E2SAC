@@ -128,7 +128,7 @@ def train(wm: Wingman):
                     )
 
 
-def eval_display(wm: Wingman):
+def eval_display_human(wm: Wingman):
     cfg = wm.cfg
     env = setup_env(wm)
 
@@ -139,6 +139,8 @@ def eval_display(wm: Wingman):
 
     if wm.cfg.display:
         env.display(cfg, net)
+    if wm.cfg.human:
+        env.human(cfg, net)
     elif wm.cfg.evaluate:
         while True:
             print(env.evaluate(cfg, net))
@@ -202,7 +204,7 @@ if __name__ == "__main__":
 
     if wm.cfg.train:
         train(wm)
-    elif wm.cfg.display or wm.cfg.evaluate:
-        eval_display(wm)
+    elif wm.cfg.display or wm.cfg.evaluate or wm.cfg.human:
+        eval_display_human(wm)
     else:
         print("Guess this is life now.")
