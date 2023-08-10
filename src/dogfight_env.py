@@ -147,11 +147,7 @@ class Environment:
         # reset the env
         self.reset()
 
-        frames = []
         frame_time = int(1000/60)
-        num_gifs = 0
-        import time
-        now = time.time()
         while True:
             # get human and agent action
             obs = gpuize(self.obs[1], cfg.device).unsqueeze(0)
@@ -165,33 +161,13 @@ class Environment:
             # get the image from the environment
             image = self.env.render()
 
-            ft = time.time() - now
-            now = time.time()
-            print(ft)
-
             # display the image using cv2
             cv2.imshow("fight!", image)
             cv2.waitKey(frame_time)
-
-            if cfg.make_gif:
-                frames.append(image)
 
             if self.ended:
                 print("-----------------------------------------")
                 print(f"Total Reward: {self.cumulative_reward}")
                 print(self.infos)
                 print("-----------------------------------------")
-
-                if cfg.make_gif:
-                    frames = [Image.fromarray(f) for f in frames]
-                    frames[0].save(
-                        f"./gifs/gif{num_gifs}.gif",
-                        save_all=True,
-                        append_images=frames[1:],
-                        duration=(1000.0 / cfg.agent_hz),
-                        loop=0,
-                    )
-                    frames = []
-                    num_gifs += 1
-
                 self.reset()
