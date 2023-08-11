@@ -158,6 +158,9 @@ class Environment:
 
             self.step(actions)
 
+            if self.env.current_hits.any():
+                print("HITTTT")
+
             # get the image from the environment
             image = self.env.render()
 
