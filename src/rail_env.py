@@ -45,9 +45,9 @@ class RailEnv:
     def label(self) -> np.ndarray:
         label = np.zeros((self.act_size,))
         track_position = self.env.track_state
-        label[0] = 0.75
-        label[1] = track_position[0]
-        label[2] = track_position[1]
+        label[0] = 1.0
+        label[1] = track_position[0] * 0.5
+        label[2] = track_position[1] * 0.25
         label[3] = 1.0 - self.env.drone.state[-1][-1]
         return label
 

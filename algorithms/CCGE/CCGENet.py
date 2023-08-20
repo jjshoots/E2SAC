@@ -22,7 +22,7 @@ class Backbone(nn.Module):
         )
 
         # process the visual input
-        _channels_description = [obs_img_size[0], 16, 16, 32, 64, 128, embedding_size]
+        _channels_description = [obs_img_size[0], 32, 32, 64, 64, embedding_size]
         _kernels_description = [3] * (len(_channels_description) - 1)
         _pooling_description = [2] * (len(_channels_description) - 1)
         _activation_description = ["relu"] * (len(_channels_description) - 1)
@@ -34,6 +34,9 @@ class Backbone(nn.Module):
         )
 
     def forward(self, obs_att, obs_img):
+        # normalize the observation image
+        obs_img = (obs_img - 127.0) / 127.0
+
         # compute the drone attitude
         att_output = self.attitude_net(obs_att)
         img_output = self.visual_net(obs_img).view(*obs_img.shape[:-3], -1)

@@ -21,6 +21,7 @@ def train(wm: Wingman):
     wm.log["epoch"] = 0
     wm.log["eval_perf"] = -math.inf
     wm.log["max_eval_perf"] = -math.inf
+    wm.log["num_episodes"] = 0
     next_eval_step = 0
 
     while memory.count <= cfg.total_steps:
@@ -87,14 +88,8 @@ def train(wm: Wingman):
                 )
 
             # for logging
+            wm.log["num_episodes"] += 1
             wm.log["total_reward"] = env.cumulative_reward
-
-            # log the reward breakdown
-            for key, value in zip(
-                env.infos["reward_breakdown_keys"],
-                env.infos["reward_breakdown"],
-            ):
-                wm.log[key] = value
 
         """TRAINING RUN"""
         dataloader = torch.utils.data.DataLoader(
