@@ -18,7 +18,12 @@ class RailEnv:
         # compute spaces
         self.act_size = self.env.action_space.shape[0]
         self.obs_att_size = self.env.observation_space["attitude"].shape[0]
-        self.obs_img_size = self.env.observation_space["rgba_img"].shape
+        self.obs_img_size = self.env.observation_space["seg_img"].shape
+        self.obs_img_size = (
+            self.obs_img_size[2],
+            self.obs_img_size[0],
+            self.obs_img_size[0],
+        )
 
         # constants
         self.device = cfg.device
@@ -32,7 +37,7 @@ class RailEnv:
 
         # splice out the observation and mask the target deltas
         self.obs_att = obs["attitude"]
-        self.obs_img = obs["rgba_img"].transpose((2, 0, 1))
+        self.obs_img = obs["seg_img"].transpose((2, 0, 1))
 
         self.infos = dict()
         self.ended = False
@@ -65,7 +70,7 @@ class RailEnv:
 
         # splice out the observation and mask the target deltas
         self.obs_att = obs["attitude"]
-        self.obs_img = obs["rgba_img"].transpose((2, 0, 1))
+        self.obs_img = obs["seg_img"].transpose((2, 0, 1))
 
         # accumulate rewards
         self.cumulative_reward += rew
