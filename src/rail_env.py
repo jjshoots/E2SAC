@@ -134,5 +134,6 @@ class RailEnv:
             if self.ended:
                 print("-----------------------------------------")
                 print(f"Total Reward: {self.cumulative_reward}")
+                print(f"Infos: {self.infos}")
                 print("-----------------------------------------")
                 self.reset()

@@ -1,5 +1,4 @@
 jj-wingman
-gymnasium[mujoco]
 matplotlib
 seaborn
 pybullet

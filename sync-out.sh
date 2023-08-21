@@ -1,6 +1,6 @@
 #!/bin/bash
 
-availab_machines=("availab-dl1" "availab-dl2" "availab-dl3" "availab-dl4")
+availab_machines=("availab-dl1" "availab-dl2")
 
 ######################################################################################################
 # sync the env files

@@ -5,8 +5,8 @@ metric:
 project: "ccge2_railway"
 name: "Trial_3"
 parameters:
-  buffer_size:
-    value: 30000
+  agent_hz:
+    value: 10
 command:
   - python3
   - src/main.py
