@@ -46,8 +46,8 @@ class GaussianActor(nn.Module):
         super().__init__()
         self.net = Actor(act_size, obs_att_size, obs_img_size)
 
-    def forward(self, obs_atti, obs_targ):
-        output = self.net(obs_atti, obs_targ)
+    def forward(self, obs_atti, obs_img):
+        output = self.net(obs_atti, obs_img)
         return output[0], output[1]
 
     @staticmethod
