@@ -38,7 +38,6 @@ def train(wm: Wingman):
             )
 
         """ENVIRONMENT ROLLOUT"""
-        print(f"{wm.log['num_episodes']}, {memory.count}")
         env.reset()
         model.eval()
         model.zero_grad()

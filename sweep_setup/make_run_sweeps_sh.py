@@ -25,6 +25,7 @@ top_lines = """#!/bin/bash
 source venv/bin/activate
 wingman-compress-weights
 
+
 declare -a pids=()
 """
 
