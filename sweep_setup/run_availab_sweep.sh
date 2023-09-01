@@ -7,7 +7,7 @@ wingman-compress-weights
 
 
 declare -a pids=()
-wandb agent jjshoots// --count 1 & 
+wandb agent jjshoots/ccge2_railway/33pm2bj5 --count 1 & 
 pids+=($!)
 sleep 10
 

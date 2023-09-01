@@ -6,7 +6,7 @@ buffer_size: 200000
 buffer_size_debug: 100
 batch_size: 256
 total_steps: 500000
-repeats_per_buffer: 1
+repeats_per_buffer: 2
 critic_update_multiplier: 1
 actor_update_multiplier: 1
 discount_factor: 0.99
@@ -47,5 +47,4 @@ wandb_name: ''
 wandb_notes: ''
 wandb_id: ''
 wandb_entity: 'jjshoots'
-# wandb_project: 'CCGE2'
-wandb_project: 'CCGE2_oracle_search'
+wandb_project: 'ccge2_railway'
