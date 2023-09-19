@@ -68,7 +68,7 @@ class CCGE(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_sup_scale(self, obs_att, obs_img, actions, labels):
+    def calc_sup_scale(self, obs_att, obs_img, actions, labels) -> tuple[torch.FloatTensor, torch.FloatTensor, dict]:
         # stack actions and labels to perform inference on both together
         actions_labels = torch.stack((actions, labels), dim=0)
 
@@ -108,7 +108,7 @@ class CCGE(nn.Module):
 
     def calc_critic_loss(
         self, obs_att, obs_img, actions, rewards, next_obs_atti, next_obs_targ, terms
-    ):
+    ) -> tuple[torch.FloatTensor, dict]:
         """
         obs_att is of shape B x input_shape
         obs_img is of shape B x C x H x W
@@ -169,7 +169,7 @@ class CCGE(nn.Module):
 
         return critic_loss, log
 
-    def calc_actor_loss(self, obs_att, obs_img, terms, labels):
+    def calc_actor_loss(self, obs_att, obs_img, terms, labels) -> tuple[torch.FloatTensor, dict]:
         """
         obs_att, obs_img is of shape B x input_shape
         terms is of shape B x 1
@@ -218,12 +218,12 @@ class CCGE(nn.Module):
 
         return actor_loss, log
 
-    def calc_alpha_loss(self, obs_att, obs_img):
+    def calc_alpha_loss(self, obs_att, obs_img) -> tuple[torch.FloatTensor, dict]:
         """
         obs_att, obs_img is of shape B x input_shape
         """
         if not self.entropy_tuning:
-            return torch.zeros(1)
+            return torch.zeros(1), {}
 
         output = self.actor(obs_att, obs_img)
         _, log_probs = self.actor.sample(*output)
