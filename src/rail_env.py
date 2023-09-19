@@ -1,3 +1,4 @@
+import time
 import numpy as np
 from pyflyt_rail_env import Environment
 from wingman import cpuize, gpuize
@@ -22,7 +23,7 @@ class RailEnv:
         self.obs_img_size = (
             self.obs_img_size[2],
             self.obs_img_size[0],
-            self.obs_img_size[0],
+            self.obs_img_size[1],
         )
 
         # constants
@@ -136,4 +137,5 @@ class RailEnv:
                 print(f"Total Reward: {self.cumulative_reward}")
                 print(f"Infos: {self.infos}")
                 print("-----------------------------------------")
+                time.sleep(4)
                 self.reset()
