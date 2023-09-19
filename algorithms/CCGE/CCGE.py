@@ -2,77 +2,10 @@
 import warnings
 
 import torch
-import torch.distributions as dist
 import torch.nn as nn
 import torch.nn.functional as func
 
-from .CCGENet import Actor, Critic
-
-
-class Q_Ensemble(nn.Module):
-    """
-    Q Network Ensembles with uncertainty estimates
-    """
-
-    def __init__(self, act_size, obs_att_size, obs_img_size, num_networks=2):
-        super().__init__()
-
-        networks = [
-            Critic(act_size, obs_att_size, obs_img_size) for _ in range(num_networks)
-        ]
-        self.networks = nn.ModuleList(networks)
-
-    def forward(self, obs_atti, obs_targ, actions):
-        """
-        obs_atti, obs_targ is of shape B x input_shape
-        actions is of shape B x act_size
-        output is a tuple of 2 x B x num_networks
-        """
-        output = []
-        for network in self.networks:
-            output.append(network(obs_atti, obs_targ, actions))
-
-        output = torch.cat(output, dim=-1)
-
-        return output
-
-
-class GaussianActor(nn.Module):
-    """
-    Gaussian Actor
-    """
-
-    def __init__(self, act_size, obs_att_size, obs_img_size):
-        super().__init__()
-        self.net = Actor(act_size, obs_att_size, obs_img_size)
-
-    def forward(self, obs_atti, obs_img):
-        output = self.net(obs_atti, obs_img)
-        return output[0], output[1]
-
-    @staticmethod
-    def sample(mu, sigma):
-        """
-        output:
-            actions is of shape B x act_size
-            entropies is of shape B x 1
-        """
-        # lower bound sigma and bias it
-        normals = dist.Normal(mu, func.softplus(sigma) + 1e-6)
-
-        # sample from dist
-        mu_samples = normals.rsample()
-        actions = torch.tanh(mu_samples)
-
-        # calculate log_probs
-        log_probs = normals.log_prob(mu_samples) - torch.log(1 - actions.pow(2) + 1e-6)
-        log_probs = log_probs.sum(dim=-1, keepdim=True)
-
-        return actions, log_probs
-
-    @staticmethod
-    def infer(mu, sigma):
-        return torch.tanh(mu)
+from .CCGENet import GaussianActor, Q_Ensemble
 
 
 class CCGE(nn.Module):
@@ -105,11 +38,6 @@ class CCGE(nn.Module):
         # twin delayed Q networks
         self.critic = Q_Ensemble(act_size, obs_att_size, obs_img_size)
         self.critic_target = Q_Ensemble(act_size, obs_att_size, obs_img_size).eval()
-
-        # torch 2.0 compile things
-        # self.actor = torch.compile(self.actor)
-        # self.critic = torch.compile(self.critic)
-        # self.critic_target = torch.compile(self.critic_target)
 
         # copy weights and disable gradients for the target network
         self.critic_target.load_state_dict(self.critic.state_dict())
