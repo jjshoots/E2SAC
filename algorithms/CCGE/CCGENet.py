@@ -72,6 +72,13 @@ class GaussianActor(nn.Module):
         )
 
     def forward(self, obs_att, obs_img):
+        """
+        input:
+            obs_att of shape B x att
+            obs_img of shape B x C x H x W
+        output:
+            tensor of shape [2, B, *action_size] for mu and sigma
+        """
         # pass things through the backbone
         att_output, img_output = self.backbone_net(obs_att, obs_img)
 
