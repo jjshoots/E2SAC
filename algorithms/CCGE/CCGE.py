@@ -68,7 +68,9 @@ class CCGE(nn.Module):
         ):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
-    def calc_sup_scale(self, obs_att, obs_img, actions, labels) -> tuple[torch.FloatTensor, torch.FloatTensor, dict]:
+    def calc_sup_scale(
+        self, obs_att, obs_img, actions, labels
+    ) -> tuple[torch.FloatTensor, torch.FloatTensor, dict]:
         # stack actions and labels to perform inference on both together
         actions_labels = torch.stack((actions, labels), dim=0)
 
@@ -169,7 +171,9 @@ class CCGE(nn.Module):
 
         return critic_loss, log
 
-    def calc_actor_loss(self, obs_att, obs_img, terms, labels) -> tuple[torch.FloatTensor, dict]:
+    def calc_actor_loss(
+        self, obs_att, obs_img, terms, labels
+    ) -> tuple[torch.FloatTensor, dict]:
         """
         obs_att, obs_img is of shape B x input_shape
         terms is of shape B x 1
