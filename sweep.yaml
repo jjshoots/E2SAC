@@ -2,7 +2,7 @@ method: random
 metric:
   name: max_eval_perf
   goal: maximize
-project: "ccge2_railway"
+project: "ccge2_railway_thesis"
 name: "Trial_3"
 parameters:
   agent_hz:

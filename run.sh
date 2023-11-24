@@ -2,7 +2,7 @@
 
 availab_machines=("availab-dl1" "availab-dl2")
 total_gpus=2
-total_runs=2
+total_runs=10
 runs_per_gpu=1
 
 ######################################################################################################

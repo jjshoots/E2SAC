@@ -102,6 +102,13 @@ def train(wm: Wingman):
                 for _ in range(cfg.critic_update_multiplier):
                     model.zero_grad()
                     q_loss, log = model.calc_critic_loss(
+                        obs_att,
+                        obs_img,
+                        actions,
+                        rewards,
+                        next_obs_att,
+                        next_obs_img,
+                        terms,
                     )
                     wm.log = {**wm.log, **log}
                     q_loss.backward()
@@ -111,9 +118,7 @@ def train(wm: Wingman):
                 # train actor
                 for _ in range(cfg.actor_update_multiplier):
                     model.zero_grad()
-                    rnf_loss, log = model.calc_actor_loss(
-                        obs_att, obs_img, terms
-                    )
+                    rnf_loss, log = model.calc_actor_loss(obs_att, obs_img, terms)
                     wm.log = {**wm.log, **log}
                     rnf_loss.backward()
                     optims["actor"].step()
