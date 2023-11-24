@@ -5,7 +5,7 @@ agent_hz: 10
 buffer_size: 100000
 buffer_size_debug: 100
 batch_size: 256
-total_steps: 1000000
+total_steps: 300000
 repeats_per_buffer: 1
 critic_update_multiplier: 1
 actor_update_multiplier: 1
@@ -24,7 +24,7 @@ target_entropy: null
 
 # eval settings
 eval_num_episodes: 10
-eval_steps_ratio: 10000
+eval_steps_ratio: 2000
 
 # wingman required params
 debug: false
@@ -38,7 +38,7 @@ mark_number: 0
 log_status: false
 
 increment: false
-logging_interval: 10000
+logging_interval: 2000
 max_skips: 5
 greater_than: 0.0
 
