@@ -3,14 +3,14 @@ metric:
   name: max_eval_perf
   goal: maximize
 project: "ccge2_railway_thesis"
-name: "Trial_3"
+name: "SAC"
 parameters:
   agent_hz:
     value: 10
 command:
   - python3
-  - src/main.py
-  # - src/mainSAC.py
+  # - src/main.py
+  - src/mainSAC.py
   # - src/mainAWAC.py
   # - src/mainJSRL.py
   - "--train"
