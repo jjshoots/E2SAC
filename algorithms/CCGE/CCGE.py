@@ -16,8 +16,7 @@ class CCGE(nn.Module):
     def __init__(
         self,
         act_size,
-        obs_att_size,
-        obs_img_size,
+        obs_size,
         entropy_tuning=True,
         target_entropy=None,
         discount_factor=0.99,
@@ -25,19 +24,18 @@ class CCGE(nn.Module):
     ):
         super().__init__()
 
-        self.obs_att_size = obs_att_size
-        self.obs_img_size = obs_img_size
+        self.obs_size = obs_size
         self.act_size = act_size
         self.use_entropy = entropy_tuning
         self.gamma = discount_factor
         self.confidence_lambda = confidence_lambda
 
         # actor head
-        self.actor = GaussianActor(act_size, obs_att_size, obs_img_size)
+        self.actor = GaussianActor(act_size, obs_size)
 
         # twin delayed Q networks
-        self.critic = Q_Ensemble(act_size, obs_att_size, obs_img_size)
-        self.critic_target = Q_Ensemble(act_size, obs_att_size, obs_img_size).eval()
+        self.critic = Q_Ensemble(act_size, obs_size)
+        self.critic_target = Q_Ensemble(act_size, obs_size).eval()
 
         # copy weights and disable gradients for the target network
         self.critic_target.load_state_dict(self.critic.state_dict())
@@ -69,35 +67,31 @@ class CCGE(nn.Module):
             target.data.copy_(target.data * (1.0 - tau) + source.data * tau)
 
     def calc_sup_scale(
-        self, obs_att, obs_img, actions, labels
+        self, obs, actions, labels
     ) -> tuple[torch.FloatTensor, torch.FloatTensor, dict]:
-        # stack actions and labels to perform inference on both together
-        actions_labels = torch.stack((actions, labels), dim=0)
-
         # put all actions and labels and states through critic
-        # shape is 2 x 2 x B x num_networks,
-        # value_uncertainty x actions_labels x batch x num_networks
-        critic_output = self.critic(obs_att, obs_img, actions_labels)
-
-        # splice the output to get q of actions
-        expected_q = critic_output[0, 0, ...]
+        # output of each is B x num_networks
+        a_out= self.critic(obs, actions)
+        act_q, act_u = a_out[0], a_out[1]
+        l_out = self.critic(obs, labels)
+        lbl_q, lbl_u = l_out[0], l_out[1]
 
         """ SUPERVISION SCALE DERIVATION """
         # uncertainty is upper bound difference between suboptimal and learned
         uncertainty = (
             (
-                critic_output[0, 1, ...].mean(dim=-1, keepdim=True)
-                + critic_output[1, 1, ...].max(dim=-1, keepdim=True)[0]
+                lbl_q.mean(dim=-1, keepdim=True)
+                + lbl_u.max(dim=-1, keepdim=True)[0]
             )
             - (
-                critic_output[0, 0, ...].mean(dim=-1, keepdim=True)
-                + critic_output[1, 0, ...].min(dim=-1, keepdim=True)[0]
+                act_q.mean(dim=-1, keepdim=True)
+                + act_u.min(dim=-1, keepdim=True)[0]
             )
         ).detach()
 
         # normalize uncertainty
         uncertainty = (
-            uncertainty / critic_output[0, 0, ...].mean(dim=-1, keepdim=True).abs()
+            uncertainty / act_q.mean(dim=-1, keepdim=True).abs()
         ).detach()
 
         # supervision scale is a switch
@@ -106,14 +100,13 @@ class CCGE(nn.Module):
         log = dict()
         log["uncertainty"] = uncertainty.mean().detach()
 
-        return sup_scale, expected_q, log
+        return sup_scale, act_q, log
 
     def calc_critic_loss(
-        self, obs_att, obs_img, actions, rewards, next_obs_atti, next_obs_targ, terms
+        self, obs, actions, rewards, next_obs, terms
     ) -> tuple[torch.FloatTensor, dict]:
         """
-        obs_att is of shape B x input_shape
-        obs_img is of shape B x C x H x W
+        obs is of shape B x C x H x W
         actions is of shape B x act_size
         rewards is of shape B x 1
         terms is of shape B x 1
@@ -121,17 +114,17 @@ class CCGE(nn.Module):
         terms = 1.0 - terms
 
         # current predicted f and f
-        current_q, current_f = self.critic(obs_att, obs_img, actions)
+        current_q, current_f = self.critic(obs, actions)
 
         # compute next q and next f and target_q
         with torch.no_grad():
             # sample the next actions based on the current policy
-            output = self.actor(next_obs_atti, next_obs_targ)
+            output = self.actor(next_obs)
             next_actions, log_probs = self.actor.sample(*output)
 
             # get the next q and f lists and get the value, then...
             next_q, next_f = self.critic_target(
-                next_obs_atti, next_obs_targ, next_actions
+                next_obs, next_actions
             )
 
             # ...take the min among ensembles
@@ -172,22 +165,20 @@ class CCGE(nn.Module):
         return critic_loss, log
 
     def calc_actor_loss(
-        self, obs_att, obs_img, terms, labels
+        self, obs, terms, labels
     ) -> tuple[torch.FloatTensor, dict]:
         """
-        obs_att, obs_img is of shape B x input_shape
+        obs is of shape B x input_shape
         terms is of shape B x 1
         """
         terms = 1.0 - terms
 
         # We re-sample actions to calculate expectations of Q.
-        output = self.actor(obs_att, obs_img)
+        output = self.actor(obs)
         actions, entropies = self.actor.sample(*output)
 
         # compute supervision scale and expected q for actions
-        sup_scale, expected_q, log2 = self.calc_sup_scale(
-            obs_att, obs_img, actions, labels
-        )
+        sup_scale, expected_q, log2 = self.calc_sup_scale(obs, actions, labels)
 
         """ REINFORCEMENT LOSS """
         # expectations of Q with clipped double Q
@@ -222,14 +213,14 @@ class CCGE(nn.Module):
 
         return actor_loss, log
 
-    def calc_alpha_loss(self, obs_att, obs_img) -> tuple[torch.FloatTensor, dict]:
+    def calc_alpha_loss(self, obs) -> tuple[torch.FloatTensor, dict]:
         """
-        obs_att, obs_img is of shape B x input_shape
+        obs is of shape B x input_shape
         """
         if not self.entropy_tuning:
             return torch.zeros(1), {}
 
-        output = self.actor(obs_att, obs_img)
+        output = self.actor(obs)
         _, log_probs = self.actor.sample(*output)
 
         # Intuitively, we increse alpha when entropy is less than target entropy, vice versa.

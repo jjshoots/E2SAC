@@ -19,12 +19,10 @@ class RailEnv:
 
         # compute spaces
         self.act_size = self.env.action_space.shape[0]
-        self.obs_att_size = self.env.observation_space["attitude"].shape[0]
-        self.obs_img_size = self.env.observation_space["seg_img"].shape
-        self.obs_img_size = (
-            self.obs_img_size[2],
-            self.obs_img_size[0],
-            self.obs_img_size[1],
+        self.obs_size = (
+            self.env.observation_space["seg_img"].shape[2],
+            self.env.observation_space["seg_img"].shape[0],
+            self.env.observation_space["seg_img"].shape[1],
         )
 
         # constants
@@ -34,31 +32,28 @@ class RailEnv:
         self._action_mid = (action_high + action_low) / 2.0
         self._action_range = (action_high - action_low) / 2.0
 
-    def reset(self):
+    def reset(self) -> np.ndarray:
         obs, _ = self.env.reset()
 
         # splice out the observation and mask the target deltas
-        self.obs_att = obs["attitude"]
-        self.obs_img = obs["seg_img"].transpose((2, 0, 1))
+        self.obs = obs["seg_img"].transpose((2, 0, 1))
 
         self.infos = dict()
         self.ended = False
         self.cumulative_reward = 0
         self.reward_breakdown = 0.0
 
-        return self.obs_att, self.obs_img
+        return self.obs
 
     @property
     def label(self) -> np.ndarray:
         label = np.zeros((self.act_size,))
         track_position = self.env.track_state
         label[0] = 1.0
-        label[1] = track_position[0] * 0.5
-        label[2] = track_position[1] * 0.25
-        label[3] = 1.0 - self.env.drone.state[-1][-1]
+        label[1] = track_position[1]
         return label
 
-    def step(self, action) -> tuple[np.ndarray, np.ndarray, float, bool]:
+    def step(self, action) -> tuple[np.ndarray, float, bool]:
         action = action.squeeze()
         assert (
             action.shape[0] == self.act_size
@@ -71,8 +66,7 @@ class RailEnv:
         obs, rew, term, trunc, self.infos = self.env.step(action)
 
         # splice out the observation and mask the target deltas
-        self.obs_att = obs["attitude"]
-        self.obs_img = obs["seg_img"].transpose((2, 0, 1))
+        self.obs = obs["seg_img"].transpose((2, 0, 1))
 
         # accumulate rewards
         self.cumulative_reward += rew
@@ -80,7 +74,7 @@ class RailEnv:
         if term or trunc:
             self.ended = True
 
-        return self.obs_att, self.obs_img, rew, term
+        return self.obs, rew, term
 
     def evaluate(self, cfg, net=None):
         if net is not None:
@@ -93,12 +87,11 @@ class RailEnv:
         eval_perf = []
 
         while len(eval_perf) < cfg.eval_num_episodes:
-            obs_att = gpuize(self.obs_att, cfg.device).unsqueeze(0)
-            obs_img = gpuize(self.obs_img, cfg.device).unsqueeze(0)
+            obs = gpuize(self.obs, cfg.device).unsqueeze(0)
 
             # get the action based on the state
             if net is not None:
-                output = net.actor(obs_att, obs_img)
+                output = net.actor(obs)
                 action = net.actor.infer(*output)
                 action = cpuize(action)[0]
             else:
@@ -121,11 +114,10 @@ class RailEnv:
         self.reset()
 
         while True:
-            obs_att = gpuize(self.obs_att, cfg.device).unsqueeze(0)
-            obs_img = gpuize(self.obs_img, cfg.device).unsqueeze(0)
+            obs = gpuize(self.obs, cfg.device).unsqueeze(0)
 
             if net is not None:
-                output = net.actor(obs_att, obs_img)
+                output = net.actor(obs)
                 # action = cpuize(net.actor.sample(*output)[0][0])
                 action = cpuize(net.actor.infer(*output))
             else:
