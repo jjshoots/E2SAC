@@ -71,7 +71,7 @@ class CCGE(nn.Module):
     ) -> tuple[torch.FloatTensor, torch.FloatTensor, dict]:
         # put all actions and labels and states through critic
         # output of each is B x num_networks
-        a_out= self.critic(obs, actions)
+        a_out = self.critic(obs, actions)
         act_q, act_u = a_out[0], a_out[1]
         l_out = self.critic(obs, labels)
         lbl_q, lbl_u = l_out[0], l_out[1]
@@ -79,20 +79,12 @@ class CCGE(nn.Module):
         """ SUPERVISION SCALE DERIVATION """
         # uncertainty is upper bound difference between suboptimal and learned
         uncertainty = (
-            (
-                lbl_q.mean(dim=-1, keepdim=True)
-                + lbl_u.max(dim=-1, keepdim=True)[0]
-            )
-            - (
-                act_q.mean(dim=-1, keepdim=True)
-                + act_u.min(dim=-1, keepdim=True)[0]
-            )
+            (lbl_q.mean(dim=-1, keepdim=True) + lbl_u.max(dim=-1, keepdim=True)[0])
+            - (act_q.mean(dim=-1, keepdim=True) + act_u.min(dim=-1, keepdim=True)[0])
         ).detach()
 
         # normalize uncertainty
-        uncertainty = (
-            uncertainty / act_q.mean(dim=-1, keepdim=True).abs()
-        ).detach()
+        uncertainty = (uncertainty / act_q.mean(dim=-1, keepdim=True).abs()).detach()
 
         # supervision scale is a switch
         sup_scale = (uncertainty > self.confidence_lambda) * 1.0
@@ -123,9 +115,7 @@ class CCGE(nn.Module):
             next_actions, log_probs = self.actor.sample(*output)
 
             # get the next q and f lists and get the value, then...
-            next_q, next_f = self.critic_target(
-                next_obs, next_actions
-            )
+            next_q, next_f = self.critic_target(next_obs, next_actions)
 
             # ...take the min among ensembles
             next_q, _ = torch.min(next_q, dim=-1, keepdim=True)
@@ -164,9 +154,7 @@ class CCGE(nn.Module):
 
         return critic_loss, log
 
-    def calc_actor_loss(
-        self, obs, terms, labels
-    ) -> tuple[torch.FloatTensor, dict]:
+    def calc_actor_loss(self, obs, terms, labels) -> tuple[torch.FloatTensor, dict]:
         """
         obs is of shape B x input_shape
         terms is of shape B x 1

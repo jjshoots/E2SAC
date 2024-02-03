@@ -90,9 +90,7 @@ class Q_Ensemble(nn.Module):
     def __init__(self, act_size, obs_size, num_networks=2):
         super().__init__()
 
-        networks = [
-            Critic(act_size, obs_size) for _ in range(num_networks)
-        ]
+        networks = [Critic(act_size, obs_size) for _ in range(num_networks)]
         self.networks = nn.ModuleList(networks)
 
     def forward(self, obs, actions):

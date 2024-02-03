@@ -1,5 +1,6 @@
 import time
 
+import matplotlib.pyplot as plt
 import numpy as np
 from pyflyt_rail_env import Environment
 from wingman import cpuize, gpuize

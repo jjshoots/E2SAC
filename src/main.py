@@ -63,7 +63,11 @@ def train(wm: Wingman):
 
                     # figure out whether to follow policy or oracle
                     sup_scale, *_ = model.calc_sup_scale(t_obs, t_act, t_lbl)
-                    act = lbl if sup_scale.squeeze(0) == 1.0 else cpuize(t_act)
+                    act = (
+                        lbl
+                        if (sup_scale.squeeze(0) == 1.0)
+                        else cpuize(t_act.squeeze(0))
+                    )
 
                 # get the next state and other stuff
                 next_obs, rew, term = env.step(act)
@@ -119,9 +123,7 @@ def train(wm: Wingman):
                 # train actor
                 for _ in range(cfg.actor_update_multiplier):
                     model.zero_grad()
-                    rnf_loss, log = model.calc_actor_loss(
-                        obs, terms, labels
-                    )
+                    rnf_loss, log = model.calc_actor_loss(obs, terms, labels)
                     wm.log = {**wm.log, **log}
                     rnf_loss.backward()
                     optims["actor"].step()
@@ -217,7 +219,7 @@ def setup_nets(wm: Wingman):
         for opt_key in checkpoint:
             optims[opt_key].load_state_dict(checkpoint[opt_key])
 
-    # torch.save(model.actor.net.state_dict(), "./wing.pth")
+    # torch.save(model.actor.state_dict(), "./rl_weights.pth")
     # exit()
 
     return model, optims
