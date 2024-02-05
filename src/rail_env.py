@@ -50,12 +50,12 @@ class RailEnv:
     def label(self) -> np.ndarray:
         label = np.zeros((self.act_size,))
         track_position = self.env.track_state
-        label[0] = 1.0
-        label[1] = track_position[1]
+        label[0] = track_position[1]
         return label
 
     def step(self, action) -> tuple[np.ndarray, float, bool]:
-        action = action.squeeze()
+        if len(action.shape) == 2:
+            action = action.squeeze(0)
         assert (
             action.shape[0] == self.act_size
         ), f"Incorrect action sizes, expected {self.act_size}, got {action.shape[0]}"
