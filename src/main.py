@@ -219,8 +219,8 @@ def setup_nets(wm: Wingman):
         for opt_key in checkpoint:
             optims[opt_key].load_state_dict(checkpoint[opt_key])
 
-    torch.save(model.actor.state_dict(), "./rl_weights.pth")
-    exit()
+    # torch.save(model.actor.state_dict(), "./rl_weights.pth")
+    # exit()
 
     return model, optims
 
